@@ -1,0 +1,46 @@
+{
+  "name"        : "diso.core",
+  "version"     : "0.0.1",
+  "description" : "Client / Server",
+  "license"     : "MIT",
+  "main"        : "index.js",
+  "repository"  : {
+    "type" : "git",
+    "url"  : "https://github.com/stephenhandley/diso.core.git"
+  },
+  "scripts" : {
+  },
+  "keywords" : [
+    "client",
+    "server",
+    "socket",
+    "websocket",
+    "diso"
+  ],
+  "directories" : {
+  },
+  "engines" : {
+    "node" : ">=0.10.5"
+  },
+  "dependencies": {
+    "jquery"           : "~2.1.0",
+    "diso.router"      : "~4.0.1",
+    "engine.io"        : "~0.9.0",
+    "engine.io-client" : "~0.9.0",
+    "connect"          : "~2.16.2",
+    "ecstatic"         : "~0.5.1",
+    "cookie-signature" : "~1.0.3",
+    "type-of-is"       : "~3.2.0"
+  },
+  "devDependencies" : {
+    "asserts"              : "4.0.x",
+    "grunt"                : "~0.4.4",
+    "grunt-contrib-watch"  : "~0.6.1",
+    "grunt-contrib-coffee" : "~0.10.1"
+  },
+  "author" : {
+    "name"  : "Stephen Handley",
+    "email" : "stephen.handley@gmail.com",
+    "url"   : "http://person.sh"
+  }
+}
