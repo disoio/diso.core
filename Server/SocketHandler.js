@@ -71,7 +71,7 @@
         }
       }
       switch (message.name) {
-        case 'swapBody':
+        case 'loadBody':
           params = message.data.route.params;
           action_name = message.data.route.name;
           action = this.actions[action_name];
@@ -108,7 +108,7 @@
           break;
         default:
           handler = this.messages[message.name];
-          console.log("MESSAGE IS " + (JSON.stringify(message, null, 2)));
+          console.log("Message received:\n" + (JSON.stringify(message, null, 2)));
           if (handler) {
             try {
               return handler(message.data, (function(_this) {
@@ -125,7 +125,8 @@
               })(this));
             } catch (_error) {
               error = _error;
-              stack = new Error(error).stack;
+              stack = new Error().stack;
+              console.log(error);
               console.error(stack);
               return this.sendError('Error processing message');
             }

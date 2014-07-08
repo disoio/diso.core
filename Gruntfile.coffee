@@ -4,18 +4,29 @@ module.exports = (grunt)->
     
     coffee: {
       glob_to_multiple: {
-        expand: true,
-        flatten: false,
-        cwd: "#{__dirname}/source/",
-        src: ['**/*.coffee'],
-        dest: "#{__dirname}/"
-        ext: '.js'
-      },
+        expand  : true
+        flatten : false
+        cwd     : "#{__dirname}/source/"
+        src     : ['**/*.coffee']
+        dest    : "#{__dirname}/"
+        ext     : '.js'
+      }
+    }
+
+    coffee_test: {
+      glob_to_multiple: {
+        expand  : true
+        flatten : false
+        cwd     : "#{__dirname}/test/"
+        src     : ['**/*.coffee']
+        dest    : "#{__dirname}/test/"
+        ext     : '.js'
+      }
     }
     
     watch: {
-      files: 'source/**/*.coffee',
-      tasks: ['coffee']
+      files: '**/*.coffee',
+      tasks: ['coffee', 'coffee_test']
     }
   )
   

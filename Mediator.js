@@ -1,9 +1,13 @@
 (function() {
-  var EventEmitter, Mediator,
+  var EventEmitter, Mediator, Type, cache,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   EventEmitter = require('events').EventEmitter;
+
+  Type = require('type-of-is');
+
+  cache = {};
 
   Mediator = (function(_super) {
     __extends(Mediator, _super);
@@ -14,31 +18,39 @@
 
     Mediator.prototype.client = null;
 
-    Mediator.prototype.ensureClient = function() {
-      if (!this.client) {
-        throw "Mediator has no client";
-      }
-    };
-
-    Mediator.prototype.ensureRouter = function() {
-      if (!this.router) {
-        throw "Mediator has no router";
-      }
+    Mediator.prototype.setup = function(opts) {
+      this.client = opts.client;
+      this.models = opts.models;
+      return this.router = opts.router;
     };
 
     Mediator.prototype.send = function(message) {
-      this.ensureClient();
       return this.client.send(message);
     };
 
-    Mediator.prototype.formatRoute = function(options) {
-      this.ensureRouter();
-      return this.router.format(options);
+    Mediator.prototype.formatRoute = function(route) {
+      return this.router.format(route);
     };
 
-    Mediator.prototype.swapBody = function(options) {
-      this.ensureClient();
-      return this.client.swapBody(options);
+    Mediator.prototype.loadBody = function(options) {
+      return this.client.loadBody(options);
+    };
+
+    Mediator.prototype.pushView = function(opts) {
+      var url;
+      this.client.page.swapBody(opts.view);
+      url = this.formatRoute(opts.route);
+      return this.client.navigate(url);
+    };
+
+    Mediator.prototype.cache = function(k, v) {
+      if (v) {
+        return cache[k] = v;
+      } else if (k in cache) {
+        return cache[k];
+      } else {
+        throw new Error("" + k + " not found in client cache");
+      }
     };
 
     return Mediator;

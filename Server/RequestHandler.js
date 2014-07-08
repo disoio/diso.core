@@ -113,7 +113,7 @@
     };
 
     RequestHandler.prototype.run = function() {
-      var action, action_name, error;
+      var action, action_name, error, stack;
       action_name = this.actionName();
       action = this.actions[action_name];
       if (action) {
@@ -130,7 +130,9 @@
         } catch (_error) {
           error = _error;
           console.error(error);
-          return this.next("Error");
+          stack = error.stack ? error.stack : (new Error()).stack;
+          console.error(stack);
+          return this.next("Error running action");
         }
       } else {
         error = "Action:" + action_name + " is not supported";

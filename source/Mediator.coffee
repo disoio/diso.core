@@ -1,29 +1,38 @@
 {EventEmitter} = require('events')
+Type           = require('type-of-is')
+
+# TODO : local storage?
+cache = {}
 
 class Mediator extends EventEmitter
   client : null
-  
-  # the client sets itself as an instance variable on Mediator in 
-  # its constructor... this is a safety check in case that doesn't
-  # happen for some reason 
-  ensureClient : ()->
-    unless @client
-      throw "Mediator has no client"
 
-  ensureRouter : ()->
-    unless @router
-      throw "Mediator has no router"
+  setup : (opts)->
+    @client = opts.client
+    @models = opts.models
+    @router = opts.router
    
   send : (message)->
-    @ensureClient()
     @client.send(message)
 
-  formatRoute : (options)->
-    @ensureRouter()
-    @router.format(options)
+  formatRoute : (route)->
+    @router.format(route)
     
-  swapBody : (options)->
-    @ensureClient()
-    @client.swapBody(options)
+  loadBody : (options)->
+    @client.loadBody(options)
+
+  pushView : (opts)->
+    @client.page.swapBody(opts.view)
+    url = @formatRoute(opts.route)
+    @client.navigate(url)
+
+  cache : (k, v)->
+    if v
+      cache[k] = v
+    else if k of cache
+      cache[k]
+    else
+      throw new Error("#{k} not found in client cache") 
+
     
 module.exports = new Mediator()

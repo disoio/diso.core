@@ -1,5 +1,5 @@
 (function() {
-  var $, Client, EngineIO, Mediator, Router, has_run,
+  var $, Client, ClientModel, EngineIO, Mediator, Router, has_run,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -11,19 +11,21 @@
 
   Mediator = require('./Mediator');
 
+  ClientModel = require('./ClientModel');
+
   has_run = false;
 
   Client = (function() {
-    Client.run = function(options) {
+    Client.run = function(opts) {
       var client;
       if (!has_run) {
-        client = new Client(options);
+        client = new Client(opts);
         client.run();
         return has_run = true;
       }
     };
 
-    function Client(options) {
+    function Client(opts) {
       this.send = __bind(this.send, this);
       this.onClose = __bind(this.onClose, this);
       this.onMessage = __bind(this.onMessage, this);
@@ -31,16 +33,22 @@
       this.run = __bind(this.run, this);
       this.onPopState = __bind(this.onPopState, this);
       var Messages, routes, socket_url;
-      this.Views = options.Views;
-      routes = options.routes;
-      Messages = options.Messages;
-      this.messages = new Messages({
+      this.views = opts.views;
+      routes = opts.routes;
+      this.should_inflate = 'models' in opts;
+      if (this.should_inflate) {
+        ClientModel.models = opts.models;
+      }
+      this.messages = 'messages' in opts ? (Messages = opts.messages, new Messages({
         client: this
-      });
+      })) : {};
       this.router = new Router();
       this.router.route(routes);
-      Mediator.client = this;
-      Mediator.router = this.router;
+      Mediator.setup({
+        client: this,
+        router: this.router,
+        models: this.models
+      });
       Mediator.on('error', (function(_this) {
         return function(message) {
           return _this.onError(message.error);
@@ -94,7 +102,7 @@
       } else if ('route' in options) {
         options.url = this.router.format(options.route);
       } else {
-        throw "Must pass url or params to swap body";
+        throw new Error("Must pass url or params to swap body");
       }
       return this.send({
         name: 'swapBody',
@@ -113,9 +121,9 @@
         page_view_class_name = body.attr('data-page-type');
         body_view_class_name = body.attr('data-body-type');
         this.page = null;
-        if ((page_view_class_name in this.Views) && (body_view_class_name in this.Views)) {
-          Page = this.Views[page_view_class_name];
-          Body = this.Views[body_view_class_name];
+        if ((page_view_class_name in this.views) && (body_view_class_name in this.views)) {
+          Page = this.views[page_view_class_name];
+          Body = this.views[body_view_class_name];
           this.page = Page.create({
             Body: Body,
             data: this.initial_data.view_data,
@@ -134,8 +142,8 @@
     Client.prototype.onOpen = function() {};
 
     Client.prototype.onMessage = function(raw_message) {
-      var View, error, handler, message, url, view, view_class_name, view_data;
-      console.log("message received \n" + raw_message);
+      var View, data, error, handler, message, url, view, view_class_name, view_data;
+      console.log("received message \n" + raw_message);
       message = JSON.parse(raw_message.data);
       if (message.error) {
         return this.onError(message.error);
@@ -147,41 +155,40 @@
           case 'initialize':
             this.initial_data = message.data || {};
             return this.run();
-          case 'swapBodyReply':
+          case 'loadBodyReply':
             view_class_name = message.data.view_class_name;
             view_data = message.data.view_data;
             url = message.data.url;
-            if (!(view_class_name in this.Views)) {
+            if (!(view_class_name in this.views)) {
               return this.error("" + view_class_name + " is not a known View");
             }
-            View = this.Views[view_class_name];
+            View = this.views[view_class_name];
             view = new View(view_data);
-            this.navigate(url);
-            return this.page.swapBody(view);
+            this.page.swapBody(view);
+            return this.navigate(url);
           default:
+            data = this.should_inflate ? ClientModel.inflate(message.data) : message.data;
+            Mediator.emit(message.name, data);
+            if (!(message.name in this.messages)) {
+              return;
+            }
             handler = this.messages[message.name];
-            if (handler) {
-              Mediator.emit(message.name, message.data);
-              try {
-                return handler(message.data, (function(_this) {
-                  return function(response) {
-                    if (response.error) {
-                      return _this.onError(error);
-                    } else if (response.reply) {
-                      return _this.sendReply({
-                        name: message.name,
-                        data: reply
-                      });
-                    }
-                  };
-                })(this));
-              } catch (_error) {
-                error = _error;
-                return this.onError(error);
-              }
-            } else {
-              error = "Message:" + message.name + " is not supported";
-              return console.error(error);
+            try {
+              return handler(message.data, (function(_this) {
+                return function(response) {
+                  if (response.error) {
+                    return _this.onError(error);
+                  } else if (response.reply) {
+                    return _this.sendReply({
+                      name: message.name,
+                      data: reply
+                    });
+                  }
+                };
+              })(this));
+            } catch (_error) {
+              error = _error;
+              return this.onError(error);
             }
         }
       }
@@ -198,11 +205,10 @@
       }
       keys = Object.keys(message);
       if (!((__indexOf.call(keys, 'name') >= 0) && (__indexOf.call(keys, 'data') >= 0) && (keys.length === 2))) {
-        throw "Messages must have name and data attributes";
+        throw new Error("Messages must have name and data attributes");
       }
-      console.log("Sending message");
-      console.log(message);
       raw_message = JSON.stringify(message);
+      console.log("sending message \n" + raw_message);
       return this.socket.send(raw_message);
     };
 

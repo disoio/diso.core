@@ -57,7 +57,7 @@ class SocketHandler
       message.data ?= {}
       
     switch message.name
-      when 'swapBody'
+      when 'loadBody'
         params      = message.data.route.params
         action_name = message.data.route.name
         action      = @actions[action_name]
@@ -91,7 +91,7 @@ class SocketHandler
       else
         handler = @messages[message.name]
 
-        console.log("MESSAGE IS #{JSON.stringify(message, null, 2)}")
+        console.log("Message received:\n#{JSON.stringify(message, null, 2)}")
 
         if handler
           try
@@ -105,7 +105,8 @@ class SocketHandler
                 )
             )
           catch error
-            stack = new Error(error).stack
+            stack = new Error().stack
+            console.log(error)
             console.error(stack)
             @sendError('Error processing message')
 

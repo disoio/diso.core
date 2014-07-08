@@ -91,12 +91,12 @@ class RequestHandler
         view_data  : data
         id_map     : view.idMap()
       }
-      
+
       if format is FORMAT.text
         view.text()
       else
         view.html()
-          
+
     headers = options.headers || {}
     headers['Content-Type'] = format
     status = options.status || 200
@@ -118,7 +118,12 @@ class RequestHandler
         )
       catch error
         console.error(error)
-        @next("Error")
+        stack = if error.stack
+          error.stack
+        else
+          (new Error()).stack
+        console.error(stack)
+        @next("Error running action")
       
     else
       error = "Action:#{action_name} is not supported"

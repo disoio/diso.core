@@ -2,31 +2,43 @@ $        = require('jquery')
 EngineIO = require('engine.io-client')
 Router   = require('diso.router')
 
-Mediator = require('./Mediator')
+Mediator    = require('./Mediator')
+ClientModel = require('./ClientModel')
 
 has_run = false
 
 class Client
-  @run : (options)->
+  @run : (opts)->
     unless has_run
-      client = new Client(options)
+      client = new Client(opts)
       client.run()
       has_run = true
   
-  constructor : (options)->
-    @Views = options.Views
-    routes = options.routes
+  constructor : (opts)->
+    @views  = opts.views
+    routes  = opts.routes
+
+    @should_inflate = ('models' of opts)
+    if @should_inflate
+      ClientModel.models = opts.models
     
-    Messages = options.Messages
-    @messages = new Messages(
-      client : @
-    )
+    @messages = if ('messages' of opts)
+      Messages = opts.messages
+      new Messages(
+        client : @
+      )
+    else
+      {}
 
     @router = new Router()
     @router.route(routes)
     
-    Mediator.client = @
-    Mediator.router = @router
+    Mediator.setup(
+      client : @
+      router : @router
+      models : @models
+    )
+
     Mediator.on('error', (message)=>
       @onError(message.error)
     )
@@ -81,7 +93,7 @@ class Client
     else if ('route' of options)
       options.url = @router.format(options.route)
     else
-      throw "Must pass url or params to swap body"
+      throw new Error("Must pass url or params to swap body")
 
     @send(
       name : 'swapBody'
@@ -102,9 +114,9 @@ class Client
       body_view_class_name = body.attr('data-body-type')
     
       @page = null
-      if (page_view_class_name of @Views) and (body_view_class_name of @Views)
-        Page = @Views[page_view_class_name]
-        Body = @Views[body_view_class_name]
+      if (page_view_class_name of @views) and (body_view_class_name of @views)
+        Page = @views[page_view_class_name]
+        Body = @views[body_view_class_name]
           
         # TODO: add current route for completeness
         @page = Page.create(
@@ -127,7 +139,7 @@ class Client
   onOpen : ()=>
   
   onMessage : (raw_message)=>
-    console.log("message received \n#{raw_message}")
+    console.log("received message \n#{raw_message}")
     message = JSON.parse(raw_message.data)
     
     if message.error
@@ -141,41 +153,45 @@ class Client
           @initial_data = message.data || {}
           @run()
         
-        when 'swapBodyReply'
+        when 'loadBodyReply'
           view_class_name = message.data.view_class_name
           view_data       = message.data.view_data
           url             = message.data.url
           
-          unless view_class_name of @Views
+          unless view_class_name of @views
             return @error("#{view_class_name} is not a known View")
 
-          View = @Views[view_class_name]
+          View = @views[view_class_name]
           view = new View(view_data)
-          @navigate(url)
           @page.swapBody(view)
+          @navigate(url)
           
-        else           
-          handler = @messages[message.name]
-
-          if handler
-            Mediator.emit(message.name, message.data)
-            
-            try
-              handler(message.data, (response)=>
-                if response.error
-                  @onError(error)
-                else if response.reply
-                  @sendReply(
-                    name : message.name
-                    data : reply
-                  )
-              )
-            catch error
-              @onError(error)
-              
+        else
+          data = if @should_inflate
+            ClientModel.inflate(message.data)
           else
-            error = "Message:#{message.name} is not supported"
-            console.error(error)
+            message.data
+          
+          Mediator.emit(message.name, data)
+
+          unless (message.name of @messages)
+            return 
+
+          handler = @messages[message.name]
+          
+          try
+            handler(message.data, (response)=>
+              if response.error
+                @onError(error)
+              else if response.reply
+                @sendReply(
+                  name : message.name
+                  data : reply
+                )
+            )
+          catch error
+            @onError(error)
+              
   
   onClose : ()=>
     console.log('socket closed')
@@ -185,12 +201,10 @@ class Client
     
     keys = Object.keys(message)
     unless (('name' in keys) and ('data' in keys) and (keys.length is 2))    
-      throw "Messages must have name and data attributes"
-      
-    console.log("Sending message")
-    console.log(message)
+      throw new Error("Messages must have name and data attributes")
       
     raw_message = JSON.stringify(message)
+    console.log("sending message \n#{raw_message}")
     @socket.send(raw_message)
   
   onError : (error)->
