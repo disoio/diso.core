@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>SocketHandler.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="Client.html">
+                Client.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientContainer.html">
+                ClientContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientModel.html">
+                ClientModel.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientStore.html">
+                ClientStore.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="RequestHandler.html">
+                RequestHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="Server.html">
+                Server.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerContainer.html">
+                ServerContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerStore.html">
+                ServerStore.coffee
+              </a>
+            
+              
+              <a class="source" href="SocketHandler.html">
+                SocketHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="parseAcceptHeader.html">
+                parseAcceptHeader.coffee
+              </a>
+            
+              
+              <a class="source" href="Mediator.html">
+                Mediator.coffee
+              </a>
+            
+              
+              <a class="source" href="Message.html">
+                Message.coffee
+              </a>
+            
+              
+              <a class="source" href="PageMap.html">
+                PageMap.coffee
+              </a>
+            
+              
+              <a class="source" href="Strings.html">
+                Strings.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>SocketHandler.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="npm-dependencies">NPM dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><a href="https://github.com/stephenhandley/type-of-is">type-of-is</a><br><a href="https://github.com/auth0/node-jsonwebtoken">jsonwebtoken</a>  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Type = <span class="hljs-built_in">require</span>(<span class="hljs-string">'type-of-is'</span>)
+JWT  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jwt-simple'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="local-dependencies">Local dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><a href="../Shared/Message.html">Message</a>  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Message = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Message'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>strings used to by JWT</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>TOKEN = {
+  EXPIRES : <span class="hljs-string">'exp'</span>
+  ISSUER  : <span class="hljs-string">'iss'</span>
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SocketHandler</span></span>
+  <span class="hljs-property">@_sockets</span> : {}
+  
+  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    <span class="hljs-property">@_socket</span>     = args.socket
+    <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
+    <span class="hljs-property">@_messages</span>   = args.messages 
+    <span class="hljs-property">@_init_store</span> = args.init_store
+    
+    <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id] = <span class="hljs-property">@_socket</span>
+      
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-property">@_onMessage</span>)
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-property">@_onClose</span>)
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-property">@_onError</span>)
+    
+  _onMessage : <span class="hljs-function"><span class="hljs-params">(raw_message)</span>=&gt;</span>
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"RCV <span class="hljs-subst">#{raw_message}</span>"</span>)
+
+    message = Message.parse(raw_message)
+
+    <span class="hljs-keyword">if</span> message.isError()
+      <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"Client error: <span class="hljs-subst">#{message.error}</span>"</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>TODO: how to best handle client errors on server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>this decodes the token (if present) and adds user_id to 
+message for use by handler </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_addUserIdFromToken</span>(message)
+    
+    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>])
+      @[<span class="hljs-string">"_<span class="hljs-subst">#{message.name}</span>"</span>](message)
+
+    <span class="hljs-keyword">else</span>
+      handler = <span class="hljs-property">@_messages</span>[message.name]
+
+      <span class="hljs-keyword">if</span> handler
+        handler(
+          message  : message
+          callback : <span class="hljs-function"><span class="hljs-params">(response)</span>=&gt;</span>
+            <span class="hljs-keyword">if</span> response?.error
+              <span class="hljs-property">@_sendError</span>(response.error)
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> response
+              reply = message.reply(response)
+              <span class="hljs-property">@_sendMessage</span>(reply)
+        )
+
+      <span class="hljs-keyword">else</span>
+        error = <span class="hljs-string">"Message:<span class="hljs-subst">#{message.name}</span> is not supported"</span>
+        <span class="hljs-built_in">console</span>.error(error)
+        <span class="hljs-property">@_sendError</span>(error)
+
+  _initialize : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    page_key   = message.data.page_key
+    init_data = <span class="hljs-property">@_init_store</span>[page_key]
+    reply     = message.reply(init_data)
+    <span class="hljs-property">@_sendMessage</span>(reply)
+
+  _authenticate : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>@_messages.authenticate should process the incoming message 
+and respond with a user object having the following methods
+<strong>id</strong>           : required, returns unique identifier for user
+<strong>saveToken</strong>    : optional, saves token
+<strong>tokenExpires</strong> : optional, returns token expiry time</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+    <span class="hljs-property">@_messages</span>.authenticate(
+      message  : message, 
+      callback : <span class="hljs-function"><span class="hljs-params">(response)</span>=&gt;</span>
+        <span class="hljs-keyword">if</span> response.error
+          <span class="hljs-keyword">return</span> <span class="hljs-property">@_sendError</span>(response.error)
+        
+        user = response.user
+        body = {}
+        body[TOKEN.ISSUER] = user.id()
+        
+        expires = <span class="hljs-keyword">if</span> Type(user.tokenExpires, Function)
+          user.tokenExpires()
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-literal">null</span>
+
+        <span class="hljs-keyword">if</span> expires
+          body[TOKEN.EXPIRES] = expires
+
+        token = JWT.encode(body, <span class="hljs-property">@_jwt_secret</span>)
+
+        reply = message.reply({
+          token   : token
+          expires : expires
+          user    : user
+        })
+
+        <span class="hljs-property">@_sendMessage</span>(reply)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>after sending token, have user save it if its supported</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> Type(user.saveToken, Function)
+          user.saveToken(
+            token    : token
+            callback : <span class="hljs-function"><span class="hljs-params">(error)</span>-&gt;</span>
+              <span class="hljs-keyword">if</span> error
+                <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>error = new Error(“Failed to save user token”)
+TODO: should send client message this failed?
+@_sendError(error)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          )
+    )
+  
+  _addUserIdFromToken : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+    <span class="hljs-keyword">if</span> message.token
+      body = JWT.decode(message.token, <span class="hljs-property">@_jwt_secret</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>check token expiration</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expires = body[TOKEN.EXPIRES]
+      expired = <span class="hljs-keyword">if</span> expires
+        now = Date.now()
+        (expires &lt; now)
+      <span class="hljs-keyword">else</span>
+        <span class="hljs-literal">false</span>
+
+      <span class="hljs-keyword">unless</span> expired
+        message.user_id = body[TOKEN.ISSUER]
+
+  _onClose : <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
+    <span class="hljs-keyword">delete</span> <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id]
+          
+  _onError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
+    <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>TODO handle error</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>TODO: Error’s should have some record of inbound 
+      message that resulted in the error.. </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _sendError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
+    message = Message.error(error)
+    <span class="hljs-property">@_sendMessage</span>(message)
+    
+  _sendMessage : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+    raw_message = message.stringify()
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"SND <span class="hljs-subst">#{raw_message}</span>"</span>)
+    <span class="hljs-property">@_socket</span>.send(raw_message)
+
+  _sendMessageAll : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+    <span class="hljs-keyword">for</span> id, socket <span class="hljs-keyword">of</span> <span class="hljs-property">@constructor</span>._sockets
+      raw_message = message.stringify()
+      socket.send(raw_message)
+        
+<span class="hljs-built_in">module</span>.exports = SocketHandler</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

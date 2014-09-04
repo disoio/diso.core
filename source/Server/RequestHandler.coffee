@@ -1,133 +1,91 @@
-Url   = require('url')
-
-Utils = require('./Utils')
-
+# Supported rendering formats
 FORMAT = {
   html : 'text/html',
   json : 'application/json',
   text : 'text/plain' 
 }
 
+parseAcceptHeader = require('./parseAcceptHeader') 
+
+class ServerStore
+  constructor : (args)->
+    @messages = args.messages
+
+  get : (args)->
+    message  = args.message
+    callback = args.callback 
+
+# RequestHandler
+# ==============
+# 
 class RequestHandler
-  constructor : (options)->
-    @request  = options.request
-    @response = options.response
-    @next     = options.next
-    
-    @Actions = options.Actions
-    if 'Page' of @Actions
-      @Page = @Actions.Page
-    
-    @parsed_url = Url.parse(@request.url, true)
-    
-    @actions = new @Actions(
-      session : @request.session
+  constructor : (args)->
+    @_init_store = args.init_store
+    messages     = args.messages
+    @_container  = args.container
+
+    @_store = new ServerStore(
+      messages : messages
     )
     
-  params : ()->
-    @request.route.params
-    
-  method : ()->
-    @request.method
-  
-  actionName : ()->
-    @request.route.name
-    
-  Page : null
-  
-  path : ()->
-    @parsed_url.pathname.slice(1)
-  
-  query : ()->
-    @parsed_url.query
-    
-  # keep it simple and respond with HTML unless JSON is explicitly requested
-  responseType : ()->
-    accepts = @request.headers['Accept']
+  _responseFormat : (request)->
+    accepts = request.headers['Accept']
 
-    if accepts      
-      for accept in Utils.parseAcceptHeader(accepts)
+    if accepts
+      parsed_accepts = parseAcceptHeader(accepts)  
+      
+      for accept in parsed_accepts
         type = "#{accept.type}/#{accept.subtype}"
-        types = v for k,v of FORMAT
+        types = (v for k,v of FORMAT)
         if (type in types)
-          return type
+          return [k, type]
     
-    FORMAT.html
+    ['html', FORMAT.html]
   
-  isXHR : ()->
-    req_with = @request.headers['X-Requested-With'] || ''
-    req_with is 'xmlhttprequest'
-    
-  render: (options)->
-    format = @responseType()
-    
-    body = if format is FORMAT.json
-      JSON.stringify(options.data)
-    else
-      unless options.View
-        throw "Action callback doesn't specify view"
-      
-      View = options.View
-      data = options.data || {}
-    
-      Page = if options.Page
-        options.Page
-      else if @Page
-        @Page
-      else
-        null
-      
-      view = if Page
-        new Page(
-          Body  : View
-          route : @actionName()
-          data  : data
-          url   : @request.url
-        )
-      else
-        new View(data)
-      
-      @request.session.initialization_data = {
-        view_data  : data
-        id_map     : view.idMap()
-      }
+  _render : (args)=>
+    request  = args.request
+    response = args.response
 
-      if format is FORMAT.text
-        view.text()
-      else
-        view.html()
+    [format, content_type] = @_responseFormat(request)      
 
-    headers = options.headers || {}
-    headers['Content-Type'] = format
-    status = options.status || 200
+    headers = @_container.headers()
+    headers['Content-Type'] = content_type
+    status = @_container.status() || 200
     
-    @response.writeHead(status, headers)
-    @response.end(body)
-  
-  run : ()->
-    action_name = @actionName()
-    action = @actions[action_name]
-    
-    if action
-      try
-        action(@params(), (response)=>
-          if response.error
-            @next(response.error)
-          else
-            @render(response)
-        )
-      catch error
-        console.error(error)
-        stack = if error.stack
-          error.stack
-        else
-          (new Error()).stack
-        console.error(stack)
-        @next("Error running action")
-      
-    else
-      error = "Action:#{action_name} is not supported"
+    body = @_container[format]()
+
+    response.writeHead(status, headers)
+    response.end(body)
+
+  run : (args)->
+    request  = args.request
+    response = args.response
+    next     = args.next
+
+    _onError = (error)->
       console.error(error)
-      @next(error)
+      next("500")
+
+    @_container.load(
+      page     : request.page
+      store    : @_store
+      callback : (error)=>
+        if error
+          return _onError(error)
+
+        # persist the init data so can get later and 
+        # send to client for initializeReply
+        # TODO: CLEANUP 4 2 SCALE PLZ 4 WEB
+        @_init_store[@_container.pageKey()] = @_container.initData()
+
+        try
+          @_render(
+            request  : request
+            response : response
+          )
+        catch error
+          _onError(error)  
+    )
+    
       
 module.exports = RequestHandler

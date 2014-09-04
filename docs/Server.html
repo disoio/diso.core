@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Server.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="Client.html">
+                Client.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientContainer.html">
+                ClientContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientModel.html">
+                ClientModel.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientStore.html">
+                ClientStore.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="RequestHandler.html">
+                RequestHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="Server.html">
+                Server.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerContainer.html">
+                ServerContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerStore.html">
+                ServerStore.coffee
+              </a>
+            
+              
+              <a class="source" href="SocketHandler.html">
+                SocketHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="parseAcceptHeader.html">
+                parseAcceptHeader.coffee
+              </a>
+            
+              
+              <a class="source" href="Mediator.html">
+                Mediator.coffee
+              </a>
+            
+              
+              <a class="source" href="Message.html">
+                Message.coffee
+              </a>
+            
+              
+              <a class="source" href="PageMap.html">
+                PageMap.coffee
+              </a>
+            
+              
+              <a class="source" href="Strings.html">
+                Strings.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>Server.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="core-dependencies">Core dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><a href="http://nodejs.org/api/http.html">http</a><br><a href="http://nodejs.org/api/url.html">url</a><br>[path]<a href="http://nodejs.org/api/path.html">http://nodejs.org/api/path.html</a>)  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>)
+Url  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'url'</span>)
+Path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="npm-dependencies">NPM dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p><a href="https://github.com/einaros/ws">ws</a>
+<a href="https://github.com/senchalabs/connect">connect</a>
+<a href="https://github.com/jesusabdullah/node-ecstatic">ecstatic</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>WS       = <span class="hljs-built_in">require</span>(<span class="hljs-string">'ws'</span>)
+Connect  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'connect'</span>)
+Ecstatic = <span class="hljs-built_in">require</span>(<span class="hljs-string">'ecstatic'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h2 id="local-dependencies">Local dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./Container.html">Container</a>
+<a href="../Shared/PageMap.html">PageMap</a>  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>RequestHandler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./RequestHandler'</span>)
+SocketHandler  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./SocketHandler'</span>)
+Container      = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerContainer'</span>)
+Store          = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerStore'</span>)
+PageMap        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/PageMap'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <h1 id="server">Server</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Handles HTTP and WebSocket connections from client</p>
+<p>Initial request from the client is HTTP GET of some
+url. The Server delegates this request to 
+<a href="./RequestHandler.html">RequestHandler</a>, which in turn
+uses <a href="../PageMap.html">PageMap</a> to find a page in 
+$args.pages matching a route name in $args.map. The page
+loads the data and views it needs and then renders itself and
+sends the result back to the client. It also stores that 
+data and a view id_map for later use by the 
+<a href="./SocketHandler.html">SocketHandler</a>.</p>
+<p>When the <a href="../Client.html">Client</a> subsequently connects via 
+EngineIO/WebSocket, a instance of <a href="./SocketHandler.html">SocketHandler</a> 
+is created to handle this persistent connection with the client. 
+The client is immediately sent an initializion payload consisting of 
+the stored data mentioned above. This is done in order to create an
+instance of the page on the client and sync it with the view hierarchy 
+previously rendered on the server prior to attaching event/behavior 
+handlers in the view.</p>
+<p>At this point, all subsequent communication is done via JSON over 
+the socket connection, and all rendering happens in the client. </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h3 id="required">required</h3>
+<p><strong>name</strong>       : name of the app/server</p>
+<p><strong>map</strong>        : map of routes to pages</p>
+<p><strong>messages</strong>   : class that will be instantiated to handle page request messages</p>
+<p><strong>jwt_secret</strong> : JSON web token secret</p>
+<p><strong>favicon</strong>    : path for user’s favicon</p>
+<h3 id="optional">optional</h3>
+<p><strong>static</strong>    : Should have path and filepath keys mapping to the url path 
+                and filesystem path for static assets</p>
+<p><strong>container</strong> : Override the default container used for pages. Default
+                implementation is <a href="./Container.html">Container</a> If overriding, 
+                you must set container on server as well.</p>
+<p><strong>request</strong>   : Override request handler</p>
+<p><strong>socket</strong>    : Override socket handler</p>
+<p><strong>logo_url</strong>  : Url for a site logo</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>required args</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    map          = args.map
+    <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
+    favicon      = args.favicon
+    <span class="hljs-property">@_name</span>       = args.name
+
+    Messages     = args.messages
+    <span class="hljs-property">@_messages</span>   = <span class="hljs-keyword">new</span> Messages()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>optional args</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    static_config = args.static
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">'request'</span> <span class="hljs-keyword">of</span> args)
+      RequestHandler = args.request
+
+    <span class="hljs-keyword">if</span> (<span class="hljs-string">'socket'</span> <span class="hljs-keyword">of</span> args)
+      SocketHandler = args.socket
+
+    container = <span class="hljs-keyword">if</span> (<span class="hljs-string">'container'</span> <span class="hljs-keyword">of</span> args)
+      args.container
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">new</span> Container(
+        logo_url  : args.logo_url
+        site_name : args.name
+      )
+
+    store = <span class="hljs-keyword">if</span> (<span class="hljs-string">'store'</span> <span class="hljs-keyword">of</span> args)
+      args.store
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">new</span> Store()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>TODO: to scale out this needs to use store 
+      in separate process (redis/leveldb/memcache)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_init_store</span> = {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>RequestHandler answers initial HTTP requests</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_request_handler</span> = <span class="hljs-keyword">new</span> RequestHandler(
+      messages   : <span class="hljs-property">@_messages</span>
+      cache      : <span class="hljs-property">@_cache</span>
+      init_store : <span class="hljs-property">@_init_store</span>
+      container  : container
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h2 id="add-connect-middleware-">Add Connect Middleware </h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _static = <span class="hljs-literal">null</span>
+    <span class="hljs-keyword">if</span> static_config</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>1) Static asset handling</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _static = Ecstatic(
+        root        : static_config.filepath
+        baseDir     : static_config.path
+        handleError : <span class="hljs-literal">false</span>
+      )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>2) favicon</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> favicon
+      favicon = Connect.favicon(favicon)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>3) body parser</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    body_parser = Connect.bodyParser()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>4) <a href="./PageMap.html">PageMap</a> is used for routing / page lookup</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
+      map   : map
+      store : store
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Create the connect middleware pipeline</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    connect = Connect()
+
+    <span class="hljs-keyword">if</span> _static
+      connect.use(_static)
+
+    <span class="hljs-keyword">if</span> favicon
+      connect.use(favicon)
+
+    connect
+      .use(body_parser)
+      .use(page_map)
+      .use(<span class="hljs-property">@_onRequest</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>create the server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_http_server</span> = Http.createServer(connect)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Listen for HTTP connections on port number passed as argument
+Also attach EngineIO to handle subsequent WebSocket upgrade</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  listen : <span class="hljs-function"><span class="hljs-params">(port)</span>-&gt;</span>
+    <span class="hljs-property">@_http_server</span>.listen(port)
+    <span class="hljs-property">@_socket_server</span> = <span class="hljs-keyword">new</span> WS.Server(server : <span class="hljs-property">@_http_server</span>)
+    <span class="hljs-property">@_socket_server</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'connection'</span>, <span class="hljs-property">@_onConnection</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Handle an http request</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onRequest : <span class="hljs-function"><span class="hljs-params">(request, response, next)</span>=&gt;</span>
+    <span class="hljs-property">@_request_handler</span>.run(
+      request  : request
+      response : response
+      next     : next
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Handle a WebSocket/EngineIO connection</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onConnection : <span class="hljs-function"><span class="hljs-params">(socket)</span>=&gt;</span>
+    <span class="hljs-keyword">new</span> SocketHandler(
+      socket     : socket
+      messages   : <span class="hljs-property">@_messages</span>
+      jwt_secret : <span class="hljs-property">@_jwt_secret</span>
+      init_store : <span class="hljs-property">@_init_store</span>
+    )
+
+<span class="hljs-built_in">module</span>.exports = Server</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

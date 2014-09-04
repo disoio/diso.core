@@ -1,46 +1,49 @@
 {
-  "name"        : "diso.core",
-  "version"     : "0.0.2",
-  "description" : "Client / Server",
-  "license"     : "MIT",
-  "main"        : "index.js",
-  "repository"  : {
-    "type" : "git",
-    "url"  : "https://github.com/stephenhandley/diso.core.git"
+  "name": "diso.core",
+  "version": "0.0.3",
+  "description": "Client / Server",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stephenhandley/diso.core.git"
   },
-  "scripts" : {
-  },
-  "keywords" : [
+  "keywords": [
     "client",
     "server",
     "socket",
     "websocket",
     "diso"
   ],
-  "directories" : {
-  },
-  "engines" : {
-    "node" : ">=0.10.5"
+  "engines": {
+    "node": ">=0.10.5"
   },
   "dependencies": {
-    "jquery"           : "~2.1.0",
-    "diso.router"      : "~4.0.1",
-    "engine.io"        : "~0.9.0",
-    "engine.io-client" : "~0.9.0",
-    "connect"          : "~2.16.2",
-    "ecstatic"         : "~0.5.1",
-    "cookie-signature" : "~1.0.3",
-    "type-of-is"       : "~3.2.0"
+    "connect": "~2.16.2",
+    "diso.router": "~6.0.0",
+    "ecstatic": "~0.5.1",
+    "jquery": "~2.1.0",
+    "jwt-simple": "~0.2.0",
+    "levelup": "~0.18.6",
+    "memdown": "~0.10.2",
+    "moment": "~2.8.1",
+    "shortid": "~2.0.0",
+    "tf": "~1.0.1",
+    "type-of-is": "~3.2.0",
+    "ws": "~0.4.32"
   },
-  "devDependencies" : {
-    "asserts"              : "4.0.x",
-    "grunt"                : "~0.4.4",
-    "grunt-contrib-watch"  : "~0.6.1",
-    "grunt-contrib-coffee" : "~0.10.1"
+  "devDependencies": {
+    "asserts": "~4.0.2",
+    "coffee-script": "~1.7.1",
+    "docco": "~0.6.3",
+    "grunt": "~0.4.4",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-coffee": "~0.10.1",
+    "grunt-docco": "~0.3.3"
   },
-  "author" : {
-    "name"  : "Stephen Handley",
-    "email" : "stephen.handley@gmail.com",
-    "url"   : "http://person.sh"
+  "author": {
+    "name": "Stephen Handley",
+    "email": "stephen.handley@gmail.com",
+    "url": "http://person.sh"
   }
 }

@@ -1,10 +1,7 @@
 (function() {
-  var FORMAT, RequestHandler, Url, Utils,
+  var FORMAT, RequestHandler, ServerStore, parseAcceptHeader,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-  Url = require('url');
-
-  Utils = require('./Utils');
 
   FORMAT = {
     html: 'text/html',
@@ -12,133 +9,103 @@
     text: 'text/plain'
   };
 
+  parseAcceptHeader = require('./parseAcceptHeader');
+
+  ServerStore = (function() {
+    function ServerStore(args) {
+      this.messages = args.messages;
+    }
+
+    ServerStore.prototype.get = function(args) {
+      var callback, message;
+      message = args.message;
+      return callback = args.callback;
+    };
+
+    return ServerStore;
+
+  })();
+
   RequestHandler = (function() {
-    function RequestHandler(options) {
-      this.request = options.request;
-      this.response = options.response;
-      this.next = options.next;
-      this.Actions = options.Actions;
-      if ('Page' in this.Actions) {
-        this.Page = this.Actions.Page;
-      }
-      this.parsed_url = Url.parse(this.request.url, true);
-      this.actions = new this.Actions({
-        session: this.request.session
+    function RequestHandler(args) {
+      this._render = __bind(this._render, this);
+      var messages;
+      this._init_store = args.init_store;
+      messages = args.messages;
+      this._container = args.container;
+      this._store = new ServerStore({
+        messages: messages
       });
     }
 
-    RequestHandler.prototype.params = function() {
-      return this.request.route.params;
-    };
-
-    RequestHandler.prototype.method = function() {
-      return this.request.method;
-    };
-
-    RequestHandler.prototype.actionName = function() {
-      return this.request.route.name;
-    };
-
-    RequestHandler.prototype.Page = null;
-
-    RequestHandler.prototype.path = function() {
-      return this.parsed_url.pathname.slice(1);
-    };
-
-    RequestHandler.prototype.query = function() {
-      return this.parsed_url.query;
-    };
-
-    RequestHandler.prototype.responseType = function() {
-      var accept, accepts, k, type, types, v, _i, _len, _ref;
-      accepts = this.request.headers['Accept'];
+    RequestHandler.prototype._responseFormat = function(request) {
+      var accept, accepts, k, parsed_accepts, type, types, v, _i, _len;
+      accepts = request.headers['Accept'];
       if (accepts) {
-        _ref = Utils.parseAcceptHeader(accepts);
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          accept = _ref[_i];
+        parsed_accepts = parseAcceptHeader(accepts);
+        for (_i = 0, _len = parsed_accepts.length; _i < _len; _i++) {
+          accept = parsed_accepts[_i];
           type = "" + accept.type + "/" + accept.subtype;
-          for (k in FORMAT) {
-            v = FORMAT[k];
-            types = v;
-          }
+          types = (function() {
+            var _results;
+            _results = [];
+            for (k in FORMAT) {
+              v = FORMAT[k];
+              _results.push(v);
+            }
+            return _results;
+          })();
           if ((__indexOf.call(types, type) >= 0)) {
-            return type;
+            return [k, type];
           }
         }
       }
-      return FORMAT.html;
+      return ['html', FORMAT.html];
     };
 
-    RequestHandler.prototype.isXHR = function() {
-      var req_with;
-      req_with = this.request.headers['X-Requested-With'] || '';
-      return req_with === 'xmlhttprequest';
+    RequestHandler.prototype._render = function(args) {
+      var body, content_type, format, headers, request, response, status, _ref;
+      request = args.request;
+      response = args.response;
+      _ref = this._responseFormat(request), format = _ref[0], content_type = _ref[1];
+      headers = this._container.headers();
+      headers['Content-Type'] = content_type;
+      status = this._container.status() || 200;
+      body = this._container[format]();
+      response.writeHead(status, headers);
+      return response.end(body);
     };
 
-    RequestHandler.prototype.render = function(options) {
-      var Page, View, body, data, format, headers, status, view;
-      format = this.responseType();
-      body = (function() {
-        if (format === FORMAT.json) {
-          return JSON.stringify(options.data);
-        } else {
-          if (!options.View) {
-            throw "Action callback doesn't specify view";
-          }
-          View = options.View;
-          data = options.data || {};
-          Page = options.Page ? options.Page : this.Page ? this.Page : null;
-          view = Page ? new Page({
-            Body: View,
-            route: this.actionName(),
-            data: data,
-            url: this.request.url
-          }) : new View(data);
-          this.request.session.initialization_data = {
-            view_data: data,
-            id_map: view.idMap()
-          };
-          if (format === FORMAT.text) {
-            return view.text();
-          } else {
-            return view.html();
-          }
-        }
-      }).call(this);
-      headers = options.headers || {};
-      headers['Content-Type'] = format;
-      status = options.status || 200;
-      this.response.writeHead(status, headers);
-      return this.response.end(body);
-    };
-
-    RequestHandler.prototype.run = function() {
-      var action, action_name, error, stack;
-      action_name = this.actionName();
-      action = this.actions[action_name];
-      if (action) {
-        try {
-          return action(this.params(), (function(_this) {
-            return function(response) {
-              if (response.error) {
-                return _this.next(response.error);
-              } else {
-                return _this.render(response);
-              }
-            };
-          })(this));
-        } catch (_error) {
-          error = _error;
-          console.error(error);
-          stack = error.stack ? error.stack : (new Error()).stack;
-          console.error(stack);
-          return this.next("Error running action");
-        }
-      } else {
-        error = "Action:" + action_name + " is not supported";
+    RequestHandler.prototype.run = function(args) {
+      var next, request, response, _onError;
+      request = args.request;
+      response = args.response;
+      next = args.next;
+      _onError = function(error) {
         console.error(error);
-        return this.next(error);
-      }
+        return next("500");
+      };
+      return this._container.load({
+        page: request.page,
+        store: this._store,
+        callback: (function(_this) {
+          return function(error) {
+            if (error) {
+              return _onError(error);
+            }
+            _this._init_store[_this._container.pageKey()] = _this._container.initData();
+            try {
+              return _this._render({
+                request: request,
+                response: response
+              });
+            } catch (_error) {
+              error = _error;
+              return _onError(error);
+            }
+          };
+        })(this)
+      });
     };
 
     return RequestHandler;

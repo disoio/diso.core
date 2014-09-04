@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ClientModel</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="Client.html">
+                Client.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientContainer.html">
+                ClientContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientModel.html">
+                ClientModel.coffee
+              </a>
+            
+              
+              <a class="source" href="ClientStore.html">
+                ClientStore.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="RequestHandler.html">
+                RequestHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="Server.html">
+                Server.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerContainer.html">
+                ServerContainer.coffee
+              </a>
+            
+              
+              <a class="source" href="ServerStore.html">
+                ServerStore.coffee
+              </a>
+            
+              
+              <a class="source" href="SocketHandler.html">
+                SocketHandler.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
+              <a class="source" href="parseAcceptHeader.html">
+                parseAcceptHeader.coffee
+              </a>
+            
+              
+              <a class="source" href="Mediator.html">
+                Mediator.coffee
+              </a>
+            
+              
+              <a class="source" href="Message.html">
+                Message.coffee
+              </a>
+            
+              
+              <a class="source" href="PageMap.html">
+                PageMap.coffee
+              </a>
+            
+              
+              <a class="source" href="Strings.html">
+                Strings.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="clientmodel">ClientModel</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Base class for simple client-side models. Models are generally
+simple wrappers layering methods / logic over the underlying json</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClientModel</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h3 id="required-args">required args</h3>
+<p><strong>data</strong> : data for this model</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(data)</span>-&gt;</span>
+    <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> data
+      @[k] = v
+
+<span class="hljs-built_in">module</span>.exports = ClientModel</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
