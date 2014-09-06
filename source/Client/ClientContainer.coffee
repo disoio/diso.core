@@ -35,11 +35,14 @@ class ClientContainer
   # in the current dom. 
   # 
   # A page is created using the body attribute of its constructor name
-  # and passed the view_data from initializeReply. The id_map in that 
+  # and passed the page_data from initializeReply. The id_map in that 
   # same message is then used to traverse the dom of and attach the 
   # view objects created in the client to their associated containers,
   # and update their ids to match those sent in the id_map (which are 
   # the ids that are present in the dom)
+  # 
+  # **init_data** : the initial data received from initializeReply. This 
+  #                 should have two attributes: 'id_map' and 'page_data'
   sync : (init_data)->
     id_map    = init_data[Strings.ID_MAP]
     page_data = init_data[Strings.PAGE_DATA]
@@ -50,6 +53,7 @@ class ClientContainer
       error = new Error("HTML body is missing #{Strings.PAGE_ATTR_NAME} attribute")
       return error
 
+    # use the page map to retrieve the page by this name
     @_page = @_page_map.sync(
       name      : page_name
       location  : window.location
@@ -61,6 +65,8 @@ class ClientContainer
       error = new Error("No page named #{page_name}")
       return error
 
+    # used to traverse the view hierarchy and sync each 
+    # element of the view with id_map passed via the initalizeReply
     _syncView = (args)->
       id   = args.id
       map  = args.map
@@ -79,6 +85,7 @@ class ClientContainer
       if (subids.length is 0)
         return
 
+      # recurse on subviews
       for i in [0 .. (subids.length - 1)]
         subid  = subids[i]
         submap = map[subid]
@@ -93,20 +100,65 @@ class ClientContainer
         )
 
     try
+      # have the page build its views
       @_page.build()
 
+      # sync the page (it will take care of syncing its subviews)
       _syncView(
         id   : page_id
         map  : id_map
         view : @_page
       )
 
+      # run the page (i.e. call setup on each view)
       @_page.run()
 
+      # null means "no error"
       return null
 
     catch error
       return error
+
+  pushPage  : ()->
+  popPage   : ()->
+
+  # goto
+  # ----
+  # Make a transition between pages
+  # 
+  # **route** : the route for new page
+  goto : (args)=>
+    console.log("GOTO!")
+    console.log(args)
+    
+    route = args.route
+
+    # get a new page for this route from the page map
+    new_page = @_page_map.route(
+      route     : route
+      location  : window.location
+      container : @
+    )
+
+    unless new_page
+      error = new Error("No page for #{route.name}")
+      return Mediator.emit('client:error', error)
+
+    # TODO: make this way more robust
+    #       for starters pass the JWT-token via get param or header
+    unless @_supportsHistory()
+      window.location = new_page.route.path()
+      return
+
+    # load the new page 
+    new_page.load((error)=>
+      console.log("LOADED PAGE!!!!")
+      ## SHOW THE NEW PAGE
+      @_pushHistory(page.route.path())
+    )
+
+  # HISTORY METHODS
+  # ---------------
 
   # _initializeHistory
   # ------------------
@@ -137,48 +189,5 @@ class ClientContainer
   # add url to the history. this will change the location bar to url
   _pushHistory : (url)->
     window.history.pushState(null, null, url)
-
-  pushPage  : ()->
-  popPage   : ()->
-
-  goto : (args)=>
-    console.log("GOTO!")
-    console.log(args)
-    
-    route      = args.route
-    transition = args.transition
-
-    new_page = @_page_map.route(
-      route     : route
-      location  : window.location
-      container : @
-    )
-
-    unless new_page
-      error = new Error("No page for #{route.name}")
-      return Mediator.emit('client:error', error)
-
-    unless @_supportsHistory()
-      # TODO : find way to pass the JWT-token via get param or header
-      window.location = new_page.route.path()
-      return
-
-    new_page.load((error)=>
-      console.log("LOADED PAGE!!!!")
-      @_pushHistory(page.route.path())
-    )
-
-  setBody : (body)->
-    if @body
-      @removeSubview(@body)
-    @body = body
-    @addSubview(@body)
-  
-  swapBody : (new_body)->
-    @body.removeBehaviors()
-    $body = $("##{@body.id}")
-    $body.replaceWith(new_body.html())
-    @setBody(new_body)
-    new_body.run()
 
 module.exports = ClientContainer

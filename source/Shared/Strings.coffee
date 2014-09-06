@@ -8,7 +8,7 @@ Strings = {
 
   # used for passing down the initial data from server to client
   ID_MAP    : 'id_map'
-  PAGE_DATA : 'view_data'
+  PAGE_DATA : 'page_data'
 }
 
 module.exports = Strings

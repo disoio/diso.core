@@ -15,6 +15,9 @@ class Mediator extends EventEmitter
   # delegate
   # --------
   # create delegate methods on Mediator to other objects
+  # 
+  # **map** : map of method name and target object pairs
+  #           used for delegation
   delegate : (map)->
     for method,target of map
       do (method, target)=>

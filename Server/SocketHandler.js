@@ -9,8 +9,8 @@
   Message = require('../Shared/Message');
 
   TOKEN = {
-    EXPIRES: 'exp',
-    ISSUER: 'iss'
+    Expires: 'exp',
+    Issuer: 'iss'
   };
 
   SocketHandler = (function() {
@@ -19,10 +19,9 @@
     function SocketHandler(args) {
       this._sendMessageAll = __bind(this._sendMessageAll, this);
       this._sendMessage = __bind(this._sendMessage, this);
-      this._sendError = __bind(this._sendError, this);
+      this._addUserIdFromToken = __bind(this._addUserIdFromToken, this);
       this._onError = __bind(this._onError, this);
       this._onClose = __bind(this._onClose, this);
-      this._addUserIdFromToken = __bind(this._addUserIdFromToken, this);
       this._onMessage = __bind(this._onMessage, this);
       this._socket = args.socket;
       this._jwt_secret = args.jwt_secret;
@@ -35,7 +34,7 @@
     }
 
     SocketHandler.prototype._onMessage = function(raw_message) {
-      var error, handler, message;
+      var error, handler, message, reply;
       console.log("RCV " + raw_message);
       message = Message.parse(raw_message);
       if (message.isError()) {
@@ -51,30 +50,42 @@
           return handler({
             message: message,
             callback: (function(_this) {
-              return function(response) {
+              return function(error, data) {
                 var reply;
-                if (response != null ? response.error : void 0) {
-                  return _this._sendError(response.error);
-                } else if (response) {
-                  reply = message.reply(response);
-                  return _this._sendMessage(reply);
-                }
+                reply = message.reply({
+                  error: error,
+                  data: data
+                });
+                return _this._sendMessage(reply);
               };
             })(this)
           });
         } else {
           error = "Message:" + message.name + " is not supported";
           console.error(error);
-          return this._sendError(error);
+          reply = message.reply({
+            error: error
+          });
+          return this._sendMessage(reply);
         }
       }
+    };
+
+    SocketHandler.prototype._onClose = function() {
+      return delete this.constructor._sockets[this._socket.id];
+    };
+
+    SocketHandler.prototype._onError = function(error) {
+      return console.error(error);
     };
 
     SocketHandler.prototype._initialize = function(message) {
       var init_data, page_key, reply;
       page_key = message.data.page_key;
       init_data = this._init_store[page_key];
-      reply = message.reply(init_data);
+      reply = message.reply({
+        data: init_data
+      });
       return this._sendMessage(reply);
     };
 
@@ -82,26 +93,28 @@
       return this._messages.authenticate({
         message: message,
         callback: (function(_this) {
-          return function(response) {
-            var body, expires, reply, token, user;
-            if (response.error) {
-              return _this._sendError(response.error);
+          return function(error, user) {
+            var body, data, expires, reply, token;
+            if (!error) {
+              body = {};
+              body[TOKEN.Issuer] = user.id();
+              expires = Type(user.tokenExpires, Function) ? user.tokenExpires() : null;
+              if (expires) {
+                body[TOKEN.Expires] = expires;
+              }
+              token = JWT.encode(body, _this._jwt_secret);
+              data = {
+                token: token,
+                expires: expires,
+                user: user
+              };
             }
-            user = response.user;
-            body = {};
-            body[TOKEN.ISSUER] = user.id();
-            expires = Type(user.tokenExpires, Function) ? user.tokenExpires() : null;
-            if (expires) {
-              body[TOKEN.EXPIRES] = expires;
-            }
-            token = JWT.encode(body, _this._jwt_secret);
             reply = message.reply({
-              token: token,
-              expires: expires,
-              user: user
+              error: error,
+              data: data
             });
             _this._sendMessage(reply);
-            if (Type(user.saveToken, Function)) {
+            if (!error && Type(user.saveToken, Function)) {
               return user.saveToken({
                 token: token,
                 callback: function(error) {
@@ -120,26 +133,12 @@
       var body, expired, expires, now;
       if (message.token) {
         body = JWT.decode(message.token, this._jwt_secret);
-        expires = body[TOKEN.EXPIRES];
+        expires = body[TOKEN.Expires];
         expired = expires ? (now = Date.now(), expires < now) : false;
         if (!expired) {
-          return message.user_id = body[TOKEN.ISSUER];
+          return message.user_id = body[TOKEN.Issuer];
         }
       }
-    };
-
-    SocketHandler.prototype._onClose = function() {
-      return delete this.constructor._sockets[this._socket.id];
-    };
-
-    SocketHandler.prototype._onError = function(error) {
-      return console.error(error);
-    };
-
-    SocketHandler.prototype._sendError = function(error) {
-      var message;
-      message = Message.error(error);
-      return this._sendMessage(message);
     };
 
     SocketHandler.prototype._sendMessage = function(message) {

@@ -89,17 +89,10 @@
       return models = _models;
     };
 
-    Message.error = function(error) {
-      return new this({
-        name: 'error',
-        error: error
-      });
-    };
-
-    Message.parse = function(raw_message) {
+    Message.parse = function(json) {
       var error, message_data;
       try {
-        message_data = JSON.parse(raw_message);
+        message_data = JSON.parse(json);
       } catch (_error) {
         error = _error;
         return this.error("JSON.parse failed");
@@ -107,12 +100,10 @@
       return new this(message_data);
     };
 
-    Message.prototype.reply = function(data) {
-      return new this.constructor({
-        name: this.replyName(),
-        data: data,
-        id: this.id
-      });
+    Message.prototype.reply = function(args) {
+      args.name = this.replyName();
+      args.id = this.id;
+      return new this.constructor(args);
     };
 
     Message.prototype.replyName = function() {

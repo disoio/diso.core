@@ -56,7 +56,6 @@ PageMap        = require('../Shared/PageMap')
 class Server
   # constructor
   # -----------
-  # ### required
   # **name**       : name of the app/server
   #
   # **map**        : map of routes to pages
@@ -67,19 +66,18 @@ class Server
   #
   # **favicon**    : path for user's favicon
   # 
-  # ### optional
-  # **static**    : Should have path and filepath keys mapping to the url path 
+  # *static*    : Should have path and filepath keys mapping to the url path 
   #                 and filesystem path for static assets
   #
-  # **container** : Override the default container used for pages. Default
+  # *container* : Override the default container used for pages. Default
   #                 implementation is [Container](./Container.html) If overriding, 
   #                 you must set container on server as well.
   #
-  # **request**   : Override request handler
+  # *request*   : Override request handler
   #
-  # **socket**    : Override socket handler
+  # *socket*    : Override socket handler
   #
-  # **logo_url**  : Url for a site logo
+  # *logo_url*  : Url for a site logo
   #
   constructor : (args)->
     # required args
@@ -117,16 +115,8 @@ class Server
     #       in separate process (redis/leveldb/memcache)
     @_init_store = {}
 
-    # RequestHandler answers initial HTTP requests
-    @_request_handler = new RequestHandler(
-      messages   : @_messages
-      cache      : @_cache
-      init_store : @_init_store
-      container  : container
-    )
-
-    # Add Connect Middleware 
-    # ----------------------
+    # CONNECT MIDDLEWARE
+    # ------------------
     _static = null
     if static_config
       # 1) Static asset handling
@@ -148,6 +138,14 @@ class Server
       map   : map
       store : store
     )
+
+    # 5) RequestHandler answers initial HTTP requests
+    request_handler = new RequestHandler(
+      messages   : @_messages
+      cache      : @_cache
+      init_store : @_init_store
+      container  : container
+    )
     
     # Create the connect middleware pipeline
     connect = Connect()
@@ -161,28 +159,28 @@ class Server
     connect
       .use(body_parser)
       .use(page_map)
-      .use(@_onRequest)
+      .use(request_handler)
 
     # create the server
     @_http_server = Http.createServer(connect)
   
+  # listen
+  # ------
   # Listen for HTTP connections on port number passed as argument
   # Also attach EngineIO to handle subsequent WebSocket upgrade
+  #
+  # **port** : port to listen on
   listen : (port)->
     @_http_server.listen(port)
     @_socket_server = new WS.Server(server : @_http_server)
-    @_socket_server.on('connection', @_onConnection)
+    @_socket_server.on('connection', @_onSocketConnection)
   
-  # Handle an http request
-  _onRequest : (request, response, next)=>
-    @_request_handler.run(
-      request  : request
-      response : response
-      next     : next
-    )
-  
+  # _onSocketConnection
+  # -------------------
   # Handle a WebSocket/EngineIO connection
-  _onConnection : (socket)=>
+  #
+  # **socket** :the socket this connection is made on
+  _onSocketConnection : (socket)=>
     new SocketHandler(
       socket     : socket
       messages   : @_messages

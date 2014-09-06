@@ -228,8 +228,9 @@ constructor for its Page </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <h3 id="required-args">required args</h3>
-<p><strong>map</strong> : map of routes to pages  </p>
+              <p><strong>store</strong> : store that will be passed to pages created
+            by this page map</p>
+<p><strong>map</strong> : map of routes to pages</p>
 
             </div>
             
@@ -247,7 +248,7 @@ constructor for its Page </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <h2 id="_process">_process</h2>
+              <h2 id="route-handling-lookup">ROUTE HANDLING / LOOKUP</h2>
 
             </div>
             
@@ -260,22 +261,8 @@ constructor for its Page </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Process the map to yield list of routes for router
-and also allow for page lookup via route name and 
-constructor name</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  _process : <span class="hljs-function"><span class="hljs-params">(map)</span>-&gt;</span>
-    <span class="hljs-keyword">for</span> name,route <span class="hljs-keyword">of</span> map
-      <span class="hljs-keyword">for</span> attr <span class="hljs-keyword">in</span> [<span class="hljs-string">'page'</span>, <span class="hljs-string">'route'</span>]
-        <span class="hljs-keyword">unless</span> route[attr]
-          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"You're missing <span class="hljs-subst">#{attr}</span> for '<span class="hljs-subst">#{name}</span>' in app's map"</span>)
-
-      page  = route.page
-      route = route.route
-
-      <span class="hljs-property">@_pages</span>[page.name] = page</pre></div></div>
             
         </li>
         
@@ -286,15 +273,9 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>add route for base route</p>
+              <h2 id="handle">handle</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-property">@_addRoute</span>(
-        name  : name
-        route : route
-        page  : page
-      )</pre></div></div>
             
         </li>
         
@@ -305,18 +286,19 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>add routes for all subroutes</p>
+              <p>this function is called by the <a href="https://github.com/senchalabs/connect">connect</a> 
+middleware pipeline on server. It looks up a page for 
+the route added by the router middleware and adds the 
+page constructor for that route to the request</p>
+<p><strong>request,response,next</strong>: the standard connect middleware trio</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> name,subroute <span class="hljs-keyword">of</span> map.subroutes
-        subroute = route + subroute
-
-        <span class="hljs-property">@_addRoute</span>(
-          name  : name
-          route : subroute
-          page  : page
-        )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  handle : <span class="hljs-function"><span class="hljs-params">(request, response, next)</span>-&gt;</span>
+    <span class="hljs-property">@_router</span>.handle(request, response, <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
+      Page = <span class="hljs-property">@_pageForRouteName</span>(request.route.name)
+      
+      <span class="hljs-keyword">if</span> Page</pre></div></div>
             
         </li>
         
@@ -327,9 +309,19 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <h2 id="_addroute">_addRoute</h2>
+              <p>if a page is found matching the route, add to request</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>        headers = request.headers
+        page = <span class="hljs-keyword">new</span> Page(
+          store  : <span class="hljs-property">@_store</span>
+          route  : request.route
+          origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
+        )
+        request.page = page
+        next()
+      <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
         
@@ -340,17 +332,13 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Add a route</p>
+              <p>trigger an error for a missing page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _addRoute : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    name  = args.name
-    route = args.route
-    page  = args.page
-
-    <span class="hljs-property">@_routes</span>[name]             = route
-    <span class="hljs-property">@_page_by_route_name</span>[name] = page</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        error = _missingPageError(route)
+        next(error)
+    )</pre></div></div>
             
         </li>
         
@@ -361,7 +349,7 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <h2 id="handle">handle</h2>
+              <h2 id="page-">page </h2>
 
             </div>
             
@@ -374,30 +362,13 @@ constructor name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>this function is called by the <a href="https://github.com/senchalabs/connect">connect</a> 
-middleware pipeline on server. It looks up a page for 
-the route added by the router middleware and adds the 
-page constructor for that route to the request</p>
+              <p>Lookup and return a page by its name</p>
+<p><strong>name</strong> : the name of the page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  handle : <span class="hljs-function"><span class="hljs-params">(req, res, next)</span>-&gt;</span>
-    <span class="hljs-property">@_router</span>.handle(req, res, <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
-      Page = <span class="hljs-property">@_pageForRouteName</span>(req.route.name)
-      
-      <span class="hljs-keyword">if</span> Page
-        headers = req.headers
-        page = <span class="hljs-keyword">new</span> Page(
-          store  : <span class="hljs-property">@_store</span>
-          route  : req.route
-          origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
-        )
-        req.page = page
-        next()
-      <span class="hljs-keyword">else</span>
-        error = _missingPageError(route)
-        next(error)
-    )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  page : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
+    <span class="hljs-property">@_pages</span>[name]</pre></div></div>
             
         </li>
         
@@ -408,7 +379,7 @@ page constructor for that route to the request</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <h2 id="_pageforroutename">_pageForRouteName</h2>
+              <h2 id="sync">sync</h2>
 
             </div>
             
@@ -421,16 +392,22 @@ page constructor for that route to the request</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>Lookup and return the page class for a given route name
-returns null if no page is found matching route’s name</p>
+              <p>Create the page for the client. This is called in the 
+initial client loading process by the ClientContainer’s 
+sync method. It takes care of passing the initial data 
+to the page. </p>
+<p><strong>name</strong> : the name of the page </p>
+<p><strong>location</strong> : the current window.location</p>
+<p><strong>container</strong> : the container for this page</p>
+<p><strong>data</strong> : the data for the page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _pageForRouteName : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
-    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">of</span> <span class="hljs-property">@_page_by_route_name</span>
-      <span class="hljs-property">@_page_by_route_name</span>[name]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-literal">null</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  sync : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    name      = args.name
+    location  = args.location
+    container = args.container
+    data      = args.data</pre></div></div>
             
         </li>
         
@@ -441,9 +418,14 @@ returns null if no page is found matching route’s name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <h2 id="page-">page </h2>
+              <p>unless we can find a page matching the name return false
+to signal error</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    Page = <span class="hljs-property">@page</span>(name)
+    <span class="hljs-keyword">unless</span> Page
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -454,52 +436,11 @@ returns null if no page is found matching route’s name</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Lookup and return a page by its name</p>
+              <p>lookup the route for the current url</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  page : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
-    <span class="hljs-property">@_pages</span>[name]</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
-              <h2 id="sync">sync</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
-              </div>
-              <p>Create the page for the client. This is called in the initial
-client loading process by the ClientContainer’s sync method.
-It takes care of passing the initial data to the page. </p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  sync : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    name      = args.name
-    location  = args.location
-    container = args.container
-    data      = args.data
-
-    Page = <span class="hljs-property">@page</span>(name)
-    <span class="hljs-keyword">unless</span> Page
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
-    
-    path = location.pathname + location.search + location.hash
+            <div class="content"><div class='highlight'><pre>    path = location.pathname + location.search + location.hash
     route = <span class="hljs-property">@_router</span>.match(path : path)
 
     <span class="hljs-keyword">new</span> Page(
@@ -513,11 +454,11 @@ It takes care of passing the initial data to the page. </p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <h2 id="route">route</h2>
 
@@ -526,15 +467,18 @@ It takes care of passing the initial data to the page. </p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>Lookup and create a page for the given route
-throws error if no page matches the route. This 
-is called by the ClientContainer’s goto method</p>
+              <p>Lookup and create a page for the given route throws error
+if no page matches the route. This is called by the 
+<a href="../Shared/ClientContainer.html">ClientContainer</a>‘s goto method</p>
+<p><strong>route</strong> : the route to use for lookup</p>
+<p><strong>location</strong> : the current window.location</p>
+<p><strong>container</strong> : the container for this page</p>
 
             </div>
             
@@ -556,7 +500,184 @@ is called by the ClientContainer’s goto method</p>
       route     : route
       origin    : location.origin
       container : container
-    )
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <h2 id="internal-methods">INTERNAL METHODS</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <h2 id="_process">_process</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Process the map to yield list of routes for router
+and also allow for page lookup via route name and 
+constructor name</p>
+<p><strong>map</strong> : the map to process</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _process : <span class="hljs-function"><span class="hljs-params">(map)</span>-&gt;</span>
+    <span class="hljs-keyword">for</span> name,route <span class="hljs-keyword">of</span> map
+      <span class="hljs-keyword">for</span> attr <span class="hljs-keyword">in</span> [<span class="hljs-string">'page'</span>, <span class="hljs-string">'route'</span>]
+        <span class="hljs-keyword">unless</span> route[attr]
+          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"You're missing <span class="hljs-subst">#{attr}</span> for '<span class="hljs-subst">#{name}</span>' in app's map"</span>)
+
+      page  = route.page
+      route = route.route
+
+      <span class="hljs-property">@_pages</span>[page.name] = page</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>add route for base route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-property">@_addRoute</span>(
+        name  : name
+        route : route
+        page  : page
+      )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>add routes for all subroutes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> name,subroute <span class="hljs-keyword">of</span> map.subroutes
+        subroute = route + subroute
+
+        <span class="hljs-property">@_addRoute</span>(
+          name  : name
+          route : subroute
+          page  : page
+        )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h2 id="_addroute">_addRoute</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Add a route to the router</p>
+<p><strong>name</strong> : route name
+<strong>route</strong> : the route
+<strong>page</strong> : page for this route</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _addRoute : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    name  = args.name
+    route = args.route
+    page  = args.page
+
+    <span class="hljs-property">@_routes</span>[name]             = route
+    <span class="hljs-property">@_page_by_route_name</span>[name] = page</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h2 id="_pageforroutename">_pageForRouteName</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Lookup and return the page class for a given route name
+returns null if no page is found matching route’s name</p>
+<p><strong>name</strong> : route name to lookup page for</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _pageForRouteName : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> name <span class="hljs-keyword">of</span> <span class="hljs-property">@_page_by_route_name</span>
+      <span class="hljs-property">@_page_by_route_name</span>[name]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span>
 
 <span class="hljs-built_in">module</span>.exports = PageMap</pre></div></div>
             

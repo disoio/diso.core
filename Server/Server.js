@@ -26,9 +26,8 @@
 
   Server = (function() {
     function Server(args) {
-      this._onConnection = __bind(this._onConnection, this);
-      this._onRequest = __bind(this._onRequest, this);
-      var Messages, body_parser, connect, container, favicon, map, page_map, static_config, store, _static;
+      this._onSocketConnection = __bind(this._onSocketConnection, this);
+      var Messages, body_parser, connect, container, favicon, map, page_map, request_handler, static_config, store, _static;
       map = args.map;
       this._jwt_secret = args.jwt_secret;
       favicon = args.favicon;
@@ -48,12 +47,6 @@
       });
       store = 'store' in args ? args.store : new Store();
       this._init_store = {};
-      this._request_handler = new RequestHandler({
-        messages: this._messages,
-        cache: this._cache,
-        init_store: this._init_store,
-        container: container
-      });
       _static = null;
       if (static_config) {
         _static = Ecstatic({
@@ -70,6 +63,12 @@
         map: map,
         store: store
       });
+      request_handler = new RequestHandler({
+        messages: this._messages,
+        cache: this._cache,
+        init_store: this._init_store,
+        container: container
+      });
       connect = Connect();
       if (_static) {
         connect.use(_static);
@@ -77,7 +76,7 @@
       if (favicon) {
         connect.use(favicon);
       }
-      connect.use(body_parser).use(page_map).use(this._onRequest);
+      connect.use(body_parser).use(page_map).use(request_handler);
       this._http_server = Http.createServer(connect);
     }
 
@@ -86,18 +85,10 @@
       this._socket_server = new WS.Server({
         server: this._http_server
       });
-      return this._socket_server.on('connection', this._onConnection);
+      return this._socket_server.on('connection', this._onSocketConnection);
     };
 
-    Server.prototype._onRequest = function(request, response, next) {
-      return this._request_handler.run({
-        request: request,
-        response: response,
-        next: next
-      });
-    };
-
-    Server.prototype._onConnection = function(socket) {
+    Server.prototype._onSocketConnection = function(socket) {
       return new SocketHandler({
         socket: socket,
         messages: this._messages,

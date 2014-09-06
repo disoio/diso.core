@@ -15,7 +15,10 @@ models = null
 
 # deflate
 # -------
-#     
+# Deflate the passed object so that it can be passed over the
+# wire as json and inflated on the other end into models
+# 
+# **obj** : object to deflate
 deflate = (obj)->
   switch Type(obj)
     when Array
@@ -40,6 +43,8 @@ deflate = (obj)->
 # Inflate the passed json object by converting plain json objects
 # into instances of their associated model. Model types are specified
 # via model key defined in [Strings](./String.html)
+#
+# **obj** : object to inflate
 inflate = (obj)->
   unless models
     return obj
@@ -81,13 +86,39 @@ inflate = (obj)->
 
 # Message
 # =======
+# A WebSocket message
 class Message
+  # name for this message
   name  : null
+
+  # unique id for this message (shared by its reply)
   id    : null
+
+  # jwt auth token
   token : null
+
+  # the data for this message
   data  : null
+
+  # an error if needed
   error : null
 
+  # constructor
+  # -----------
+  # Create a message
+  #
+  # ### required args
+  # **name** : the name for this message
+  # 
+  # *id*     : id for this message, otherwise will be generated
+  #
+  # *token*  : jwt token used to identify / authorize the user
+  #            sending this message
+  #
+  # *data*   : the data / params for this message
+  #
+  # *error*  : used in replies if error occured during processing
+  #            of message
   constructor : (args)->
     unless args.name
       throw new Error("Message must have name")
@@ -108,36 +139,53 @@ class Message
   # @setModels
   # ----------
   # Set the models to be used by inflate
+  #
+  # **_models** : models to be used for inflation
   @setModels : (_models)->
     models = _models
 
-  @error : (error)->
-    new @(
-      name  : 'error'
-      error : error
-    )
-
-  @parse : (raw_message)->
+  # @parse
+  # ------
+  # Parse and create message from raw josn string
+  #
+  # **json** : the raw json to parse
+  @parse : (json)->
     try 
-      message_data = JSON.parse(raw_message)
+      message_data = JSON.parse(json)
     catch error
       return @error("JSON.parse failed")
 
     new @(message_data)
 
-  reply : (data)->
-    new @constructor(
-      name   : @replyName()
-      data   : data
-      id     : @id
-    )
+  # reply
+  # ------
+  # Create a reply message from this message using its id
+  # 
+  # *data* : data for the reply
+  #
+  # *error* : error
+  reply : (args)->
+    args.name = @replyName()
+    args.id   = @id
+    new @constructor(args)
 
+  # replyName
+  # ---------
+  # The name of the reply to this message
   replyName : ()->
     "#{@name}Reply"
 
+  # replyEventName
+  # --------------
+  # The event name that gets triggered by this message's reply
+  # This is used in the [ClientStore](../Client/ClientStore.html)
+  # in order to trigger load callback once the data is available
   replyEventName : ()->
     "message:#{@replyName()}:id:#{@id}"
 
+  # stringify
+  # ---------
+  # Encode this message into json, deflating its data in the process
   stringify : ()->
     message = {
       name  : @name
@@ -154,12 +202,26 @@ class Message
     message = deflate(message)
     JSON.stringify(message)
 
+  # isError
+  # -------
+  # Returns true if this message has an error
   isError : ()->
     !!@error
 
+  # is
+  # --
+  # Convenience method for checking the name of this message
+  # 
+  # **name** : message name to check against
   is : (name)->
     (@name is name)
   
+  # in
+  # --
+  # Convenience method for checking whether this message's is one
+  # of several possibilities
+  #
+  # **names** : message names to check against
   in : (names)->
     (@name in names)
 

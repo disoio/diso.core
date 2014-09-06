@@ -85,7 +85,7 @@
       reply_evt = message.replyEventName();
       return Mediator.once(reply_evt, (function(_this) {
         return function(message) {
-          if (message.error) {
+          if (message.isError()) {
             return callback(message.error);
           } else {
             data = message.data;
@@ -102,13 +102,13 @@
     ClientStore.prototype.subscribe = function(args) {
       var key;
       key = this._key(args);
-      return this.on(key, args.callback);
+      return this.on("store:update:" + key, args.callback);
     };
 
     ClientStore.prototype.unsubscribe = function(args) {
       var key;
       key = this._key(args);
-      return this.removeListener(key, args.callback);
+      return this.removeListener("store:update:" + key, args.callback);
     };
 
     return ClientStore;

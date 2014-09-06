@@ -12,13 +12,32 @@ Message = require('../Shared/Message')
 
 # strings used to by JWT
 TOKEN = {
-  EXPIRES : 'exp'
-  ISSUER  : 'iss'
+  Expires : 'exp'
+  Issuer  : 'iss'
 }
 
+# RequestHandler
+# ==============
+# This class handles socket requests received by the server
+# Aside from the initalize and authenticate messages, it 
+# delegates directly to the user specified messages object, 
+# calling methods with the name of the sent messages to handle
+# processing.
+# 
 class SocketHandler
+  # sockets keyed by socket id
   @_sockets : {}
   
+  # constructor 
+  # ----------
+  # **socket** : the socket 
+  # 
+  # **jwt_secret** : jwt_secret used for decoding token
+  # 
+  # **message** : object of handlers for messages
+  # 
+  # **init_store** : the store used for getting data from 
+  #                  initial http render for initializeReply
   constructor : (args)->
     @_socket     = args.socket
     @_jwt_secret = args.jwt_secret
@@ -30,7 +49,13 @@ class SocketHandler
     @_socket.on('message', @_onMessage)
     @_socket.on('close', @_onClose)
     @_socket.on('error', @_onError)
-    
+  
+  # INTERNAL METHODS
+  # ----------------
+
+  # _onMessage
+  # ----------
+  # Event handler for message from socket
   _onMessage : (raw_message)=>
     console.log("RCV #{raw_message}")
 
@@ -45,6 +70,7 @@ class SocketHandler
     # message for use by handler 
     @_addUserIdFromToken(message)
     
+    # initialize and authenticate messages are handled by framework
     if message.in(['initialize', 'authenticate'])
       @["_#{message.name}"](message)
 
@@ -54,62 +80,85 @@ class SocketHandler
       if handler
         handler(
           message  : message
-          callback : (response)=>
-            if response?.error
-              @_sendError(response.error)
-            else if response
-              reply = message.reply(response)
-              @_sendMessage(reply)
+          callback : (error, data)=>
+            reply = message.reply(
+              error : error
+              data  : data
+            )
+            @_sendMessage(reply)
         )
 
       else
         error = "Message:#{message.name} is not supported"
         console.error(error)
-        @_sendError(error)
+        reply = message.reply(
+          error : error
+        )
+        @_sendMessage(reply)
 
+  _onClose : ()=>
+    delete @constructor._sockets[@_socket.id]
+          
+  _onError : (error)=>
+    console.error(error)
+    #TODO handle error bettr
+
+  # _initialize
+  # -----------
+  # Respond to the initialize message with the id map and data 
+  # used by the server side render of the requested page
+  # 
+  # **message** : message from client with page_key 
   _initialize : (message)->
     page_key   = message.data.page_key
     init_data = @_init_store[page_key]
-    reply     = message.reply(init_data)
+    reply     = message.reply(data : init_data)
     @_sendMessage(reply)
 
+  # _authenticate 
+  # -------------
+  # Delegates to an authenticate message in the user provided
+  # messages object and then encodes a jwt token that the client
+  # will include in subsequent request. 
+  # **message** : the message from client with auth data
+  #
+  # messages.authenticate should process the incoming message 
+  # and respond with a user object having the following methods
+  # **id**         : required, returns unique identifier for user
+  # *saveToken*    : optional, saves token
+  # *tokenExpires* : optional, returns token expiry time
   _authenticate : (message)->
-    # @_messages.authenticate should process the incoming message 
-    # and respond with a user object having the following methods
-    # **id**           : required, returns unique identifier for user
-    # **saveToken**    : optional, saves token
-    # **tokenExpires** : optional, returns token expiry time
-
     @_messages.authenticate(
       message  : message, 
-      callback : (response)=>
-        if response.error
-          return @_sendError(response.error)
-        
-        user = response.user
-        body = {}
-        body[TOKEN.ISSUER] = user.id()
-        
-        expires = if Type(user.tokenExpires, Function)
-          user.tokenExpires()
-        else
-          null
+      callback : (error, user)=>
+        unless error             
+          body = {}
+          body[TOKEN.Issuer] = user.id()
+          
+          expires = if Type(user.tokenExpires, Function)
+            user.tokenExpires()
+          else
+            null
 
-        if expires
-          body[TOKEN.EXPIRES] = expires
+          if expires
+            body[TOKEN.Expires] = expires
 
-        token = JWT.encode(body, @_jwt_secret)
+          token = JWT.encode(body, @_jwt_secret)
 
-        reply = message.reply({
-          token   : token
-          expires : expires
-          user    : user
-        })
+          data = {
+            token   : token
+            expires : expires
+            user    : user
+          }
 
+        reply = message.reply(
+          error : error
+          data  : data
+        )
         @_sendMessage(reply)
 
         # after sending token, have user save it if its supported
-        if Type(user.saveToken, Function)
+        if (!error and Type(user.saveToken, Function))
           user.saveToken(
             token    : token
             callback : (error)->
@@ -121,12 +170,18 @@ class SocketHandler
           )
     )
   
+  # _addUserIdFromToken
+  # -------------------
+  # If message has token, decode it and add the associated user id
+  # to the message for later processing
+  #
+  # **message** : message to process
   _addUserIdFromToken : (message)=>
     if message.token
       body = JWT.decode(message.token, @_jwt_secret)
 
       # check token expiration
-      expires = body[TOKEN.EXPIRES]
+      expires = body[TOKEN.Expires]
       expired = if expires
         now = Date.now()
         (expires < now)
@@ -134,26 +189,23 @@ class SocketHandler
         false
 
       unless expired
-        message.user_id = body[TOKEN.ISSUER]
-
-  _onClose : ()=>
-    delete @constructor._sockets[@_socket.id]
-          
-  _onError : (error)=>
-    console.error(error)
-    #TODO handle error
-  
-  # TODO: Error's should have some record of inbound 
-  #       message that resulted in the error.. 
-  _sendError : (error)=>
-    message = Message.error(error)
-    @_sendMessage(message)
-    
+        message.user_id = body[TOKEN.Issuer]
+   
+  # _sendMessage
+  # ------------
+  # Send a message to the client
+  #
+  # **message** : message to send
   _sendMessage : (message)=>
     raw_message = message.stringify()
     console.log("SND #{raw_message}")
     @_socket.send(raw_message)
 
+  # _sendMessageAll
+  # ---------------
+  # Send a message to all clients
+  #
+  # **message** : message to send
   _sendMessageAll : (message)=>
     for id, socket of @constructor._sockets
       raw_message = message.stringify()

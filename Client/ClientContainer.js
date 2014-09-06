@@ -14,8 +14,8 @@
 
   ClientContainer = (function() {
     function ClientContainer(args) {
-      this.goto = __bind(this.goto, this);
       this._onPopState = __bind(this._onPopState, this);
+      this.goto = __bind(this.goto, this);
       this._page_map = new PageMap(args);
       this._initializeHistory();
     }
@@ -88,35 +88,15 @@
       }
     };
 
-    ClientContainer.prototype._initializeHistory = function() {
-      if (this._supportsHistory()) {
-        return $(window).on('popstate', this._onPopState);
-      }
-    };
-
-    ClientContainer.prototype._supportsHistory = function() {
-      var _ref;
-      return !!((_ref = window.history) != null ? _ref.pushState : void 0);
-    };
-
-    ClientContainer.prototype._onPopState = function() {
-      return console.log("HANDLE POP STATE YO:" + document.location);
-    };
-
-    ClientContainer.prototype._pushHistory = function(url) {
-      return window.history.pushState(null, null, url);
-    };
-
     ClientContainer.prototype.pushPage = function() {};
 
     ClientContainer.prototype.popPage = function() {};
 
     ClientContainer.prototype.goto = function(args) {
-      var error, new_page, route, transition;
+      var error, new_page, route;
       console.log("GOTO!");
       console.log(args);
       route = args.route;
-      transition = args.transition;
       new_page = this._page_map.route({
         route: route,
         location: window.location,
@@ -138,21 +118,23 @@
       })(this));
     };
 
-    ClientContainer.prototype.setBody = function(body) {
-      if (this.body) {
-        this.removeSubview(this.body);
+    ClientContainer.prototype._initializeHistory = function() {
+      if (this._supportsHistory()) {
+        return $(window).on('popstate', this._onPopState);
       }
-      this.body = body;
-      return this.addSubview(this.body);
     };
 
-    ClientContainer.prototype.swapBody = function(new_body) {
-      var $body;
-      this.body.removeBehaviors();
-      $body = $("#" + this.body.id);
-      $body.replaceWith(new_body.html());
-      this.setBody(new_body);
-      return new_body.run();
+    ClientContainer.prototype._supportsHistory = function() {
+      var _ref;
+      return !!((_ref = window.history) != null ? _ref.pushState : void 0);
+    };
+
+    ClientContainer.prototype._onPopState = function() {
+      return console.log("HANDLE POP STATE YO:" + document.location);
+    };
+
+    ClientContainer.prototype._pushHistory = function(url) {
+      return window.history.pushState(null, null, url);
     };
 
     return ClientContainer;

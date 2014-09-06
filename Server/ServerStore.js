@@ -17,7 +17,7 @@
           callback: callback
         });
       } else {
-        error = "Message:" + message.name + " is not supported";
+        error = new Error("Message:" + message.name + " is not supported");
         console.error(error);
         return callback(error);
       }

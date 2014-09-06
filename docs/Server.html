@@ -278,21 +278,19 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <h3 id="required">required</h3>
-<p><strong>name</strong>       : name of the app/server</p>
+              <p><strong>name</strong>       : name of the app/server</p>
 <p><strong>map</strong>        : map of routes to pages</p>
 <p><strong>messages</strong>   : class that will be instantiated to handle page request messages</p>
 <p><strong>jwt_secret</strong> : JSON web token secret</p>
 <p><strong>favicon</strong>    : path for user’s favicon</p>
-<h3 id="optional">optional</h3>
-<p><strong>static</strong>    : Should have path and filepath keys mapping to the url path 
+<p><em>static</em>    : Should have path and filepath keys mapping to the url path 
                 and filesystem path for static assets</p>
-<p><strong>container</strong> : Override the default container used for pages. Default
+<p><em>container</em> : Override the default container used for pages. Default
                 implementation is <a href="./Container.html">Container</a> If overriding, 
                 you must set container on server as well.</p>
-<p><strong>request</strong>   : Override request handler</p>
-<p><strong>socket</strong>    : Override socket handler</p>
-<p><strong>logo_url</strong>  : Url for a site logo</p>
+<p><em>request</em>   : Override request handler</p>
+<p><em>socket</em>    : Override socket handler</p>
+<p><em>logo_url</em>  : Url for a site logo</p>
 
             </div>
             
@@ -378,16 +376,9 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>RequestHandler answers initial HTTP requests</p>
+              <h2 id="connect-middleware">CONNECT MIDDLEWARE</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_request_handler</span> = <span class="hljs-keyword">new</span> RequestHandler(
-      messages   : <span class="hljs-property">@_messages</span>
-      cache      : <span class="hljs-property">@_cache</span>
-      init_store : <span class="hljs-property">@_init_store</span>
-      container  : container
-    )</pre></div></div>
             
         </li>
         
@@ -398,19 +389,6 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <h2 id="add-connect-middleware-">Add Connect Middleware </h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
               
             </div>
             
@@ -420,11 +398,11 @@ the socket connection, and all rendering happens in the client. </p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>1) Static asset handling</p>
 
@@ -439,11 +417,11 @@ the socket connection, and all rendering happens in the client. </p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>2) favicon</p>
 
@@ -455,11 +433,11 @@ the socket connection, and all rendering happens in the client. </p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>3) body parser</p>
 
@@ -470,11 +448,11 @@ the socket connection, and all rendering happens in the client. </p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>4) <a href="./PageMap.html">PageMap</a> is used for routing / page lookup</p>
 
@@ -483,6 +461,26 @@ the socket connection, and all rendering happens in the client. </p>
             <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
       map   : map
       store : store
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>5) RequestHandler answers initial HTTP requests</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    request_handler = <span class="hljs-keyword">new</span> RequestHandler(
+      messages   : <span class="hljs-property">@_messages</span>
+      cache      : <span class="hljs-property">@_cache</span>
+      init_store : <span class="hljs-property">@_init_store</span>
+      container  : container
     )</pre></div></div>
             
         </li>
@@ -509,7 +507,7 @@ the socket connection, and all rendering happens in the client. </p>
     connect
       .use(body_parser)
       .use(page_map)
-      .use(<span class="hljs-property">@_onRequest</span>)</pre></div></div>
+      .use(request_handler)</pre></div></div>
             
         </li>
         
@@ -535,15 +533,9 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>Listen for HTTP connections on port number passed as argument
-Also attach EngineIO to handle subsequent WebSocket upgrade</p>
+              <h2 id="listen">listen</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  listen : <span class="hljs-function"><span class="hljs-params">(port)</span>-&gt;</span>
-    <span class="hljs-property">@_http_server</span>.listen(port)
-    <span class="hljs-property">@_socket_server</span> = <span class="hljs-keyword">new</span> WS.Server(server : <span class="hljs-property">@_http_server</span>)
-    <span class="hljs-property">@_socket_server</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'connection'</span>, <span class="hljs-property">@_onConnection</span>)</pre></div></div>
             
         </li>
         
@@ -554,16 +546,16 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>Handle an http request</p>
+              <p>Listen for HTTP connections on port number passed as argument
+Also attach EngineIO to handle subsequent WebSocket upgrade</p>
+<p><strong>port</strong> : port to listen on</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _onRequest : <span class="hljs-function"><span class="hljs-params">(request, response, next)</span>=&gt;</span>
-    <span class="hljs-property">@_request_handler</span>.run(
-      request  : request
-      response : response
-      next     : next
-    )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  listen : <span class="hljs-function"><span class="hljs-params">(port)</span>-&gt;</span>
+    <span class="hljs-property">@_http_server</span>.listen(port)
+    <span class="hljs-property">@_socket_server</span> = <span class="hljs-keyword">new</span> WS.Server(server : <span class="hljs-property">@_http_server</span>)
+    <span class="hljs-property">@_socket_server</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'connection'</span>, <span class="hljs-property">@_onSocketConnection</span>)</pre></div></div>
             
         </li>
         
@@ -574,11 +566,25 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <p>Handle a WebSocket/EngineIO connection</p>
+              <h2 id="_onsocketconnection">_onSocketConnection</h2>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _onConnection : <span class="hljs-function"><span class="hljs-params">(socket)</span>=&gt;</span>
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Handle a WebSocket/EngineIO connection</p>
+<p><strong>socket</strong> :the socket this connection is made on</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onSocketConnection : <span class="hljs-function"><span class="hljs-params">(socket)</span>=&gt;</span>
     <span class="hljs-keyword">new</span> SocketHandler(
       socket     : socket
       messages   : <span class="hljs-property">@_messages</span>

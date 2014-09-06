@@ -1,3 +1,10 @@
+# Local dependencies
+# ------------------ 
+# [Client ](./Client .html)  
+# [ClientModel](./ClientModel.html)  
+# [ClientStore](./ClientStore.html)  
+# [ClientContainer](./ClientContainer.html)  
+# [Mediator](../Shared/Mediator.html) 
 Client    = require('./Client')
 Model     = require('./ClientModel')
 Store     = require('./ClientStore')

@@ -12,12 +12,17 @@ Strings = require('../Shared/Strings')
 
 # ServerContainer
 # ===============
-# the container provides all the HTML needed outside of the body tag. 
-#
+# The container provides all the HTML needed outside of the body tag. 
+# as well as 
 class ServerContainer
   _init_page_data : null
   _status : 200
 
+  # constructor
+  # -----------
+  # **site_name** : the name of the site serving this container
+  #
+  # **logo_url** : url for site logo
   constructor : (args)->
     @_site_name = args.site_name
     @_logo_url  = args.logo_url
@@ -35,6 +40,13 @@ class ServerContainer
 
     idMap(@_page)
 
+  # load
+  # ----
+  # Load and build the page that this container is rendering
+  #
+  # **page** : page to load & build
+  # 
+  # **callback** : callback to return (error)
   load : (args)->
     @_page   = args.page
     callback = args.callback
@@ -47,22 +59,76 @@ class ServerContainer
       callback(error)
     )
 
+  # initData
+  # --------
+  # Returns the page and id map data for this container to be
+  # used in sync on the client
   initData : ()->
     result = {}
     result[Strings.ID_MAP] = @_idMap()
     result[Strings.PAGE_DATA] = @_page.data
     result
 
-  # _pageAttr
-  # ---------
-  _pageAttr : ()->
-    "#{Strings.PAGE_ATTR_NAME}=\"#{@pageKey()}\""
-
+  # pageKey
+  # -------
+  # The key used to place the page's constructor name and id
+  # in the body tag for use in client sync
   pageKey : ()->
     "#{@_page.constructor.name}:#{@_page.id}"
 
+  # status
+  # ------
+  # returns the http status
   status : ()->
     @_status
+
+  # headers
+  # -------
+  # returns and custom headers for the container's page
+  headers : ()->
+    @_page.headers()
+
+  # html
+  # ----
+  # render this container as html
+  html : ()->
+    # TODO
+    # <link rel="shortcut icon" href="#{@favicon_url}" />
+    """
+      <!DOCTYPE html>
+      <html>
+        <head>
+          #{@_meta()}
+
+          <title>#{@_title()}</title>
+
+          #{(Tag.stylesheet(href: href) for href in @_page.styles).join("\n")}
+          
+          #{(Tag.script(src: src) for src in @_page.scripts).join("\n")}
+          
+          #{@_page.head()}        
+        </head>
+        
+        <body #{@_pageAttr()}>
+          #{@_page.html()}
+        </body>
+      </html>
+    """
+
+  # text
+  # ----
+  # render this container as text
+  text : ()->
+    @_page.text()
+
+  # json
+  # ----
+  # render this container as json
+  json : ()->
+    @_page.json()
+
+  # INTERNAL METHODS
+  # ----------------
 
   # meta
   # ----
@@ -130,49 +196,18 @@ class ServerContainer
       
     html
     
+  # _title
+  # -------
+  # Title for this container's page
   _title : ()->
     @_page.title() || @_site_name
 
-  headers : ()->
-    @_page.headers()
+  # _pageAttr
+  # ---------
+  # The attribute used to pass this page's id and name in 
+  # the rendered html for use in client sync
+  _pageAttr : ()->
+    "#{Strings.PAGE_ATTR_NAME}=\"#{@pageKey()}\""
 
-  # html
-  # ----
-  # render this container as html
-  html : ()->
-    # TODO
-    # <link rel="shortcut icon" href="#{@favicon_url}" />
-    """
-      <!DOCTYPE html>
-      <html>
-        <head>
-          #{@_meta()}
-
-          <title>#{@_title()}</title>
-
-          #{(Tag.stylesheet(href: href) for href in @_page.styles).join("\n")}
-          
-          #{(Tag.script(src: src) for src in @_page.scripts).join("\n")}
-          
-          #{@_page.head()}        
-        </head>
-        
-        <body #{@_pageAttr()}>
-          #{@_page.html()}
-        </body>
-      </html>
-    """
-
-  # text
-  # ----
-  # render this container as text
-  text : ()->
-    @_page.text()
-
-  # json
-  # ----
-  # render this container as json
-  json : ()->
-    @_page.json()
 
 module.exports = ServerContainer

@@ -185,32 +185,9 @@ JWT  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jwt
             </div>
             
             <div class="content"><div class='highlight'><pre>TOKEN = {
-  EXPIRES : <span class="hljs-string">'exp'</span>
-  ISSUER  : <span class="hljs-string">'iss'</span>
-}
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SocketHandler</span></span>
-  <span class="hljs-property">@_sockets</span> : {}
-  
-  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    <span class="hljs-property">@_socket</span>     = args.socket
-    <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
-    <span class="hljs-property">@_messages</span>   = args.messages 
-    <span class="hljs-property">@_init_store</span> = args.init_store
-    
-    <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id] = <span class="hljs-property">@_socket</span>
-      
-    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-property">@_onMessage</span>)
-    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-property">@_onClose</span>)
-    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-property">@_onError</span>)
-    
-  _onMessage : <span class="hljs-function"><span class="hljs-params">(raw_message)</span>=&gt;</span>
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"RCV <span class="hljs-subst">#{raw_message}</span>"</span>)
-
-    message = Message.parse(raw_message)
-
-    <span class="hljs-keyword">if</span> message.isError()
-      <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"Client error: <span class="hljs-subst">#{message.error}</span>"</span>)</pre></div></div>
+  Expires : <span class="hljs-string">'exp'</span>
+  Issuer  : <span class="hljs-string">'iss'</span>
+}</pre></div></div>
             
         </li>
         
@@ -221,11 +198,9 @@ JWT  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jwt
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>TODO: how to best handle client errors on server</p>
+              <h1 id="requesthandler">RequestHandler</h1>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span></pre></div></div>
             
         </li>
         
@@ -236,42 +211,15 @@ JWT  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jwt
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>this decodes the token (if present) and adds user_id to 
-message for use by handler </p>
+              <p>This class handles socket requests received by the server
+Aside from the initalize and authenticate messages, it 
+delegates directly to the user specified messages object, 
+calling methods with the name of the sent messages to handle
+processing.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_addUserIdFromToken</span>(message)
-    
-    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>])
-      @[<span class="hljs-string">"_<span class="hljs-subst">#{message.name}</span>"</span>](message)
-
-    <span class="hljs-keyword">else</span>
-      handler = <span class="hljs-property">@_messages</span>[message.name]
-
-      <span class="hljs-keyword">if</span> handler
-        handler(
-          message  : message
-          callback : <span class="hljs-function"><span class="hljs-params">(response)</span>=&gt;</span>
-            <span class="hljs-keyword">if</span> response?.error
-              <span class="hljs-property">@_sendError</span>(response.error)
-            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> response
-              reply = message.reply(response)
-              <span class="hljs-property">@_sendMessage</span>(reply)
-        )
-
-      <span class="hljs-keyword">else</span>
-        error = <span class="hljs-string">"Message:<span class="hljs-subst">#{message.name}</span> is not supported"</span>
-        <span class="hljs-built_in">console</span>.error(error)
-        <span class="hljs-property">@_sendError</span>(error)
-
-  _initialize : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    page_key   = message.data.page_key
-    init_data = <span class="hljs-property">@_init_store</span>[page_key]
-    reply     = message.reply(init_data)
-    <span class="hljs-property">@_sendMessage</span>(reply)
-
-  _authenticate : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SocketHandler</span></span></pre></div></div>
             
         </li>
         
@@ -282,42 +230,11 @@ message for use by handler </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>@_messages.authenticate should process the incoming message 
-and respond with a user object having the following methods
-<strong>id</strong>           : required, returns unique identifier for user
-<strong>saveToken</strong>    : optional, saves token
-<strong>tokenExpires</strong> : optional, returns token expiry time</p>
+              <p>sockets keyed by socket id</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-    <span class="hljs-property">@_messages</span>.authenticate(
-      message  : message, 
-      callback : <span class="hljs-function"><span class="hljs-params">(response)</span>=&gt;</span>
-        <span class="hljs-keyword">if</span> response.error
-          <span class="hljs-keyword">return</span> <span class="hljs-property">@_sendError</span>(response.error)
-        
-        user = response.user
-        body = {}
-        body[TOKEN.ISSUER] = user.id()
-        
-        expires = <span class="hljs-keyword">if</span> Type(user.tokenExpires, Function)
-          user.tokenExpires()
-        <span class="hljs-keyword">else</span>
-          <span class="hljs-literal">null</span>
-
-        <span class="hljs-keyword">if</span> expires
-          body[TOKEN.EXPIRES] = expires
-
-        token = JWT.encode(body, <span class="hljs-property">@_jwt_secret</span>)
-
-        reply = message.reply({
-          token   : token
-          expires : expires
-          user    : user
-        })
-
-        <span class="hljs-property">@_sendMessage</span>(reply)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-property">@_sockets</span> : {}</pre></div></div>
             
         </li>
         
@@ -328,16 +245,9 @@ and respond with a user object having the following methods
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>after sending token, have user save it if its supported</p>
+              <h2 id="constructor-">constructor </h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> Type(user.saveToken, Function)
-          user.saveToken(
-            token    : token
-            callback : <span class="hljs-function"><span class="hljs-params">(error)</span>-&gt;</span>
-              <span class="hljs-keyword">if</span> error
-                <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
             
         </li>
         
@@ -348,18 +258,25 @@ and respond with a user object having the following methods
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>error = new Error(“Failed to save user token”)
-TODO: should send client message this failed?
-@_sendError(error)</p>
+              <p><strong>socket</strong> : the socket </p>
+<p><strong>jwt_secret</strong> : jwt_secret used for decoding token</p>
+<p><strong>message</strong> : object of handlers for messages</p>
+<p><strong>init_store</strong> : the store used for getting data from 
+                 initial http render for initializeReply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          )
-    )
-  
-  _addUserIdFromToken : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
-    <span class="hljs-keyword">if</span> message.token
-      body = JWT.decode(message.token, <span class="hljs-property">@_jwt_secret</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    <span class="hljs-property">@_socket</span>     = args.socket
+    <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
+    <span class="hljs-property">@_messages</span>   = args.messages 
+    <span class="hljs-property">@_init_store</span> = args.init_store
+    
+    <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id] = <span class="hljs-property">@_socket</span>
+      
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'message'</span>, <span class="hljs-property">@_onMessage</span>)
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'close'</span>, <span class="hljs-property">@_onClose</span>)
+    <span class="hljs-property">@_socket</span>.<span class="hljs-literal">on</span>(<span class="hljs-string">'error'</span>, <span class="hljs-property">@_onError</span>)</pre></div></div>
             
         </li>
         
@@ -370,25 +287,9 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>check token expiration</p>
+              <h2 id="internal-methods">INTERNAL METHODS</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      expires = body[TOKEN.EXPIRES]
-      expired = <span class="hljs-keyword">if</span> expires
-        now = Date.now()
-        (expires &lt; now)
-      <span class="hljs-keyword">else</span>
-        <span class="hljs-literal">false</span>
-
-      <span class="hljs-keyword">unless</span> expired
-        message.user_id = body[TOKEN.ISSUER]
-
-  _onClose : <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
-    <span class="hljs-keyword">delete</span> <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id]
-          
-  _onError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
-    <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
             
         </li>
         
@@ -399,8 +300,7 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>TODO handle error</p>
-
+              
             </div>
             
         </li>
@@ -412,21 +312,370 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>TODO: Error’s should have some record of inbound 
-      message that resulted in the error.. </p>
+              <h2 id="_onmessage">_onMessage</h2>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _sendError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
-    message = Message.error(error)
-    <span class="hljs-property">@_sendMessage</span>(message)
-    
-  _sendMessage : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Event handler for message from socket</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onMessage : <span class="hljs-function"><span class="hljs-params">(raw_message)</span>=&gt;</span>
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"RCV <span class="hljs-subst">#{raw_message}</span>"</span>)
+
+    message = Message.parse(raw_message)
+
+    <span class="hljs-keyword">if</span> message.isError()
+      <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"Client error: <span class="hljs-subst">#{message.error}</span>"</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>TODO: how to best handle client errors on server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>this decodes the token (if present) and adds user_id to 
+message for use by handler </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_addUserIdFromToken</span>(message)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>initialize and authenticate messages are handled by framework</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>])
+      @[<span class="hljs-string">"_<span class="hljs-subst">#{message.name}</span>"</span>](message)
+
+    <span class="hljs-keyword">else</span>
+      handler = <span class="hljs-property">@_messages</span>[message.name]
+
+      <span class="hljs-keyword">if</span> handler
+        handler(
+          message  : message
+          callback : <span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
+            reply = message.reply(
+              error : error
+              data  : data
+            )
+            <span class="hljs-property">@_sendMessage</span>(reply)
+        )
+
+      <span class="hljs-keyword">else</span>
+        error = <span class="hljs-string">"Message:<span class="hljs-subst">#{message.name}</span> is not supported"</span>
+        <span class="hljs-built_in">console</span>.error(error)
+        reply = message.reply(
+          error : error
+        )
+        <span class="hljs-property">@_sendMessage</span>(reply)
+
+  _onClose : <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
+    <span class="hljs-keyword">delete</span> <span class="hljs-property">@constructor</span>._sockets[<span class="hljs-property">@_socket</span>.id]
+          
+  _onError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
+    <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>TODO handle error bettr</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <h2 id="_initialize">_initialize</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Respond to the initialize message with the id map and data 
+used by the server side render of the requested page</p>
+<p><strong>message</strong> : message from client with page_key </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _initialize : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    page_key   = message.data.page_key
+    init_data = <span class="hljs-property">@_init_store</span>[page_key]
+    reply     = message.reply(data : init_data)
+    <span class="hljs-property">@_sendMessage</span>(reply)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <h2 id="_authenticate-">_authenticate </h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Delegates to an authenticate message in the user provided
+messages object and then encodes a jwt token that the client
+will include in subsequent request. 
+<strong>message</strong> : the message from client with auth data</p>
+<p>messages.authenticate should process the incoming message 
+and respond with a user object having the following methods
+<strong>id</strong>         : required, returns unique identifier for user
+<em>saveToken</em>    : optional, saves token
+<em>tokenExpires</em> : optional, returns token expiry time</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _authenticate : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    <span class="hljs-property">@_messages</span>.authenticate(
+      message  : message, 
+      callback : <span class="hljs-function"><span class="hljs-params">(error, user)</span>=&gt;</span>
+        <span class="hljs-keyword">unless</span> error             
+          body = {}
+          body[TOKEN.Issuer] = user.id()
+          
+          expires = <span class="hljs-keyword">if</span> Type(user.tokenExpires, Function)
+            user.tokenExpires()
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-literal">null</span>
+
+          <span class="hljs-keyword">if</span> expires
+            body[TOKEN.Expires] = expires
+
+          token = JWT.encode(body, <span class="hljs-property">@_jwt_secret</span>)
+
+          data = {
+            token   : token
+            expires : expires
+            user    : user
+          }
+
+        reply = message.reply(
+          error : error
+          data  : data
+        )
+        <span class="hljs-property">@_sendMessage</span>(reply)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>after sending token, have user save it if its supported</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!error <span class="hljs-keyword">and</span> Type(user.saveToken, Function))
+          user.saveToken(
+            token    : token
+            callback : <span class="hljs-function"><span class="hljs-params">(error)</span>-&gt;</span>
+              <span class="hljs-keyword">if</span> error
+                <span class="hljs-built_in">console</span>.error(error)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>error = new Error(“Failed to save user token”)
+TODO: should send client message this failed?
+@_sendError(error)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          )
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <h2 id="_adduseridfromtoken">_addUserIdFromToken</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>If message has token, decode it and add the associated user id
+to the message for later processing</p>
+<p><strong>message</strong> : message to process</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _addUserIdFromToken : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+    <span class="hljs-keyword">if</span> message.token
+      body = JWT.decode(message.token, <span class="hljs-property">@_jwt_secret</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>check token expiration</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      expires = body[TOKEN.Expires]
+      expired = <span class="hljs-keyword">if</span> expires
+        now = Date.now()
+        (expires &lt; now)
+      <span class="hljs-keyword">else</span>
+        <span class="hljs-literal">false</span>
+
+      <span class="hljs-keyword">unless</span> expired
+        message.user_id = body[TOKEN.Issuer]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <h2 id="_sendmessage">_sendMessage</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Send a message to the client</p>
+<p><strong>message</strong> : message to send</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _sendMessage : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
     raw_message = message.stringify()
     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"SND <span class="hljs-subst">#{raw_message}</span>"</span>)
-    <span class="hljs-property">@_socket</span>.send(raw_message)
+    <span class="hljs-property">@_socket</span>.send(raw_message)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <h2 id="_sendmessageall">_sendMessageAll</h2>
 
-  _sendMessageAll : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Send a message to all clients</p>
+<p><strong>message</strong> : message to send</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _sendMessageAll : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
     <span class="hljs-keyword">for</span> id, socket <span class="hljs-keyword">of</span> <span class="hljs-property">@constructor</span>._sockets
       raw_message = message.stringify()
       socket.send(raw_message)

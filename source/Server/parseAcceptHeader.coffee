@@ -1,4 +1,8 @@
+# parseAcceptHeader
+# -----------------
 # Helper function to parse the HTTP ACCEPT header
+# 
+# **str** : str headers to parse
 parseAcceptHeader = (str)->
   index = 0
 

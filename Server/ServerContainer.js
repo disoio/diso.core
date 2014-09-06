@@ -55,16 +55,51 @@
       return result;
     };
 
-    ServerContainer.prototype._pageAttr = function() {
-      return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this.pageKey()) + "\"";
-    };
-
     ServerContainer.prototype.pageKey = function() {
       return "" + this._page.constructor.name + ":" + this._page.id;
     };
 
     ServerContainer.prototype.status = function() {
       return this._status;
+    };
+
+    ServerContainer.prototype.headers = function() {
+      return this._page.headers();
+    };
+
+    ServerContainer.prototype.html = function() {
+      var href, src;
+      return "<!DOCTYPE html>\n<html>\n  <head>\n    " + (this._meta()) + "\n\n    <title>" + (this._title()) + "</title>\n\n    " + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this._page.styles;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          href = _ref[_i];
+          _results.push(Tag.stylesheet({
+            href: href
+          }));
+        }
+        return _results;
+      }).call(this)).join("\n")) + "\n    \n    " + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this._page.scripts;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          src = _ref[_i];
+          _results.push(Tag.script({
+            src: src
+          }));
+        }
+        return _results;
+      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
+    };
+
+    ServerContainer.prototype.text = function() {
+      return this._page.text();
+    };
+
+    ServerContainer.prototype.json = function() {
+      return this._page.json();
     };
 
     ServerContainer.prototype._meta = function() {
@@ -125,43 +160,8 @@
       return this._page.title() || this._site_name;
     };
 
-    ServerContainer.prototype.headers = function() {
-      return this._page.headers();
-    };
-
-    ServerContainer.prototype.html = function() {
-      var href, src;
-      return "<!DOCTYPE html>\n<html>\n  <head>\n    " + (this._meta()) + "\n\n    <title>" + (this._title()) + "</title>\n\n    " + (((function() {
-        var _i, _len, _ref, _results;
-        _ref = this._page.styles;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          href = _ref[_i];
-          _results.push(Tag.stylesheet({
-            href: href
-          }));
-        }
-        return _results;
-      }).call(this)).join("\n")) + "\n    \n    " + (((function() {
-        var _i, _len, _ref, _results;
-        _ref = this._page.scripts;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          src = _ref[_i];
-          _results.push(Tag.script({
-            src: src
-          }));
-        }
-        return _results;
-      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
-    };
-
-    ServerContainer.prototype.text = function() {
-      return this._page.text();
-    };
-
-    ServerContainer.prototype.json = function() {
-      return this._page.json();
+    ServerContainer.prototype._pageAttr = function() {
+      return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this.pageKey()) + "\"";
     };
 
     return ServerContainer;

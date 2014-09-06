@@ -66,19 +66,17 @@ class Client
 
   # constructor
   # -----------
-  # ### required args
   # **map** : map of routes to pages  
   # 
-  # ### optional args
-  # **models**    : Client side models.. if present, client will traverse the
+  # *models*    : Client side models.. if present, client will traverse the
   #                 message data and inflate plain json objects into instances
   #                 of those models using the $model attr 
   # 
-  # **reconnect** : If false, disables autoreconnect, otherwise should
+  # *reconnect* : If false, disables autoreconnect, otherwise should
   #                 be object that can specify the following configuration
   #                 params: *max_timeout*, *min_timeout*  
   #
-  # **container** : Override the default container used for pages. Default
+  # *container* : Override the default container used for pages. Default
   #                 implementation is [Container](./Container.html)
   #                 If overriding, you must set container on server as well.
   #
@@ -156,6 +154,9 @@ class Client
 
   # _clientError 
   # ------------
+  # Emit an error in the client
+  #
+  # **message** : error message
   _clientError : (message)->
     error = new Error(message)
     Mediator.emit('client:error', error)
@@ -188,6 +189,9 @@ class Client
   # the page of that name with initial_data and id_map. The page syncs 
   # with the dom and handles user interaction, delegating to Mediator.send
   # to relay messages to/from the server via this client's send method
+  #
+  # **init_data** : the initial data received from initializeReply. This 
+  #                 should have two attributes: 'id_map' and 'page_data'
   _run : (init_data)=>
     error = @_container.sync(init_data)
 
@@ -208,6 +212,7 @@ class Client
   _auth : (auth)->
     key = "#{@_name}:auth"
 
+    # remove the auth key from client and localStorage
     removeAuth = ()=>
       localStorage.removeItem(key)
       @__auth = null
@@ -223,16 +228,19 @@ class Client
         removeAuth()
 
     if (arguments.length is 1)
+      # its a write
       if auth
-        # its a write
+        # we have auth data, set it and check expiry
         @__auth = auth
         checkAuthExpiration()
 
+        # set if not expired
         if @__auth
           raw_auth = JSON.stringify(@__auth)
           localStorage.setItem(key, raw_auth)
       
       else
+        # if single argument is null/falselike remove auth (logout)
         removeAuth()
 
     else 
@@ -252,10 +260,13 @@ class Client
   # send
   # ----
   # send a message to the server
+  #
+  # **message** : the message to send
   send: (message) =>
     unless Type(message, Message)
       message = new Message(message)
 
+    # add the auth token if present
     auth = @_auth()
     message.token = if auth then auth.token else null
     
@@ -267,7 +278,7 @@ class Client
   # --------
   # called to connect to server when the Client is 
   # initially constructed and called to reconnect 
-  # after the client loses connectivity 
+  # after the client loses connectivity
   _connect : ()=>
     socket_url = "ws://#{window.location.host}"
     @_socket = new WebSocket(socket_url)

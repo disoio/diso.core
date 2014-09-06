@@ -23,18 +23,134 @@ class PageMap
   
   # constructor
   # -----------
-  # ### required args
-  # **map** : map of routes to pages  
+  # **store** : store that will be passed to pages created
+  #             by this page map
+  #
+  # **map** : map of routes to pages
   constructor : (args)->
     @_store = args.store
     @_process(args.map)
     @_router = new Router(@_routes)
+
+  # ROUTE HANDLING / LOOKUP
+  # -----------------------
+
+  # handle
+  # ------
+  # this function is called by the [connect](https://github.com/senchalabs/connect) 
+  # middleware pipeline on server. It looks up a page for 
+  # the route added by the router middleware and adds the 
+  # page constructor for that route to the request
+  #
+  # **request,response,next**: the standard connect middleware trio
+  handle : (request, response, next)->
+    @_router.handle(request, response, ()=>
+      Page = @_pageForRouteName(request.route.name)
+      
+      if Page
+        # if a page is found matching the route, add to request
+        headers = request.headers
+        page = new Page(
+          store  : @_store
+          route  : request.route
+          origin : "#{headers.protocol}#{headers.host}"
+        )
+        request.page = page
+        next()
+      else
+        # trigger an error for a missing page
+        error = _missingPageError(route)
+        next(error)
+    )
+
+  # page 
+  # ----
+  # Lookup and return a page by its name
+  #
+  # **name** : the name of the page
+  page : (name)->
+    @_pages[name]
+
+  # sync
+  # ----
+  # Create the page for the client. This is called in the 
+  # initial client loading process by the ClientContainer's 
+  # sync method. It takes care of passing the initial data 
+  # to the page. 
+  # 
+  # **name** : the name of the page 
+  #
+  # **location** : the current window.location
+  # 
+  # **container** : the container for this page
+  #
+  # **data** : the data for the page
+  sync : (args)->
+    name      = args.name
+    location  = args.location
+    container = args.container
+    data      = args.data
+
+    # unless we can find a page matching the name return false
+    # to signal error
+    Page = @page(name)
+    unless Page
+      return false
+    
+    # lookup the route for the current url
+    path = location.pathname + location.search + location.hash
+    route = @_router.match(path : path)
+
+    new Page(
+      store     : @_store
+      route     : route
+      origin    : location.origin
+      container : container
+      data      : data
+    )
+
+  # route
+  # -----
+  # Lookup and create a page for the given route throws error
+  # if no page matches the route. This is called by the 
+  # [ClientContainer](../Shared/ClientContainer.html)'s goto method
+  # 
+  # **route** : the route to use for lookup
+  #
+  # **location** : the current window.location
+  # 
+  # **container** : the container for this page
+  route : (args)->
+    route     = args.route
+    location  = args.location
+    container = args.container
+
+    matched_route = @_router.match(route : route)
+
+    Page = @_pageForRouteName(matched_route.name)
+
+    unless Page 
+      error = _missingPageError(matched_route)
+      throw error
+
+    new Page(
+      store     : @_store
+      route     : route
+      origin    : location.origin
+      container : container
+    )
+
+
+  # INTERNAL METHODS
+  # ----------------
 
   # _process
   # --------
   # Process the map to yield list of routes for router
   # and also allow for page lookup via route name and 
   # constructor name
+  #
+  # **map** : the map to process
   _process : (map)->
     for name,route of map
       for attr in ['page', 'route']
@@ -65,7 +181,11 @@ class PageMap
 
   # _addRoute
   # ---------
-  # Add a route
+  # Add a route to the router
+  # 
+  # **name** : route name
+  # **route** : the route
+  # **page** : page for this route
   _addRoute : (args)->
     name  = args.name
     route = args.route
@@ -74,95 +194,16 @@ class PageMap
     @_routes[name]             = route
     @_page_by_route_name[name] = page
 
-  # handle
-  # ------
-  # this function is called by the [connect](https://github.com/senchalabs/connect) 
-  # middleware pipeline on server. It looks up a page for 
-  # the route added by the router middleware and adds the 
-  # page constructor for that route to the request
-  handle : (req, res, next)->
-    @_router.handle(req, res, ()=>
-      Page = @_pageForRouteName(req.route.name)
-      
-      if Page
-        headers = req.headers
-        page = new Page(
-          store  : @_store
-          route  : req.route
-          origin : "#{headers.protocol}#{headers.host}"
-        )
-        req.page = page
-        next()
-      else
-        error = _missingPageError(route)
-        next(error)
-    )
-
   # _pageForRouteName
   # -----------------
   # Lookup and return the page class for a given route name
   # returns null if no page is found matching route's name
+  #
+  # **name** : route name to lookup page for
   _pageForRouteName : (name)->
     if name of @_page_by_route_name
       @_page_by_route_name[name]
     else
       null
-
-  # page 
-  # ----
-  # Lookup and return a page by its name
-  page : (name)->
-    @_pages[name]
-
-  # sync
-  # ----
-  # Create the page for the client. This is called in the initial
-  # client loading process by the ClientContainer's sync method.
-  # It takes care of passing the initial data to the page. 
-  sync : (args)->
-    name      = args.name
-    location  = args.location
-    container = args.container
-    data      = args.data
-
-    Page = @page(name)
-    unless Page
-      return null
-    
-    path = location.pathname + location.search + location.hash
-    route = @_router.match(path : path)
-
-    new Page(
-      store     : @_store
-      route     : route
-      origin    : location.origin
-      container : container
-      data      : data
-    )
-
-  # route
-  # -----
-  # Lookup and create a page for the given route
-  # throws error if no page matches the route. This 
-  # is called by the ClientContainer's goto method
-  route : (args)->
-    route     = args.route
-    location  = args.location
-    container = args.container
-
-    matched_route = @_router.match(route : route)
-
-    Page = @_pageForRouteName(matched_route.name)
-
-    unless Page 
-      error = _missingPageError(matched_route)
-      throw error
-
-    new Page(
-      store     : @_store
-      route     : route
-      origin    : location.origin
-      container : container
-    )
 
 module.exports = PageMap

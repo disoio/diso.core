@@ -123,87 +123,505 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
+              <h2 id="core-dependencies">Core dependencies</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><a href="http://nodejs.org/api/events.html#events_class_events_eventemitter">EventEmitter</a> </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>{EventEmitter} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2 id="local-dependencies">Local dependencies</h2>
+<p><a href="../Shared/Mediator.html">Mediator</a><br><a href="../Shared/Message.html">Message</a>  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>Mediator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Mediator'</span>)
+Message  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Message'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h1 id="cache">Cache</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>{EventEmitter}   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>)
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cache</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
 
-Mediator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Mediator'</span>)
-Message  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Message'</span>)
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p><strong>_store</strong> : backing store for this cache</p>
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cache</span> </span>
-  constructor : <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_store</span>)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@_store</span>)</span>-&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>cache!</p>
 
-  _data : {}
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _data : {}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <h2 id="_key">_key</h2>
 
-  _key : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    <span class="hljs-string">"<span class="hljs-subst">#{args.type}</span>:<span class="hljs-subst">#{args.id}</span>"</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Create cache key from type and id</p>
+<p><strong>type</strong> : constructor type
+<strong>id</strong> : object id</p>
 
-  get  : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _key : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    <span class="hljs-string">"<span class="hljs-subst">#{args.type}</span>:<span class="hljs-subst">#{args.id}</span>"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h2 id="get">get</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p><strong>type</strong> : constructor type
+<strong>id</strong> : object id</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  get  : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     key = <span class="hljs-property">@_key</span>(args)
 
     <span class="hljs-keyword">if</span> key <span class="hljs-keyword">of</span> <span class="hljs-property">@_data</span>
       <span class="hljs-property">@_data</span>[key]
     <span class="hljs-keyword">else</span>
-      <span class="hljs-literal">null</span>
+      <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <h2 id="put">put</h2>
 
-  put  : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p><strong>type</strong> : constructor type
+<strong>id</strong> : object id</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  put  : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     key = <span class="hljs-property">@_key</span>(args)
     data = args.data
 
     <span class="hljs-property">@_data</span>[key] = data
-    <span class="hljs-property">@_store</span>.emit(key, data)
+    <span class="hljs-property">@_store</span>.emit(key, data)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h2 id="remove">remove</h2>
 
-  remove : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p><strong>type</strong> : constructor type
+<strong>id</strong> : object id</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  remove : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     key = <span class="hljs-property">@_key</span>(args)
-    <span class="hljs-keyword">delete</span> <span class="hljs-property">@_data</span>[key]
+    <span class="hljs-keyword">delete</span> <span class="hljs-property">@_data</span>[key]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h1 id="clientstore">ClientStore</h1>
 
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClientStore</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EventEmitter</span></span>
-  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>The store used by pages in the client to fetch the data 
+they need. It sends messages over the client’s web socket
+and subscribes to their responses, sending that response
+data to the page via callback once it has been received</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClientStore</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EventEmitter</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     <span class="hljs-property">@_cache</span> = <span class="hljs-keyword">new</span> Cache(@)
     
-    Mediator.<span class="hljs-literal">on</span>(<span class="hljs-string">'message:cache:invalidate'</span>, <span class="hljs-property">@_invalidateCache</span>)
+    Mediator.<span class="hljs-literal">on</span>(<span class="hljs-string">'message:cache:invalidate'</span>, <span class="hljs-property">@_invalidateCache</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <h2 id="_invalidatecache">_invalidateCache</h2>
 
-  _invalidateCache : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>TODO: Endpoint for server-triggered cache invalidation</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _invalidateCache : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
     <span class="hljs-keyword">for</span> cache_args <span class="hljs-keyword">in</span> message.data.remove
-      <span class="hljs-property">@_cache</span>.remove(cache_args)
+      <span class="hljs-property">@_cache</span>.remove(cache_args)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <h2 id="get">get</h2>
 
-  get : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Get data from the store</p>
+<p><strong>message</strong> : the message to use on a cache miss</p>
+<p><strong>callback</strong> : returns (error, data)</p>
+<p><em>cache</em> : the cache key args (type, id) to be used for
+          caching</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  get : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     message    = args.message
     callback   = args.callback
     cache_args = args.cache
 
     <span class="hljs-keyword">unless</span> Type(message, Message)
-      message = <span class="hljs-keyword">new</span> Message(message)
+      message = <span class="hljs-keyword">new</span> Message(message)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>first try the cache</p>
 
-    <span class="hljs-keyword">if</span> cache_args
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> cache_args
       data = <span class="hljs-property">@_cache</span>.get(cache_args)
       <span class="hljs-keyword">if</span> data
-        <span class="hljs-keyword">return</span> callback(<span class="hljs-literal">null</span>, data)
-   
-    Mediator.send(message)
+        <span class="hljs-keyword">return</span> callback(<span class="hljs-literal">null</span>, data)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>cache miss, send message to server</p>
 
-    reply_evt = message.replyEventName()
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    Mediator.send(message)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>subscribe to the message reply, and trigger
+cache update and callback once recieved</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    reply_evt = message.replyEventName()
     Mediator.once(reply_evt, <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
-      <span class="hljs-keyword">if</span> message.error 
+      <span class="hljs-keyword">if</span> message.isError()
         callback(message.error)
       <span class="hljs-keyword">else</span>
-        data = message.data
+        data = message.data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>update cache</p>
 
-        <span class="hljs-keyword">if</span> cache_args
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> cache_args
           cache_args.data = data
           <span class="hljs-property">@_cache</span>.put(cache_args)
 
         callback(<span class="hljs-literal">null</span>, data)
-    )
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h2 id="subscribe">subscribe</h2>
 
-  subscribe : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    key = <span class="hljs-property">@_key</span>(args)
-    <span class="hljs-property">@on</span>(key, args.callback)
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>TODO: let page subscribe to updates on objects in cache</p>
 
-  unsubscribe : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  subscribe : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     key = <span class="hljs-property">@_key</span>(args)
-    <span class="hljs-property">@removeListener</span>(key, args.callback)
+    <span class="hljs-property">@on</span>(<span class="hljs-string">"store:update:<span class="hljs-subst">#{key}</span>"</span>, args.callback)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h2 id="unsubscribe">unsubscribe</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>TODO: let page unsubscribe from updates on objects in cache</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  unsubscribe : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    key = <span class="hljs-property">@_key</span>(args)
+    <span class="hljs-property">@removeListener</span>(<span class="hljs-string">"store:update:<span class="hljs-subst">#{key}</span>"</span>, args.callback)
 
 <span class="hljs-built_in">module</span>.exports = ClientStore</pre></div></div>
             

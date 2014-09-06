@@ -5,7 +5,6 @@
 class ClientModel
   # constructor
   # -----------
-  # ### required args
   # **data** : data for this model
   constructor : (data)->
     for k,v of data

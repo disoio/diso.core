@@ -123,25 +123,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <p>Supported rendering formats</p>
+              <h2 id="local-dependencies">Local dependencies</h2>
+<p><a href="./ServerStore.html">ServerStore</a><br><a href="./parseAcceptHeader.html">parseAcceptHeader</a>  </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>FORMAT = {
-  html : <span class="hljs-string">'text/html'</span>,
-  json : <span class="hljs-string">'application/json'</span>,
-  text : <span class="hljs-string">'text/plain'</span> 
-}
-
-parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./parseAcceptHeader'</span>) 
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServerStore</span></span>
-  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    <span class="hljs-property">@messages</span> = args.messages
-
-  get : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    message  = args.message
-    callback = args.callback</pre></div></div>
+            <div class="content"><div class='highlight'><pre>ServerStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerStore'</span>)
+parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./parseAcceptHeader'</span>)</pre></div></div>
             
         </li>
         
@@ -152,9 +140,15 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h1 id="requesthandler">RequestHandler</h1>
+              <p>Supported rendering formats</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>FORMAT = {
+  html : <span class="hljs-string">'text/html'</span>,
+  json : <span class="hljs-string">'application/json'</span>,
+  text : <span class="hljs-string">'text/plain'</span> 
+}</pre></div></div>
             
         </li>
         
@@ -165,54 +159,112 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              
+              <h1 id="requesthandler">RequestHandler</h1>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span></span>
-  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>This class handles http requests received by the server</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p><strong>init_store</strong> : the cache where initial render / idmap data is 
+                 stored for later retrieval to answer initialize 
+                 socket message</p>
+<p><strong>messages</strong> : the user specified messages handler passed to the server</p>
+<p><strong>container</strong> : the container that handles page rendering</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     <span class="hljs-property">@_init_store</span> = args.init_store
     messages     = args.messages
-    <span class="hljs-property">@_container</span>  = args.container
+    <span class="hljs-property">@_container</span>  = args.container</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Store used by container/page to fetch data
+Basically just a pass through to messages</p>
 
-    <span class="hljs-property">@_store</span> = <span class="hljs-keyword">new</span> ServerStore(
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_store</span> = <span class="hljs-keyword">new</span> ServerStore(
       messages : messages
-    )
-    
-  _responseFormat : <span class="hljs-function"><span class="hljs-params">(request)</span>-&gt;</span>
-    accepts = request.headers[<span class="hljs-string">'Accept'</span>]
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h2 id="handle">handle</h2>
 
-    <span class="hljs-keyword">if</span> accepts
-      parsed_accepts = parseAcceptHeader(accepts)  
-      
-      <span class="hljs-keyword">for</span> accept <span class="hljs-keyword">in</span> parsed_accepts
-        type = <span class="hljs-string">"<span class="hljs-subst">#{accept.type}</span>/<span class="hljs-subst">#{accept.subtype}</span>"</span>
-        types = (v <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> FORMAT)
-        <span class="hljs-keyword">if</span> (type <span class="hljs-keyword">in</span> types)
-          <span class="hljs-keyword">return</span> [k, type]
-    
-    [<span class="hljs-string">'html'</span>, FORMAT.html]
-  
-  _render : <span class="hljs-function"><span class="hljs-params">(args)</span>=&gt;</span>
-    request  = args.request
-    response = args.response
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>this function is called by the <a href="https://github.com/senchalabs/connect">connect</a> 
+middleware pipeline on server. It uses the container to 
+handle the page thats been attached to the request, caches 
+data to be passed down to the client during the socket 
+setup and initializing phase, and then calls render to send
+the response</p>
+<p><strong>request,response,next</strong>: the standard connect middleware trio</p>
 
-    [format, content_type] = <span class="hljs-property">@_responseFormat</span>(request)      
-
-    headers = <span class="hljs-property">@_container</span>.headers()
-    headers[<span class="hljs-string">'Content-Type'</span>] = content_type
-    status = <span class="hljs-property">@_container</span>.status() || <span class="hljs-number">200</span>
-    
-    body = <span class="hljs-property">@_container</span>[format]()
-
-    response.writeHead(status, headers)
-    response.end(body)
-
-  run : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    request  = args.request
-    response = args.response
-    next     = args.next
-<span class="hljs-function">
-    <span class="hljs-title">_onError</span> = <span class="hljs-params">(error)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  handle : <span class="hljs-function"><span class="hljs-params">(request, response, next)</span>-&gt;</span>
+<span class="hljs-function">    <span class="hljs-title">_onError</span> = <span class="hljs-params">(error)</span>-&gt;</span>
       <span class="hljs-built_in">console</span>.error(error)
       next(<span class="hljs-string">"500"</span>)
 
@@ -226,11 +278,11 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
         </li>
         
         
-        <li id="section-4">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-4">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>persist the init data so can get later and 
 send to client for initializeReply
@@ -247,8 +299,117 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
           )
         <span class="hljs-keyword">catch</span> error
           _onError(error)  
-    )
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h2 id="internal-methods">INTERNAL METHODS</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <h2 id="_responseformat">_responseFormat</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Finds the response format for an incoming request</p>
+<p><strong>request</strong> : the http request to find the response format for</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _responseFormat : <span class="hljs-function"><span class="hljs-params">(request)</span>-&gt;</span>
+    accepts = request.headers[<span class="hljs-string">'Accept'</span>]
+
+    <span class="hljs-keyword">if</span> accepts
+      parsed_accepts = parseAcceptHeader(accepts)  
+      
+      <span class="hljs-keyword">for</span> accept <span class="hljs-keyword">in</span> parsed_accepts
+        type = <span class="hljs-string">"<span class="hljs-subst">#{accept.type}</span>/<span class="hljs-subst">#{accept.subtype}</span>"</span>
+        types = (v <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> FORMAT)
+        <span class="hljs-keyword">if</span> (type <span class="hljs-keyword">in</span> types)
+          <span class="hljs-keyword">return</span> [k, type]
     
+    [<span class="hljs-string">'html'</span>, FORMAT.html]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h2 id="_render">_render</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Have the container render the page for the given request</p>
+<p><strong>request</strong> : the http request being handled</p>
+<p><strong>response</strong> : the http response that will be used to 
+               answer the request</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _render : <span class="hljs-function"><span class="hljs-params">(args)</span>=&gt;</span>
+    request  = args.request
+    response = args.response
+
+    [format, content_type] = <span class="hljs-property">@_responseFormat</span>(request)      
+
+    headers = <span class="hljs-property">@_container</span>.headers()
+    headers[<span class="hljs-string">'Content-Type'</span>] = content_type
+    status = <span class="hljs-property">@_container</span>.status() || <span class="hljs-number">200</span>
+    
+    body = <span class="hljs-property">@_container</span>[format]()
+
+    response.writeHead(status, headers)
+    response.end(body)
       
 <span class="hljs-built_in">module</span>.exports = RequestHandler</pre></div></div>
             

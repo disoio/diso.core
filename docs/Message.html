@@ -197,7 +197,10 @@ needs to be set via Message.setModels</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              
+              <p>Deflate the passed object so that it can be passed over the
+wire as json and inflated on the other end into models</p>
+<p><strong>obj</strong> : object to deflate</p>
+
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">deflate</span> = <span class="hljs-params">(obj)</span>-&gt;</span>
@@ -244,6 +247,7 @@ needs to be set via Message.setModels</p>
               <p>Inflate the passed json object by converting plain json objects
 into instances of their associated model. Model types are specified
 via model key defined in <a href="./String.html">Strings</a></p>
+<p><strong>obj</strong> : object to inflate</p>
 
             </div>
             
@@ -357,17 +361,122 @@ it to lookup the associated model</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              
+              <p>A WebSocket message</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span></span>
-  name  : <span class="hljs-literal">null</span>
-  id    : <span class="hljs-literal">null</span>
-  token : <span class="hljs-literal">null</span>
-  data  : <span class="hljs-literal">null</span>
-  error : <span class="hljs-literal">null</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>name for this message</p>
 
-  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  name  : <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>unique id for this message (shared by its reply)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  id    : <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>jwt auth token</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  token : <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>the data for this message</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  data  : <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>an error if needed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  error : <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Create a message</p>
+<h3 id="required-args">required args</h3>
+<p><strong>name</strong> : the name for this message</p>
+<p><em>id</em>     : id for this message, otherwise will be generated</p>
+<p><em>token</em>  : jwt token used to identify / authorize the user
+           sending this message</p>
+<p><em>data</em>   : the data / params for this message</p>
+<p><em>error</em>  : used in replies if error occured during processing
+           of message</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     <span class="hljs-keyword">unless</span> args.name
       <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Message must have name"</span>)
 
@@ -387,11 +496,11 @@ it to lookup the associated model</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <h2 id="-setmodels">@setModels</h2>
 
@@ -400,47 +509,175 @@ it to lookup the associated model</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Set the models to be used by inflate</p>
+<p><strong>_models</strong> : models to be used for inflation</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-property">@setModels</span> : <span class="hljs-function"><span class="hljs-params">(_models)</span>-&gt;</span>
-    models = _models
+    models = _models</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <h2 id="-parse">@parse</h2>
 
-  <span class="hljs-property">@error</span> : <span class="hljs-function"><span class="hljs-params">(error)</span>-&gt;</span>
-    <span class="hljs-keyword">new</span> @(
-      name  : <span class="hljs-string">'error'</span>
-      error : error
-    )
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Parse and create message from raw josn string</p>
+<p><strong>json</strong> : the raw json to parse</p>
 
-  <span class="hljs-property">@parse</span> : <span class="hljs-function"><span class="hljs-params">(raw_message)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-property">@parse</span> : <span class="hljs-function"><span class="hljs-params">(json)</span>-&gt;</span>
     <span class="hljs-keyword">try</span> 
-      message_data = JSON.parse(raw_message)
+      message_data = JSON.parse(json)
     <span class="hljs-keyword">catch</span> error
       <span class="hljs-keyword">return</span> <span class="hljs-property">@error</span>(<span class="hljs-string">"JSON.parse failed"</span>)
 
-    <span class="hljs-keyword">new</span> @(message_data)
+    <span class="hljs-keyword">new</span> @(message_data)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <h2 id="reply">reply</h2>
 
-  reply : <span class="hljs-function"><span class="hljs-params">(data)</span>-&gt;</span>
-    <span class="hljs-keyword">new</span> <span class="hljs-property">@constructor</span>(
-      name   : <span class="hljs-property">@replyName</span>()
-      data   : data
-      id     : <span class="hljs-property">@id</span>
-    )
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Create a reply message from this message using its id</p>
+<p><em>data</em> : data for the reply</p>
+<p><em>error</em> : error</p>
 
-  replyName : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-string">"<span class="hljs-subst">#{<span class="hljs-property">@name</span>}</span>Reply"</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  reply : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    args.name = <span class="hljs-property">@replyName</span>()
+    args.id   = <span class="hljs-property">@id</span>
+    <span class="hljs-keyword">new</span> <span class="hljs-property">@constructor</span>(args)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <h2 id="replyname">replyName</h2>
 
-  replyEventName : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-string">"message:<span class="hljs-subst">#{<span class="hljs-property">@replyName</span>()}</span>:id:<span class="hljs-subst">#{<span class="hljs-property">@id</span>}</span>"</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>The name of the reply to this message</p>
 
-  stringify : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  replyName : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-string">"<span class="hljs-subst">#{<span class="hljs-property">@name</span>}</span>Reply"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <h2 id="replyeventname">replyEventName</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>The event name that gets triggered by this message’s reply
+This is used in the <a href="../Client/ClientStore.html">ClientStore</a>
+in order to trigger load callback once the data is available</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  replyEventName : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-string">"message:<span class="hljs-subst">#{<span class="hljs-property">@replyName</span>()}</span>:id:<span class="hljs-subst">#{<span class="hljs-property">@id</span>}</span>"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <h2 id="stringify">stringify</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>Encode this message into json, deflating its data in the process</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  stringify : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
     message = {
       name  : <span class="hljs-property">@name</span>
       id    : <span class="hljs-property">@id</span>
@@ -454,15 +691,72 @@ it to lookup the associated model</p>
       message.data = <span class="hljs-property">@data</span>
     
     message = deflate(message)
-    JSON.stringify(message)
+    JSON.stringify(message)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <h2 id="iserror">isError</h2>
 
-  isError : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    !!<span class="hljs-property">@error</span>
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Returns true if this message has an error</p>
 
-  <span class="hljs-keyword">is</span> : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
-    (<span class="hljs-property">@name</span> <span class="hljs-keyword">is</span> name)
-  
-  <span class="hljs-keyword">in</span> : <span class="hljs-function"><span class="hljs-params">(names)</span>-&gt;</span>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isError : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    !!<span class="hljs-property">@error</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <h2 id="is">is</h2>
+<p>Convenience method for checking the name of this message</p>
+<p><strong>name</strong> : message name to check against</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">is</span> : <span class="hljs-function"><span class="hljs-params">(name)</span>-&gt;</span>
+    (<span class="hljs-property">@name</span> <span class="hljs-keyword">is</span> name)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <h2 id="in">in</h2>
+<p>Convenience method for checking whether this message’s is one
+of several possibilities</p>
+<p><strong>names</strong> : message names to check against</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">in</span> : <span class="hljs-function"><span class="hljs-params">(names)</span>-&gt;</span>
     (<span class="hljs-property">@name</span> <span class="hljs-keyword">in</span> names)
 
 <span class="hljs-built_in">module</span>.exports = Message</pre></div></div>

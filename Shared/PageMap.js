@@ -24,6 +24,76 @@
       this._router = new Router(this._routes);
     }
 
+    PageMap.prototype.handle = function(request, response, next) {
+      return this._router.handle(request, response, (function(_this) {
+        return function() {
+          var Page, error, headers, page;
+          Page = _this._pageForRouteName(request.route.name);
+          if (Page) {
+            headers = request.headers;
+            page = new Page({
+              store: _this._store,
+              route: request.route,
+              origin: "" + headers.protocol + headers.host
+            });
+            request.page = page;
+            return next();
+          } else {
+            error = _missingPageError(route);
+            return next(error);
+          }
+        };
+      })(this));
+    };
+
+    PageMap.prototype.page = function(name) {
+      return this._pages[name];
+    };
+
+    PageMap.prototype.sync = function(args) {
+      var Page, container, data, location, name, path, route;
+      name = args.name;
+      location = args.location;
+      container = args.container;
+      data = args.data;
+      Page = this.page(name);
+      if (!Page) {
+        return false;
+      }
+      path = location.pathname + location.search + location.hash;
+      route = this._router.match({
+        path: path
+      });
+      return new Page({
+        store: this._store,
+        route: route,
+        origin: location.origin,
+        container: container,
+        data: data
+      });
+    };
+
+    PageMap.prototype.route = function(args) {
+      var Page, container, error, location, matched_route, route;
+      route = args.route;
+      location = args.location;
+      container = args.container;
+      matched_route = this._router.match({
+        route: route
+      });
+      Page = this._pageForRouteName(matched_route.name);
+      if (!Page) {
+        error = _missingPageError(matched_route);
+        throw error;
+      }
+      return new Page({
+        store: this._store,
+        route: route,
+        origin: location.origin,
+        container: container
+      });
+    };
+
     PageMap.prototype._process = function(map) {
       var attr, name, page, route, subroute, _i, _len, _ref, _results;
       _results = [];
@@ -72,82 +142,12 @@
       return this._page_by_route_name[name] = page;
     };
 
-    PageMap.prototype.handle = function(req, res, next) {
-      return this._router.handle(req, res, (function(_this) {
-        return function() {
-          var Page, error, headers, page;
-          Page = _this._pageForRouteName(req.route.name);
-          if (Page) {
-            headers = req.headers;
-            page = new Page({
-              store: _this._store,
-              route: req.route,
-              origin: "" + headers.protocol + headers.host
-            });
-            req.page = page;
-            return next();
-          } else {
-            error = _missingPageError(route);
-            return next(error);
-          }
-        };
-      })(this));
-    };
-
     PageMap.prototype._pageForRouteName = function(name) {
       if (name in this._page_by_route_name) {
         return this._page_by_route_name[name];
       } else {
         return null;
       }
-    };
-
-    PageMap.prototype.page = function(name) {
-      return this._pages[name];
-    };
-
-    PageMap.prototype.sync = function(args) {
-      var Page, container, data, location, name, path, route;
-      name = args.name;
-      location = args.location;
-      container = args.container;
-      data = args.data;
-      Page = this.page(name);
-      if (!Page) {
-        return null;
-      }
-      path = location.pathname + location.search + location.hash;
-      route = this._router.match({
-        path: path
-      });
-      return new Page({
-        store: this._store,
-        route: route,
-        origin: location.origin,
-        container: container,
-        data: data
-      });
-    };
-
-    PageMap.prototype.route = function(args) {
-      var Page, container, error, location, matched_route, route;
-      route = args.route;
-      location = args.location;
-      container = args.container;
-      matched_route = this._router.match({
-        route: route
-      });
-      Page = this._pageForRouteName(matched_route.name);
-      if (!Page) {
-        error = _missingPageError(matched_route);
-        throw error;
-      }
-      return new Page({
-        store: this._store,
-        route: route,
-        origin: location.origin,
-        container: container
-      });
     };
 
     return PageMap;
