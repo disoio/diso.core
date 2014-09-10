@@ -128,13 +128,11 @@ class Message
     @token = args.token
     @data  = inflate(args.data || {})
 
-    @error = if ('error' of args)
-      error = args.error
-      unless Type(error, Error)
-        error = new Error(error) 
-      error        
-    else 
-      null
+    @error = null
+    if args.error
+      @error = args.error
+      unless Type(@error, Error)
+        @error = new Error(@error)
 
   # @setModels
   # ----------

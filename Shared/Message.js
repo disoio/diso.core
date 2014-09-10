@@ -74,7 +74,6 @@
     Message.prototype.error = null;
 
     function Message(args) {
-      var error;
       if (!args.name) {
         throw new Error("Message must have name");
       }
@@ -82,7 +81,13 @@
       this.id = args.id || ShortId.generate();
       this.token = args.token;
       this.data = inflate(args.data || {});
-      this.error = 'error' in args ? (error = args.error, !Type(error, Error) ? error = new Error(error) : void 0, error) : null;
+      this.error = null;
+      if (args.error) {
+        this.error = args.error;
+        if (!Type(this.error, Error)) {
+          this.error = new Error(this.error);
+        }
+      }
     }
 
     Message.setModels = function(_models) {

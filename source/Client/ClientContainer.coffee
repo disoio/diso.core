@@ -72,7 +72,7 @@ class ClientContainer
       map  = args.map
       view = args.view
 
-      view.setNode(id)
+      view.setId(id)
 
       subids      = Object.keys(map)
       subviews    = view.subviews()
@@ -99,25 +99,18 @@ class ClientContainer
           view : subview
         )
 
-    try
-      # have the page build its views
-      @_page.build()
+    # have the page build its views
+    @_page.build()
 
-      # sync the page (it will take care of syncing its subviews)
-      _syncView(
-        id   : page_id
-        map  : id_map
-        view : @_page
-      )
+    # sync the page (it will take care of syncing its subviews)
+    _syncView(
+      id   : page_id
+      map  : id_map
+      view : @_page
+    )
 
-      # run the page (i.e. call setup on each view)
-      @_page.run()
-
-      # null means "no error"
-      return null
-
-    catch error
-      return error
+    # run the page (i.e. call setup on each view)
+    @_page.run()
 
   pushPage  : ()->
   popPage   : ()->

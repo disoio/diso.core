@@ -128,8 +128,10 @@ class Client
     # [Mediator](../Mediator.html) provides decoupled pubsub-style
     # communication between client components. We
     Mediator.delegate(
-      'send' : @
-      'goto' : @_container
+      'send'          : @
+      'authenticated' : @
+      'user'          : @
+      'goto'          : @_container
     )
 
     # http://caniuse.com/websockets
@@ -147,10 +149,18 @@ class Client
       @_init()
     )
 
+  # authorized
+  # ----------
+  authenticated : ()->
+    !!@_auth()
+
   # logout
   # ------
   logout : ()->
     @_auth(null)
+
+  user : ()->
+    @_auth().user
 
   # _clientError 
   # ------------
@@ -193,12 +203,8 @@ class Client
   # **init_data** : the initial data received from initializeReply. This 
   #                 should have two attributes: 'id_map' and 'page_data'
   _run : (init_data)=>
-    error = @_container.sync(init_data)
-
-    if error
-      @_clientError(error)
-    else
-      Mediator.emit('client:ready')
+    @_container.sync(init_data)
+    Mediator.emit('client:ready')
 
   # _auth
   # ---------
@@ -341,7 +347,6 @@ class Client
   _authenticateReply : (message)->
     data = message.data
     Mediator.emit("client:authenticated", data)
-    delete data.user
     @_auth(data)
 
   # _onError

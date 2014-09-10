@@ -9,51 +9,14 @@
 
   Message = require('../Shared/Message');
 
-  Cache = (function() {
-    function Cache(_store) {
-      this._store = _store;
-    }
-
-    Cache.prototype._data = {};
-
-    Cache.prototype._key = function(args) {
-      return "" + args.type + ":" + args.id;
-    };
-
-    Cache.prototype.get = function(args) {
-      var key;
-      key = this._key(args);
-      if (key in this._data) {
-        return this._data[key];
-      } else {
-        return null;
-      }
-    };
-
-    Cache.prototype.put = function(args) {
-      var data, key;
-      key = this._key(args);
-      data = args.data;
-      this._data[key] = data;
-      return this._store.emit(key, data);
-    };
-
-    Cache.prototype.remove = function(args) {
-      var key;
-      key = this._key(args);
-      return delete this._data[key];
-    };
-
-    return Cache;
-
-  })();
+  Cache = require('../Shared/Cache');
 
   ClientStore = (function(_super) {
     __extends(ClientStore, _super);
 
-    function ClientStore(args) {
-      this._cache = new Cache(this);
-      Mediator.on('message:cache:invalidate', this._invalidateCache);
+    function ClientStore() {
+      this._cache = new Cache();
+      Mediator.on('message:invalidateCache', this._invalidateCache);
     }
 
     ClientStore.prototype._invalidateCache = function(message) {
@@ -67,16 +30,36 @@
       return _results;
     };
 
+    ClientStore.prototype._key = function(args) {
+      var key;
+      if ('key' in args) {
+        return args.key;
+      } else {
+        key = args.type;
+        if ('id' in args) {
+          key = "" + key + ":" + args.id;
+        }
+        return key;
+      }
+    };
+
+    ClientStore.prototype._event = function(key) {
+      return "update:" + key;
+    };
+
     ClientStore.prototype.get = function(args) {
-      var cache_args, callback, data, message, reply_evt;
+      var cache_args, callback, data, key, message, reply_evt;
       message = args.message;
       callback = args.callback;
       cache_args = args.cache;
       if (!Type(message, Message)) {
         message = new Message(message);
       }
-      if (cache_args) {
-        data = this._cache.get(cache_args);
+      key = cache_args ? this._key(cache_args) : null;
+      if (key) {
+        data = this._cache.get({
+          key: key
+        });
         if (data) {
           return callback(null, data);
         }
@@ -85,13 +68,18 @@
       reply_evt = message.replyEventName();
       return Mediator.once(reply_evt, (function(_this) {
         return function(message) {
+          var event;
           if (message.isError()) {
-            return callback(message.error);
+            return callback(message.error, null);
           } else {
             data = message.data;
-            if (cache_args) {
-              cache_args.data = data;
-              _this._cache.put(cache_args);
+            if (key) {
+              _this._cache.put({
+                key: key,
+                data: data
+              });
+              event = _this._event(key);
+              _this.emit(event, data);
             }
             return callback(null, data);
           }
@@ -100,15 +88,19 @@
     };
 
     ClientStore.prototype.subscribe = function(args) {
-      var key;
+      var callback, event, key;
+      callback = args.callback;
       key = this._key(args);
-      return this.on("store:update:" + key, args.callback);
+      event = this._event(key);
+      return this.on(event, callback);
     };
 
     ClientStore.prototype.unsubscribe = function(args) {
-      var key;
+      var callback, event, key;
+      callback = args.callback;
       key = this._key(args);
-      return this.removeListener("store:update:" + key, args.callback);
+      event = this._event(key);
+      return this.removeListener(event, args.callback);
     };
 
     return ClientStore;

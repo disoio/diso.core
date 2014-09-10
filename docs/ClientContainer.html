@@ -79,6 +79,11 @@
               </a>
             
               
+              <a class="source" href="Cache.html">
+                Cache.coffee
+              </a>
+            
+              
               <a class="source" href="Mediator.html">
                 Mediator.coffee
               </a>
@@ -300,7 +305,7 @@ element of the view with id_map passed via the initalizeReply</p>
       map  = args.map
       view = args.view
 
-      view.setNode(id)
+      view.setId(id)
 
       subids      = Object.keys(map)
       subviews    = view.subviews()
@@ -337,9 +342,7 @@ element of the view with id_map passed via the initalizeReply</p>
           id   : subid
           map  : submap
           view : subview
-        )
-
-    <span class="hljs-keyword">try</span></pre></div></div>
+        )</pre></div></div>
             
         </li>
         
@@ -354,7 +357,7 @@ element of the view with id_map passed via the initalizeReply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-property">@_page</span>.build()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_page</span>.build()</pre></div></div>
             
         </li>
         
@@ -369,11 +372,11 @@ element of the view with id_map passed via the initalizeReply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      _syncView(
-        id   : page_id
-        map  : id_map
-        view : <span class="hljs-property">@_page</span>
-      )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _syncView(
+      id   : page_id
+      map  : id_map
+      view : <span class="hljs-property">@_page</span>
+    )</pre></div></div>
             
         </li>
         
@@ -388,7 +391,10 @@ element of the view with id_map passed via the initalizeReply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-property">@_page</span>.run()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_page</span>.run()
+
+  pushPage  : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+  popPage   : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span></pre></div></div>
             
         </li>
         
@@ -399,17 +405,9 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>null means “no error”</p>
+              <h2 id="goto">goto</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
-
-    <span class="hljs-keyword">catch</span> error
-      <span class="hljs-keyword">return</span> error
-
-  pushPage  : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-  popPage   : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span></pre></div></div>
             
         </li>
         
@@ -419,19 +417,6 @@ element of the view with id_map passed via the initalizeReply</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <h2 id="goto">goto</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Make a transition between pages</p>
 <p><strong>route</strong> : the route for new page</p>
@@ -447,11 +432,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>get a new page for this route from the page map</p>
 
@@ -470,11 +455,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>TODO: make this way more robust
       for starters pass the JWT-token via get param or header</p>
@@ -488,11 +473,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>load the new page </p>
 
@@ -504,11 +489,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <h1 id="show-the-new-page">SHOW THE NEW PAGE</h1>
 
@@ -520,14 +505,26 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <h2 id="history-methods">HISTORY METHODS</h2>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <h2 id="history-methods">HISTORY METHODS</h2>
-
+              
             </div>
             
         </li>
@@ -539,7 +536,8 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              
+              <h2 id="_initializehistory">_initializeHistory</h2>
+
             </div>
             
         </li>
@@ -550,19 +548,6 @@ element of the view with id_map passed via the initalizeReply</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              <h2 id="_initializehistory">_initializeHistory</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-25">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Initialize the html5 history api. Using the browser api rather 
 than adapter and falling back to full page loads if it isn’t 
@@ -578,11 +563,11 @@ support
         </li>
         
         
-        <li id="section-26">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <h2 id="_supportshistory">_supportsHistory</h2>
 
@@ -591,11 +576,11 @@ support
         </li>
         
         
-        <li id="section-27">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>returns true if the user’s browser supports HTML5 history
 <a href="http://caniuse.com/#search=history">http://caniuse.com/#search=history</a></p>
@@ -608,11 +593,11 @@ support
         </li>
         
         
-        <li id="section-28">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <h2 id="_onpopstate">_onPopState</h2>
 
@@ -621,11 +606,11 @@ support
         </li>
         
         
-        <li id="section-29">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>called when user presses back button<br>TODO: handle this correctly / integrate with router</p>
 
@@ -637,11 +622,11 @@ support
         </li>
         
         
-        <li id="section-30">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <h2 id="_pushhistory">_pushHistory</h2>
 
@@ -650,11 +635,11 @@ support
         </li>
         
         
-        <li id="section-31">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>add url to the history. this will change the location bar to url</p>
 

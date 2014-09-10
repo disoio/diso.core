@@ -48,7 +48,7 @@
         id = args.id;
         map = args.map;
         view = args.view;
-        view.setNode(id);
+        view.setId(id);
         subids = Object.keys(map);
         subviews = view.subviews();
         temp_subids = Object.keys(subviews);
@@ -73,19 +73,13 @@
         }
         return _results;
       };
-      try {
-        this._page.build();
-        _syncView({
-          id: page_id,
-          map: id_map,
-          view: this._page
-        });
-        this._page.run();
-        return null;
-      } catch (_error) {
-        error = _error;
-        return error;
-      }
+      this._page.build();
+      _syncView({
+        id: page_id,
+        map: id_map,
+        view: this._page
+      });
+      return this._page.run();
     };
 
     ClientContainer.prototype.pushPage = function() {};

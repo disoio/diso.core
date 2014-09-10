@@ -7,62 +7,10 @@
 # ------------------ 
 # [Mediator](../Shared/Mediator.html)  
 # [Message](../Shared/Message.html)  
+# [ClientCache](../Shared/Cache.html)  
 Mediator = require('../Shared/Mediator')
 Message  = require('../Shared/Message')
-
-# Cache
-# =====
-class Cache
-  # constructor
-  # -----------
-  # **_store** : backing store for this cache
-  constructor : (@_store)->
-
-  # cache!
-  _data : {}
-
-  # _key
-  # ----
-  # Create cache key from type and id
-  # 
-  # **type** : constructor type
-  # **id** : object id
-  _key : (args)->
-    "#{args.type}:#{args.id}"
-
-  # get
-  # ---
-  # 
-  # **type** : constructor type
-  # **id** : object id
-  get  : (args)->
-    key = @_key(args)
-
-    if key of @_data
-      @_data[key]
-    else
-      null
-
-  # put
-  # ---
-  # 
-  # **type** : constructor type
-  # **id** : object id
-  put  : (args)->
-    key = @_key(args)
-    data = args.data
-
-    @_data[key] = data
-    @_store.emit(key, data)
-
-  # remove
-  # ------
-  # 
-  # **type** : constructor type
-  # **id** : object id
-  remove : (args)->
-    key = @_key(args)
-    delete @_data[key]
+Cache    = require('../Shared/Cache')
 
 # ClientStore
 # ===========
@@ -73,10 +21,10 @@ class Cache
 class ClientStore extends EventEmitter
   # constructor
   # -----------
-  constructor : (args)->
-    @_cache = new Cache(@)
+  constructor : ()->
+    @_cache = new Cache()
     
-    Mediator.on('message:cache:invalidate', @_invalidateCache)
+    Mediator.on('message:invalidateCache', @_invalidateCache)
 
   # _invalidateCache
   # ----------------
@@ -84,6 +32,31 @@ class ClientStore extends EventEmitter
   _invalidateCache : (message)->
     for cache_args in message.data.remove
       @_cache.remove(cache_args)
+
+
+  # key
+  # ----
+  # Create cache key from type and id or directly from key
+  # 
+  # Key can be created from 
+  # **type** : constructor type  
+  # *id*     : optional object id, otherwise key for full collection  
+  # or specified directly
+  # **key**  : key 
+  _key : (args)->
+    if ('key' of args)
+      args.key
+    else
+      key = args.type
+      if ('id' of args) 
+        key = "#{key}:#{args.id}"
+      key
+
+  # _event
+  # ------
+  # Returns the event emit / subscribed to for a given key
+  _event : (key)->
+    "update:#{key}"
 
   # get
   # ---
@@ -93,7 +66,7 @@ class ClientStore extends EventEmitter
   #
   # **callback** : returns (error, data)
   #
-  # *cache* : the cache key args (type, id) to be used for
+  # *cache* : the cache key args (type, id) or (key) to be used for
   #           caching
   get : (args)->
     message    = args.message
@@ -104,8 +77,13 @@ class ClientStore extends EventEmitter
       message = new Message(message)
 
     # first try the cache
-    if cache_args
-      data = @_cache.get(cache_args)
+    key = if cache_args
+      @_key(cache_args)
+    else
+      null
+
+    if key
+      data = @_cache.get(key : key)
       if data
         return callback(null, data)
     
@@ -117,30 +95,54 @@ class ClientStore extends EventEmitter
     reply_evt = message.replyEventName()
     Mediator.once(reply_evt, (message)=>
       if message.isError()
-        callback(message.error)
+        callback(message.error, null)
       else
         data = message.data
 
         # update cache
-        if cache_args
-          cache_args.data = data
-          @_cache.put(cache_args)
+        if key
+          @_cache.put(
+            key  : key
+            data : data
+          )
+          event = @_event(key)
+          @emit(event, data)
 
         callback(null, data)
     )
 
   # subscribe
   # ---------
-  # TODO: let page subscribe to updates on objects in cache
+  # Subscribe to updates on objects in store
+  #
+  # **callback** : callback to call on update
+  # 
+  # Key can be created from 
+  # **type** : constructor type  
+  # *id*     : optional object id, otherwise key for full collection  
+  # or specified directly
+  # **key**  : key 
   subscribe : (args)->
-    key = @_key(args)
-    @on("store:update:#{key}", args.callback)
+    callback = args.callback
+    key      = @_key(args)
+    event    = @_event(key)
+    @on(event, callback)
 
   # unsubscribe
   # -----------
-  # TODO: let page unsubscribe from updates on objects in cache
+  # Unsubscribe from updates on objects in store
+  #
+  # **callback** : callback to unsubscribe
+  # 
+  # Key can be created from 
+  # **type** : constructor type  
+  # *id*     : optional object id, otherwise key for full collection  
+  # or specified directly
+  # **key**  : key 
   unsubscribe : (args)->
-    key = @_key(args)
-    @removeListener("store:update:#{key}", args.callback)
+    callback = args.callback
+    key      = @_key(args)
+    event    = @_event(key)
+    @removeListener(event, args.callback)
 
 module.exports = ClientStore

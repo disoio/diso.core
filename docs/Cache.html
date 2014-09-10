@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Mediator.coffee</title>
+  <title>Cache</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -114,12 +114,6 @@
     
     <ul class="sections">
         
-          <li id="title">
-              <div class="annotation">
-                  <h1>Mediator.coffee</h1>
-              </div>
-          </li>
-        
         
         
         <li id="section-1">
@@ -128,7 +122,7 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="core-dependencies">Core dependencies</h2>
+              <h1 id="cache">Cache</h1>
 
             </div>
             
@@ -141,11 +135,10 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p><a href="http://nodejs.org/api/events.html#events_class_events_eventemitter">EventEmitter</a>  </p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>{EventEmitter} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cache</span></span></pre></div></div>
             
         </li>
         
@@ -156,9 +149,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <h2 id="npm-dependencies">NPM dependencies</h2>
+              <p>teh data</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  _data : <span class="hljs-literal">null</span>
+
+  constructor : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span></pre></div></div>
             
         </li>
         
@@ -169,11 +166,11 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p><a href="https://github.com/stephenhandley/type-of-is">type-of-is</a>  </p>
+              <p>TODO: read from localStorage</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>Type = <span class="hljs-built_in">require</span>(<span class="hljs-string">'type-of-is'</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_data</span> = {}</pre></div></div>
             
         </li>
         
@@ -184,7 +181,7 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h1 id="mediator">Mediator</h1>
+              <h2 id="get">get</h2>
 
             </div>
             
@@ -197,10 +194,18 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              
+              <p>Get data from cache</p>
+<p><strong>key</strong> : key to get</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Mediator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">EventEmitter</span></span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  get : <span class="hljs-function"><span class="hljs-params">(key)</span>-&gt;</span>
+    key = args.key
+
+    <span class="hljs-keyword">if</span> key <span class="hljs-keyword">of</span> <span class="hljs-property">@_data</span>
+      <span class="hljs-property">@_data</span>[key]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
@@ -211,7 +216,7 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <h2 id="delegate">delegate</h2>
+              <h2 id="put">put</h2>
 
             </div>
             
@@ -224,19 +229,49 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>create delegate methods on Mediator to other objects</p>
-<p><strong>map</strong> : map of method name and target object pairs
-          used for delegation</p>
+              <p>Put data into the cache</p>
+<p><strong>key</strong> : key to put</p>
+<p><strong>data</strong> : data to put</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  delegate : <span class="hljs-function"><span class="hljs-params">(map)</span>-&gt;</span>
-    <span class="hljs-keyword">for</span> method,target <span class="hljs-keyword">of</span> map
-      <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(method, target)</span>=&gt;</span>
-        @[method] = <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-          target[method].apply(target, arguments)
-    
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> Mediator()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  put : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    key  = args.key
+    data = args.data
+    <span class="hljs-property">@_data</span>[key] = data</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <h2 id="remove">remove</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Remove data from the cache</p>
+<p><strong>key</strong> : key to remove</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  remove : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    key = args.key
+    <span class="hljs-keyword">delete</span> <span class="hljs-property">@_data</span>[key]
+
+<span class="hljs-built_in">module</span>.exports = Cache</pre></div></div>
             
         </li>
         

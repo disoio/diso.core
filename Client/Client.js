@@ -78,6 +78,8 @@
       }
       Mediator.delegate({
         'send': this,
+        'authenticated': this,
+        'user': this,
         'goto': this._container
       });
       if ('WebSocket' in window) {
@@ -94,8 +96,16 @@
       })(this));
     }
 
+    Client.prototype.authenticated = function() {
+      return !!this._auth();
+    };
+
     Client.prototype.logout = function() {
       return this._auth(null);
+    };
+
+    Client.prototype.user = function() {
+      return this._auth().user;
     };
 
     Client.prototype._clientError = function(message) {
@@ -119,13 +129,8 @@
     };
 
     Client.prototype._run = function(init_data) {
-      var error;
-      error = this._container.sync(init_data);
-      if (error) {
-        return this._clientError(error);
-      } else {
-        return Mediator.emit('client:ready');
-      }
+      this._container.sync(init_data);
+      return Mediator.emit('client:ready');
     };
 
     Client.prototype._auth = function(auth) {
@@ -227,7 +232,6 @@
       var data;
       data = message.data;
       Mediator.emit("client:authenticated", data);
-      delete data.user;
       return this._auth(data);
     };
 

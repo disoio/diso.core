@@ -79,6 +79,11 @@
               </a>
             
               
+              <a class="source" href="Cache.html">
+                Cache.coffee
+              </a>
+            
+              
               <a class="source" href="Mediator.html">
                 Mediator.coffee
               </a>
@@ -485,13 +490,11 @@ it to lookup the associated model</p>
     <span class="hljs-property">@token</span> = args.token
     <span class="hljs-property">@data</span>  = inflate(args.data || {})
 
-    <span class="hljs-property">@error</span> = <span class="hljs-keyword">if</span> (<span class="hljs-string">'error'</span> <span class="hljs-keyword">of</span> args)
-      error = args.error
-      <span class="hljs-keyword">unless</span> Type(error, Error)
-        error = <span class="hljs-keyword">new</span> Error(error) 
-      error        
-    <span class="hljs-keyword">else</span> 
-      <span class="hljs-literal">null</span></pre></div></div>
+    <span class="hljs-property">@error</span> = <span class="hljs-literal">null</span>
+    <span class="hljs-keyword">if</span> args.error
+      <span class="hljs-property">@error</span> = args.error
+      <span class="hljs-keyword">unless</span> Type(<span class="hljs-property">@error</span>, Error)
+        <span class="hljs-property">@error</span> = <span class="hljs-keyword">new</span> Error(<span class="hljs-property">@error</span>)</pre></div></div>
             
         </li>
         
