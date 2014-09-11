@@ -120,7 +120,7 @@ class PageMap
   # **location** : the current window.location
   # 
   # **container** : the container for this page
-  route : (args)->
+  route : (args)-> 
     route     = args.route
     location  = args.location
     container = args.container
@@ -135,7 +135,7 @@ class PageMap
 
     new Page(
       store     : @_store
-      route     : route
+      route     : matched_route
       origin    : location.origin
       container : container
     )

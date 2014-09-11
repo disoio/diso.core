@@ -603,9 +603,7 @@ the following metadata
             </div>
             
             <div class="content"><div class='highlight'><pre>  _meta : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    meta  = <span class="hljs-property">@_page</span>.meta
-    <span class="hljs-keyword">if</span> Type(meta, Function)
-      meta = meta()
+    meta  = <span class="hljs-property">@_page</span>.getMeta()
 
     url   = <span class="hljs-property">@_page</span>.url
     title = <span class="hljs-property">@_title</span>()

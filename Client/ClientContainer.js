@@ -82,15 +82,20 @@
       return this._page.run();
     };
 
-    ClientContainer.prototype.pushPage = function() {};
-
-    ClientContainer.prototype.popPage = function() {};
+    ClientContainer.prototype.changePage = function(new_page) {
+      this._page.remove();
+      this._page = new_page;
+      $('body').replaceWith(this._page.html());
+      this._page.run();
+      return this._pushHistory(new_page.route.path());
+    };
 
     ClientContainer.prototype.goto = function(args) {
-      var error, new_page, route;
-      console.log("GOTO!");
-      console.log(args);
+      var clientError, error, new_page, route;
       route = args.route;
+      clientError = function(error) {
+        return Mediator.emit('client:error', error);
+      };
       new_page = this._page_map.route({
         route: route,
         location: window.location,
@@ -98,16 +103,20 @@
       });
       if (!new_page) {
         error = new Error("No page for " + route.name);
-        return Mediator.emit('client:error', error);
+        return clientError(error);
       }
       if (!this._supportsHistory()) {
         window.location = new_page.route.path();
         return;
       }
       return new_page.load((function(_this) {
-        return function(error) {
-          console.log("LOADED PAGE!!!!");
-          return _this._pushHistory(page.route.path());
+        return function(error, data) {
+          if (error) {
+            return clientError(error);
+          }
+          new_page.setData(data);
+          new_page.build();
+          return _this.changePage(new_page);
         };
       })(this));
     };

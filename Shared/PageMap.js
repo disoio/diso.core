@@ -88,7 +88,7 @@
       }
       return new Page({
         store: this._store,
-        route: route,
+        route: matched_route,
         origin: location.origin,
         container: container
       });

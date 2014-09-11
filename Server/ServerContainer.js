@@ -104,10 +104,7 @@
 
     ServerContainer.prototype._meta = function() {
       var args, attr, content, html, image, k, m, meta, metadata, name, title, type, url, v, _ref;
-      meta = this._page.meta;
-      if (Type(meta, Function)) {
-        meta = meta();
-      }
+      meta = this._page.getMeta();
       url = this._page.url;
       title = this._title();
       image = meta.image || this._logo_url;

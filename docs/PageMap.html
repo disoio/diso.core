@@ -487,7 +487,7 @@ if no page matches the route. This is called by the
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  route : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  route : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span> 
     route     = args.route
     location  = args.location
     container = args.container
@@ -502,7 +502,7 @@ if no page matches the route. This is called by the
 
     <span class="hljs-keyword">new</span> Page(
       store     : <span class="hljs-property">@_store</span>
-      route     : route
+      route     : matched_route
       origin    : location.origin
       container : container
     )</pre></div></div>

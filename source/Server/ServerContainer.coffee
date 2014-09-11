@@ -141,9 +141,7 @@ class ServerContainer
   #   type        : <type for page>  (optional)
   # }
   _meta : ()->
-    meta  = @_page.meta
-    if Type(meta, Function)
-      meta = meta()
+    meta  = @_page.getMeta()
 
     url   = @_page.url
     title = @_title()

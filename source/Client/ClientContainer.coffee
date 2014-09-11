@@ -112,8 +112,12 @@ class ClientContainer
     # run the page (i.e. call setup on each view)
     @_page.run()
 
-  pushPage  : ()->
-  popPage   : ()->
+  changePage : (new_page)->
+    @_page.remove()
+    @_page = new_page
+    $('body').replaceWith(@_page.html())
+    @_page.run()
+    @_pushHistory(new_page.route.path()) # or just new_page.url ? 
 
   # goto
   # ----
@@ -121,10 +125,10 @@ class ClientContainer
   # 
   # **route** : the route for new page
   goto : (args)=>
-    console.log("GOTO!")
-    console.log(args)
-    
     route = args.route
+
+    clientError = (error)->
+      Mediator.emit('client:error', error)
 
     # get a new page for this route from the page map
     new_page = @_page_map.route(
@@ -135,7 +139,7 @@ class ClientContainer
 
     unless new_page
       error = new Error("No page for #{route.name}")
-      return Mediator.emit('client:error', error)
+      return clientError(error)
 
     # TODO: make this way more robust
     #       for starters pass the JWT-token via get param or header
@@ -144,10 +148,14 @@ class ClientContainer
       return
 
     # load the new page 
-    new_page.load((error)=>
-      console.log("LOADED PAGE!!!!")
-      ## SHOW THE NEW PAGE
-      @_pushHistory(page.route.path())
+    new_page.load((error, data)=>
+      if error
+        return clientError(error)
+
+      new_page.setData(data)
+      new_page.build()
+
+      @changePage(new_page)
     )
 
   # HISTORY METHODS
