@@ -158,8 +158,8 @@ class ClientContainer
       @changePage(new_page)
     )
 
-  # HISTORY METHODS
-  # ---------------
+  # *HISTORY METHODS*
+  # -----------------
 
   # _initializeHistory
   # ------------------

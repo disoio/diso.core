@@ -72,8 +72,8 @@ class RequestHandler
           _onError(error)  
     )
 
-  # INTERNAL METHODS
-  # ----------------
+  # *INTERNAL METHODS*
+  # ------------------
   
   # _responseFormat
   # ---------------

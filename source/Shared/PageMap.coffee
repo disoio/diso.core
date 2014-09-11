@@ -32,8 +32,8 @@ class PageMap
     @_process(args.map)
     @_router = new Router(@_routes)
 
-  # ROUTE HANDLING / LOOKUP
-  # -----------------------
+  # *ROUTE HANDLING / LOOKUP*
+  # -------------------------
 
   # handle
   # ------
@@ -141,8 +141,8 @@ class PageMap
     )
 
 
-  # INTERNAL METHODS
-  # ----------------
+  # *INTERNAL METHODS*
+  # ------------------
 
   # _process
   # --------

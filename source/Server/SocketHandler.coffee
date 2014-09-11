@@ -50,8 +50,8 @@ class SocketHandler
     @_socket.on('close', @_onClose)
     @_socket.on('error', @_onError)
   
-  # INTERNAL METHODS
-  # ----------------
+  # *INTERNAL METHODS*
+  # ------------------
 
   # _onMessage
   # ----------

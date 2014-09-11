@@ -127,11 +127,11 @@ class ServerContainer
   json : ()->
     @_page.json()
 
-  # INTERNAL METHODS
-  # ----------------
+  # *INTERNAL METHODS*
+  # ------------------
 
-  # meta
-  # ----
+  # _meta
+  # -----
   # pages should have a attribute or function 'meta' that provides 
   # the following metadata
   # {

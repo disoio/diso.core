@@ -260,8 +260,8 @@ class Client
 
       @__auth
 
-  # WebSocket Methods
-  # -----------------
+  # *WebSocket Methods*
+  # -------------------
 
   # send
   # ----
