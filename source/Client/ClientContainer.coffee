@@ -7,9 +7,9 @@ Router = require('diso.router')
 
 # Local dependencies
 # ------------------ 
-# [Mediator](../Shared/Mediator.html)  
-# [PageMap](../Shared/PageMap.html)  
-# [Strings](../Shared/Strings.html)  
+# [Mediator](./Mediator.html)  
+# [PageMap](./PageMap.html)  
+# [Strings](./Strings.html)  
 Mediator = require('../Shared/Mediator')
 PageMap  = require('../Shared/PageMap')
 Strings  = require('../Shared/Strings')

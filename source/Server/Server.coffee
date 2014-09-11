@@ -2,16 +2,16 @@
 # -----------------
 # [http](http://nodejs.org/api/http.html)  
 # [url](http://nodejs.org/api/url.html)  
-# [path]http://nodejs.org/api/path.html)  
+# [path](http://nodejs.org/api/path.html)  
 Http = require('http')
 Url  = require('url')
 Path = require('path')
 
 # NPM dependencies
 # ----------------
-# [ws](https://github.com/einaros/ws)
-# [connect](https://github.com/senchalabs/connect)
-# [ecstatic](https://github.com/jesusabdullah/node-ecstatic)
+# [ws](https://github.com/einaros/ws)  
+# [connect](https://github.com/senchalabs/connect)  
+# [ecstatic](https://github.com/jesusabdullah/node-ecstatic)  
 WS       = require('ws')
 Connect  = require('connect')
 Ecstatic = require('ecstatic')
@@ -20,8 +20,8 @@ Ecstatic = require('ecstatic')
 # ------------------
 # [RequestHandler](./RequestHandler.html)  
 # [SocketHandler](./SocketHandler.html)  
-# [Container](./Container.html)
-# [PageMap](../Shared/PageMap.html)  
+# [Container](./Container.html)  
+# [PageMap](./PageMap.html)  
 RequestHandler = require('./RequestHandler')
 SocketHandler  = require('./SocketHandler')
 Container      = require('./ServerContainer')

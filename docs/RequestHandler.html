@@ -129,12 +129,8 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <h2 id="local-dependencies">Local dependencies</h2>
-<p><a href="./ServerStore.html">ServerStore</a><br><a href="./parseAcceptHeader.html">parseAcceptHeader</a>  </p>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>ServerStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerStore'</span>)
-parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./parseAcceptHeader'</span>)</pre></div></div>
             
         </li>
         
@@ -144,6 +140,22 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p><a href="./ServerStore.html">ServerStore</a><br><a href="./parseAcceptHeader.html">parseAcceptHeader</a>  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>ServerStore = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerStore'</span>)
+parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./parseAcceptHeader'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
               <p>Supported rendering formats</p>
 
@@ -158,30 +170,15 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
         </li>
         
         
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <h1 id="requesthandler">RequestHandler</h1>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-4">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>This class handles http requests received by the server</p>
+              <h1 id="requesthandler">RequestHandler</h1>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span></span></pre></div></div>
             
         </li>
         
@@ -192,9 +189,11 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="constructor">constructor</h2>
+              <p>This class handles http requests received by the server</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RequestHandler</span></span></pre></div></div>
             
         </li>
         
@@ -204,6 +203,19 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h2 id="constructor">constructor</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p><strong>init_store</strong> : the cache where initial render / idmap data is 
                  stored for later retrieval to answer initialize 
@@ -221,11 +233,11 @@ parseAcceptHeader = <span class="hljs-built_in">require</span>(<span class="hljs
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Store used by container/page to fetch data
 Basically just a pass through to messages</p>
@@ -239,11 +251,11 @@ Basically just a pass through to messages</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <h2 id="handle">handle</h2>
 
@@ -252,11 +264,11 @@ Basically just a pass through to messages</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>this function is called by the <a href="https://github.com/senchalabs/connect">connect</a> 
 middleware pipeline on server. It uses the container to 
@@ -283,11 +295,11 @@ the response</p>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>persist the init data so can get later and 
 send to client for initializeReply
@@ -309,26 +321,14 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
         </li>
         
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
-              </div>
-              <h2 id="internal-methods">INTERNAL METHODS</h2>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              
+              <h2 id="internal-methods">INTERNAL METHODS</h2>
+
             </div>
             
         </li>
@@ -340,8 +340,7 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <h2 id="_responseformat">_responseFormat</h2>
-
+              
             </div>
             
         </li>
@@ -352,6 +351,19 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <h2 id="_responseformat">_responseFormat</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Finds the response format for an incoming request</p>
 <p><strong>request</strong> : the http request to find the response format for</p>
@@ -375,11 +387,11 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <h2 id="_render">_render</h2>
 
@@ -388,11 +400,11 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Have the container render the page for the given request</p>
 <p><strong>request</strong> : the http request being handled</p>

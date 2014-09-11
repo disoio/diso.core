@@ -5,9 +5,9 @@
 
 # Local dependencies
 # ------------------ 
-# [Mediator](../Shared/Mediator.html)  
-# [Message](../Shared/Message.html)  
-# [ClientCache](../Shared/Cache.html)  
+# [Mediator](./Mediator.html)  
+# [Message](./Message.html)  
+# [Cache](./Cache.html)  
 Mediator = require('../Shared/Mediator')
 Message  = require('../Shared/Message')
 Cache    = require('../Shared/Cache')

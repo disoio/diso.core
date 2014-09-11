@@ -7,7 +7,7 @@ JWT  = require('jwt-simple')
 
 # Local dependencies
 # ------------------
-# [Message](../Shared/Message.html)  
+# [Message](./Message.html)  
 Message = require('../Shared/Message')
 
 # strings used to by JWT

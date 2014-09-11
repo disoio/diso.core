@@ -1,9 +1,9 @@
 # Local dependencies
-# ------------------ 
+# ------------------
 # [ServerStore](./ServerStore.html)  
 # [parseAcceptHeader](./parseAcceptHeader.html)  
 ServerStore = require('./ServerStore')
-parseAcceptHeader = require('./parseAcceptHeader') 
+parseAcceptHeader = require('./parseAcceptHeader')
 
 # Supported rendering formats
 FORMAT = {

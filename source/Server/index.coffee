@@ -5,7 +5,7 @@
 # [SocketHandler](./SocketHandler.html)  
 # [ServerContainer](./ServerContainer.html)  
 # [ServerStore](./ServerStore.html)  
-# [Mediator](../Shared/Mediator.html)  
+# [Mediator](./Mediator.html)  
 Server         = require('./Server')
 RequestHandler = require('./RequestHandler')
 SocketHandler  = require('./SocketHandler')

@@ -7,7 +7,7 @@ Type = require('type-of-is')
 
 # Local dependencies
 # ------------------ 
-# [Strings](../Shared/Strings.html)  
+# [Strings](./Strings.html)  
 Strings = require('../Shared/Strings')
 
 # ServerContainer
