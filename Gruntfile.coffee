@@ -19,7 +19,7 @@ module.exports = (grunt)->
         flatten : false
         cwd     : "#{__dirname}/source/"
         src     : ['**/*.coffee']
-        dest    : "#{__dirname}/"
+        dest    : "#{__dirname}/build/"
         ext     : '.js'
       }
     }

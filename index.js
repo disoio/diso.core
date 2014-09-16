@@ -1,13 +1,11 @@
-(function() {
-  var Client, Server;
+// Local dependencies
+// ------------------
+// [Client](./Client.html)  
+// [Server](./Server.html)  
+var Client = require('./build/Client');
+var Server = require('./build/Server');
 
-  Client = require('./Client');
-
-  Server = require('./Server');
-
-  module.exports = {
-    Server: Server,
-    Client: Client
-  };
-
-}).call(this);
+module.exports = {
+  Server: Server,
+  Client: Client
+};

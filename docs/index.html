@@ -103,11 +103,6 @@
                 Strings.coffee
               </a>
             
-              
-              <a class="source" href="index.html">
-                index.coffee
-              </a>
-            
           </div>
         </li>
       </ul>
@@ -129,29 +124,24 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <h2 id="local-dependencies">Local dependencies</h2>
+<p><a href="./Server.html">Server</a><br><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./ServerContainer.html">ServerContainer</a><br><a href="./ServerStore.html">ServerStore</a><br><a href="./Mediator.html">Mediator</a>  </p>
 
             </div>
             
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p><a href="./Client.html">Client</a><br><a href="./Server.html">Server</a>  </p>
+            <div class="content"><div class='highlight'><pre>Server         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Server'</span>)
+RequestHandler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./RequestHandler'</span>)
+SocketHandler  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./SocketHandler'</span>)
+Container      = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerContainer'</span>)
+Store          = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerStore'</span>)
+Mediator       = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Mediator'</span>)
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>Client   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Client'</span>)
-Server   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Server'</span>)
+Server.RequestHandler = RequestHandler
+Server.SocketHandler  = SocketHandler
+Server.Container      = Container
+Server.Store          = Store
+Server.Mediator       = Mediator
 
-<span class="hljs-built_in">module</span>.exports = {
-  Server   : Server
-  Client   : Client
-}</pre></div></div>
+<span class="hljs-built_in">module</span>.exports = Server</pre></div></div>
             
         </li>
         
