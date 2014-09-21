@@ -121,9 +121,11 @@
       }
       page_key = this._container.pageKey();
       return this.send({
-        name: 'initialize',
-        data: {
-          page_key: page_key
+        message: {
+          name: 'initialize',
+          data: {
+            page_key: page_key
+          }
         }
       });
     };
@@ -177,8 +179,15 @@
       }
     };
 
-    Client.prototype.send = function(message) {
-      var auth, raw_message;
+    Client.prototype.send = function(args) {
+      var auth, callback, message, raw_message, reply_evt;
+      message = args.message;
+      callback = args.callback;
+      if (Type(message, String)) {
+        message = {
+          name: message
+        };
+      }
       if (!Type(message, Message)) {
         message = new Message(message);
       }
@@ -186,7 +195,11 @@
       message.token = auth ? auth.token : null;
       raw_message = message.stringify();
       Mediator.emit('client:send', raw_message);
-      return this._socket.send(raw_message);
+      this._socket.send(raw_message);
+      if (callback) {
+        reply_evt = message.replyEventName();
+        return Mediator.once(reply_evt, callback);
+      }
     };
 
     Client.prototype._connect = function() {

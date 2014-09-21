@@ -88,27 +88,26 @@ class ClientStore extends EventEmitter
         return callback(null, data)
     
     # cache miss, send message to server
-    Mediator.send(message)
+    # trigger cache update on reply
+    Mediator.send(
+      message  : message
+      callback : (reply)=>
+        if reply.isError()
+          callback(reply.error, null)
+        else
+          data = reply.data
 
-    # subscribe to the message reply, and trigger
-    # cache update and callback once recieved
-    reply_evt = message.replyEventName()
-    Mediator.once(reply_evt, (message)=>
-      if message.isError()
-        callback(message.error, null)
-      else
-        data = message.data
+          # update cache
+          if key
+            @_cache.put(
+              key  : key
+              data : data
+            )
+            event = @_event(key)
+            @emit(event, data)
 
-        # update cache
-        if key
-          @_cache.put(
-            key  : key
-            data : data
-          )
-          event = @_event(key)
-          @emit(event, data)
+          callback(null, data)
 
-        callback(null, data)
     )
 
   # subscribe

@@ -52,6 +52,19 @@ Research
 - http://www.rabbitmq.com/tutorials/tutorial-one-python.html
 - http://www.squaremobius.net/rabbit.js/#zeromq
 
+
+## derp rest
+
+http://en.wikipedia.org/wiki/Representational_state_transfer
+http://en.wikipedia.org/wiki/HATEOAS
+http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven
+http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+http://en.wikipedia.org/wiki/HTTP
+https://github.com/prettymuchbryce/node-http-status/blob/master/lib/httpstatus.js
+http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+https://dev.twitter.com/docs/error-codes-responses
+https://github.com/visionmedia/express/blob/master/examples/route-map/index.js#L47
+
 Todo
 -----
 

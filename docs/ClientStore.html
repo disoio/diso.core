@@ -388,11 +388,18 @@ data to the page via callback once it has been received</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>cache miss, send message to server</p>
+              <p>cache miss, send message to server
+trigger cache update on reply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    Mediator.send(message)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    Mediator.send(
+      message  : message
+      callback : <span class="hljs-function"><span class="hljs-params">(reply)</span>=&gt;</span>
+        <span class="hljs-keyword">if</span> reply.isError()
+          callback(reply.error, <span class="hljs-literal">null</span>)
+        <span class="hljs-keyword">else</span>
+          data = reply.data</pre></div></div>
             
         </li>
         
@@ -403,17 +410,21 @@ data to the page via callback once it has been received</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>subscribe to the message reply, and trigger
-cache update and callback once recieved</p>
+              <p>update cache</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    reply_evt = message.replyEventName()
-    Mediator.once(reply_evt, <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
-      <span class="hljs-keyword">if</span> message.isError()
-        callback(message.error, <span class="hljs-literal">null</span>)
-      <span class="hljs-keyword">else</span>
-        data = message.data</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> key
+            <span class="hljs-property">@_cache</span>.put(
+              key  : key
+              data : data
+            )
+            event = <span class="hljs-property">@_event</span>(key)
+            <span class="hljs-property">@emit</span>(event, data)
+
+          callback(<span class="hljs-literal">null</span>, data)
+
+    )</pre></div></div>
             
         </li>
         
@@ -424,20 +435,9 @@ cache update and callback once recieved</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>update cache</p>
+              <h2 id="subscribe">subscribe</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> key
-          <span class="hljs-property">@_cache</span>.put(
-            key  : key
-            data : data
-          )
-          event = <span class="hljs-property">@_event</span>(key)
-          <span class="hljs-property">@emit</span>(event, data)
-
-        callback(<span class="hljs-literal">null</span>, data)
-    )</pre></div></div>
             
         </li>
         
@@ -447,19 +447,6 @@ cache update and callback once recieved</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <h2 id="subscribe">subscribe</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Subscribe to updates on objects in store</p>
 <p><strong>callback</strong> : callback to call on update</p>
@@ -478,11 +465,11 @@ cache update and callback once recieved</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <h2 id="unsubscribe">unsubscribe</h2>
 
@@ -491,11 +478,11 @@ cache update and callback once recieved</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Unsubscribe from updates on objects in store</p>
 <p><strong>callback</strong> : callback to unsubscribe</p>

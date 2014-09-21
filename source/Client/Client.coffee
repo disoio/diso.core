@@ -183,9 +183,11 @@ class Client
 
     page_key = @_container.pageKey()
     @send(
-      name : 'initialize'
-      data : {
-        page_key : page_key
+      message : {
+        name : 'initialize'
+        data : {
+          page_key : page_key
+        }
       }
     )
 
@@ -268,7 +270,15 @@ class Client
   # send a message to the server
   #
   # **message** : the message to send
-  send: (message) =>
+  send: (args) =>
+    message  = args.message
+    callback = args.callback
+
+    if Type(message, String)
+      message = {
+        name : message
+      }
+
     unless Type(message, Message)
       message = new Message(message)
 
@@ -279,6 +289,10 @@ class Client
     raw_message = message.stringify()
     Mediator.emit('client:send', raw_message)
     @_socket.send(raw_message)
+
+    if callback 
+      reply_evt = message.replyEventName()
+      Mediator.once(reply_evt, callback)
 
   # _connect
   # --------

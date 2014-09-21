@@ -48,7 +48,7 @@
     };
 
     ClientStore.prototype.get = function(args) {
-      var cache_args, callback, data, key, message, reply_evt;
+      var cache_args, callback, data, key, message;
       message = args.message;
       callback = args.callback;
       cache_args = args.cache;
@@ -64,27 +64,28 @@
           return callback(null, data);
         }
       }
-      Mediator.send(message);
-      reply_evt = message.replyEventName();
-      return Mediator.once(reply_evt, (function(_this) {
-        return function(message) {
-          var event;
-          if (message.isError()) {
-            return callback(message.error, null);
-          } else {
-            data = message.data;
-            if (key) {
-              _this._cache.put({
-                key: key,
-                data: data
-              });
-              event = _this._event(key);
-              _this.emit(event, data);
+      return Mediator.send({
+        message: message,
+        callback: (function(_this) {
+          return function(reply) {
+            var event;
+            if (reply.isError()) {
+              return callback(reply.error, null);
+            } else {
+              data = reply.data;
+              if (key) {
+                _this._cache.put({
+                  key: key,
+                  data: data
+                });
+                event = _this._event(key);
+                _this.emit(event, data);
+              }
+              return callback(null, data);
             }
-            return callback(null, data);
-          }
-        };
-      })(this));
+          };
+        })(this)
+      });
     };
 
     ClientStore.prototype.subscribe = function(args) {

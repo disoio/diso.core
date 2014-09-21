@@ -645,9 +645,11 @@ have been met  </p>
 
     page_key = <span class="hljs-property">@_container</span>.pageKey()
     <span class="hljs-property">@send</span>(
-      name : <span class="hljs-string">'initialize'</span>
-      data : {
-        page_key : page_key
+      message : {
+        name : <span class="hljs-string">'initialize'</span>
+        data : {
+          page_key : page_key
+        }
       }
     )</pre></div></div>
             
@@ -906,7 +908,15 @@ if expired</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">send</span>: <span class="hljs-function"><span class="hljs-params">(message)</span> =&gt;</span>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">send</span>: <span class="hljs-function"><span class="hljs-params">(args)</span> =&gt;</span>
+    message  = args.message
+    callback = args.callback
+
+    <span class="hljs-keyword">if</span> Type(message, String)
+      message = {
+        name : message
+      }
+
     <span class="hljs-keyword">unless</span> Type(message, Message)
       message = <span class="hljs-keyword">new</span> Message(message)</pre></div></div>
             
@@ -928,7 +938,11 @@ if expired</p>
     
     raw_message = message.stringify()
     Mediator.emit(<span class="hljs-string">'client:send'</span>, raw_message)
-    <span class="hljs-property">@_socket</span>.send(raw_message)</pre></div></div>
+    <span class="hljs-property">@_socket</span>.send(raw_message)
+
+    <span class="hljs-keyword">if</span> callback 
+      reply_evt = message.replyEventName()
+      Mediator.once(reply_evt, callback)</pre></div></div>
             
         </li>
         
