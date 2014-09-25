@@ -79,8 +79,12 @@ class Server
   #
   # *logo_url*  : Url for a site logo
   #
-  constructor : (args)->
-    # required args
+  constructor : (args = {})->
+    required_args = ['name', 'map', 'messages', 'jwt_secret', 'favicon']
+    for arg in required_args
+      unless args[arg]
+        throw new Error("diso.core.Server: Missing argument #{arg}")
+
     map          = args.map
     @_jwt_secret = args.jwt_secret
     favicon      = args.favicon

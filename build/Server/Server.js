@@ -26,8 +26,18 @@
 
   Server = (function() {
     function Server(args) {
+      var Messages, arg, body_parser, connect, container, favicon, map, page_map, request_handler, required_args, static_config, store, _i, _len, _static;
+      if (args == null) {
+        args = {};
+      }
       this._onSocketConnection = __bind(this._onSocketConnection, this);
-      var Messages, body_parser, connect, container, favicon, map, page_map, request_handler, static_config, store, _static;
+      required_args = ['name', 'map', 'messages', 'jwt_secret', 'favicon'];
+      for (_i = 0, _len = required_args.length; _i < _len; _i++) {
+        arg = required_args[_i];
+        if (!args[arg]) {
+          throw new Error("diso.core.Server: Missing argument " + arg);
+        }
+      }
       map = args.map;
       this._jwt_secret = args.jwt_secret;
       favicon = args.favicon;
