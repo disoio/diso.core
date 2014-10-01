@@ -7,6 +7,12 @@ class ClientModel
   # -----------
   # **data** : data for this model
   constructor : (data)->
+    @setData(data)
+  
+  # setData
+  # -------
+  # **data** : data to set for this model
+  setData : (data)->
     for k,v of data
       @[k] = v
 

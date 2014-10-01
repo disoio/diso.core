@@ -3,12 +3,18 @@
 
   ClientModel = (function() {
     function ClientModel(data) {
-      var k, v;
+      this.setData(data);
+    }
+
+    ClientModel.prototype.setData = function(data) {
+      var k, v, _results;
+      _results = [];
       for (k in data) {
         v = data[k];
-        this[k] = v;
+        _results.push(this[k] = v);
       }
-    }
+      return _results;
+    };
 
     return ClientModel;
 
