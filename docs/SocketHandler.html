@@ -34,11 +34,6 @@
               </a>
             
               
-              <a class="source" href="ClientStore.html">
-                ClientStore.coffee
-              </a>
-            
-              
               <a class="source" href="index.html">
                 index.coffee
               </a>
@@ -56,11 +51,6 @@
               
               <a class="source" href="ServerContainer.html">
                 ServerContainer.coffee
-              </a>
-            
-              
-              <a class="source" href="ServerStore.html">
-                ServerStore.coffee
               </a>
             
               
@@ -259,6 +249,7 @@ processing.</p>
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><strong>socket</strong> : the socket </p>
+<p><strong>models</strong> : server side models</p>
 <p><strong>jwt_secret</strong> : jwt_secret used for decoding token</p>
 <p><strong>message</strong> : object of handlers for messages</p>
 <p><strong>init_store</strong> : the store used for getting data from 
@@ -268,6 +259,7 @@ processing.</p>
             
             <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
     <span class="hljs-property">@_socket</span>     = args.socket
+    <span class="hljs-property">@_models</span>     = args.models
     <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
     <span class="hljs-property">@_messages</span>   = args.messages 
     <span class="hljs-property">@_init_store</span> = args.init_store
@@ -381,7 +373,7 @@ message for use by handler </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>])
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>, <span class="hljs-string">'find'</span>])
       @[<span class="hljs-string">"_<span class="hljs-subst">#{message.name}</span>"</span>](message)
 
     <span class="hljs-keyword">else</span>
@@ -570,7 +562,7 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <h2 id="_adduseridfromtoken">_addUserIdFromToken</h2>
+              <h2 id="_find">_find</h2>
 
             </div>
             
@@ -582,6 +574,69 @@ TODO: should send client message this failed?
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _find : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    data = message.data
+    
+    _id        = data._id
+    model_name = data.model
+<span class="hljs-function">
+    <span class="hljs-title">_reply</span> = <span class="hljs-params">(reply_data)</span>=&gt;</span>
+      reply = message.reply(reply_data)
+      <span class="hljs-property">@_sendMessage</span>(reply)
+<span class="hljs-function">
+    <span class="hljs-title">_error</span> = <span class="hljs-params">(error)</span>=&gt;</span>
+      <span class="hljs-built_in">console</span>.error(error)
+      _reply(
+        data  : <span class="hljs-literal">null</span>
+        error : <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Model not found"</span>)
+      )
+
+    Model = <span class="hljs-property">@_models</span>[model_name]
+    <span class="hljs-keyword">unless</span> Model
+      error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Could not find model named '<span class="hljs-subst">#{model_name}</span>'"</span>)
+      <span class="hljs-keyword">return</span> _error(error)
+
+    Model.find(
+      _id      : _id
+      callback : <span class="hljs-function"><span class="hljs-params">(error, model)</span>-&gt;</span>
+        <span class="hljs-keyword">if</span> error
+          <span class="hljs-keyword">return</span> _error(error)
+
+        <span class="hljs-keyword">if</span> model
+          _reply(
+            error : <span class="hljs-literal">null</span>
+            data  : { model : model }
+          )
+        <span class="hljs-keyword">else</span>
+          error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Could not find <span class="hljs-subst">#{model_name}</span> with id <span class="hljs-subst">#{_id}</span>"</span>)
+          _error(error)
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <h2 id="_adduseridfromtoken">_addUserIdFromToken</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>If message has token, decode it and add the associated user id
 to the message for later processing</p>
@@ -596,11 +651,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>check token expiration</p>
 
@@ -619,11 +674,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <h2 id="_sendmessage">_sendMessage</h2>
 
@@ -632,11 +687,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Send a message to the client</p>
 <p><strong>message</strong> : message to send</p>
@@ -651,11 +706,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <h2 id="_sendmessageall">_sendMessageAll</h2>
 
@@ -664,11 +719,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Send a message to all clients</p>
 <p><strong>message</strong> : message to send</p>

@@ -34,11 +34,6 @@
               </a>
             
               
-              <a class="source" href="ClientStore.html">
-                ClientStore.coffee
-              </a>
-            
-              
               <a class="source" href="index.html">
                 index.coffee
               </a>
@@ -56,11 +51,6 @@
               
               <a class="source" href="ServerContainer.html">
                 ServerContainer.coffee
-              </a>
-            
-              
-              <a class="source" href="ServerStore.html">
-                ServerStore.coffee
               </a>
             
               
@@ -278,6 +268,7 @@ the socket connection, and all rendering happens in the client. </p>
               <p><strong>name</strong>       : name of the app/server</p>
 <p><strong>map</strong>        : map of routes to pages</p>
 <p><strong>messages</strong>   : class that will be instantiated to handle page request messages</p>
+<p><strong>models</strong>     : Server side models used </p>
 <p><strong>jwt_secret</strong> : JSON web token secret</p>
 <p><strong>favicon</strong>    : path for user’s favicon</p>
 <p><em>static</em>    : Should have path and filepath keys mapping to the url path 
@@ -303,7 +294,9 @@ the socket connection, and all rendering happens in the client. </p>
     <span class="hljs-property">@_name</span>       = args.name
 
     Messages     = args.messages
-    <span class="hljs-property">@_messages</span>   = <span class="hljs-keyword">new</span> Messages()</pre></div></div>
+    <span class="hljs-property">@_messages</span>   = <span class="hljs-keyword">new</span> Messages()
+
+    <span class="hljs-property">@_models</span>     = args.models</pre></div></div>
             
         </li>
         
@@ -332,12 +325,7 @@ the socket connection, and all rendering happens in the client. </p>
       <span class="hljs-keyword">new</span> Container(
         logo_url  : args.logo_url
         site_name : args.name
-      )
-
-    store = <span class="hljs-keyword">if</span> (<span class="hljs-string">'store'</span> <span class="hljs-keyword">of</span> args)
-      args.store
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">new</span> Store()</pre></div></div>
+      )</pre></div></div>
             
         </li>
         
@@ -447,8 +435,8 @@ the socket connection, and all rendering happens in the client. </p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
-      map   : map
-      store : store
+      map    : map
+      models : <span class="hljs-property">@_models</span>
     )</pre></div></div>
             
         </li>
@@ -576,6 +564,7 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
     <span class="hljs-keyword">new</span> SocketHandler(
       socket     : socket
       messages   : <span class="hljs-property">@_messages</span>
+      models     : <span class="hljs-property">@_models</span>
       jwt_secret : <span class="hljs-property">@_jwt_secret</span>
       init_store : <span class="hljs-property">@_init_store</span>
     )

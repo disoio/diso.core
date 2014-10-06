@@ -19,7 +19,7 @@
     PageMap.prototype._page_by_route_name = {};
 
     function PageMap(args) {
-      this._store = args.store;
+      this._models = args.models;
       this._process(args.map);
       this._router = new Router(this._routes);
     }
@@ -32,7 +32,7 @@
           if (Page) {
             headers = request.headers;
             page = new Page({
-              store: _this._store,
+              models: _this._models,
               route: request.route,
               origin: "" + headers.protocol + headers.host
             });
@@ -65,7 +65,7 @@
         path: path
       });
       return new Page({
-        store: this._store,
+        models: this._models,
         route: route,
         origin: location.origin,
         container: container,
@@ -87,7 +87,7 @@
         throw error;
       }
       return new Page({
-        store: this._store,
+        models: this._models,
         route: matched_route,
         origin: location.origin,
         container: container

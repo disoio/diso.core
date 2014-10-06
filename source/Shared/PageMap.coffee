@@ -23,12 +23,11 @@ class PageMap
   
   # constructor
   # -----------
-  # **store** : store that will be passed to pages created
-  #             by this page map
+  # **models** : models used by pages to get data
   #
   # **map** : map of routes to pages
   constructor : (args)->
-    @_store = args.store
+    @_models = args.models
     @_process(args.map)
     @_router = new Router(@_routes)
 
@@ -51,7 +50,7 @@ class PageMap
         # if a page is found matching the route, add to request
         headers = request.headers
         page = new Page(
-          store  : @_store
+          models : @_models
           route  : request.route
           origin : "#{headers.protocol}#{headers.host}"
         )
@@ -102,7 +101,7 @@ class PageMap
     route = @_router.match(path : path)
 
     new Page(
-      store     : @_store
+      models    : @_models
       route     : route
       origin    : location.origin
       container : container
@@ -134,7 +133,7 @@ class PageMap
       throw error
 
     new Page(
-      store     : @_store
+      models    : @_models
       route     : matched_route
       origin    : location.origin
       container : container

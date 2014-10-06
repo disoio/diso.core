@@ -26,7 +26,7 @@
 
   Server = (function() {
     function Server(args) {
-      var Messages, arg, body_parser, connect, container, favicon, map, page_map, request_handler, required_args, static_config, store, _i, _len, _static;
+      var Messages, arg, body_parser, connect, container, favicon, map, page_map, request_handler, required_args, static_config, _i, _len, _static;
       if (args == null) {
         args = {};
       }
@@ -44,6 +44,7 @@
       this._name = args.name;
       Messages = args.messages;
       this._messages = new Messages();
+      this._models = args.models;
       static_config = args["static"];
       if ('request' in args) {
         RequestHandler = args.request;
@@ -55,7 +56,6 @@
         logo_url: args.logo_url,
         site_name: args.name
       });
-      store = 'store' in args ? args.store : new Store();
       this._init_store = {};
       _static = null;
       if (static_config) {
@@ -71,7 +71,7 @@
       body_parser = Connect.bodyParser();
       page_map = new PageMap({
         map: map,
-        store: store
+        models: this._models
       });
       request_handler = new RequestHandler({
         messages: this._messages,
@@ -102,6 +102,7 @@
       return new SocketHandler({
         socket: socket,
         messages: this._messages,
+        models: this._models,
         jwt_secret: this._jwt_secret,
         init_store: this._init_store
       });

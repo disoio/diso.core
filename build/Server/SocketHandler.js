@@ -24,6 +24,7 @@
       this._onClose = __bind(this._onClose, this);
       this._onMessage = __bind(this._onMessage, this);
       this._socket = args.socket;
+      this._models = args.models;
       this._jwt_secret = args.jwt_secret;
       this._messages = args.messages;
       this._init_store = args.init_store;
@@ -42,7 +43,7 @@
         return;
       }
       this._addUserIdFromToken(message);
-      if (message["in"](['initialize', 'authenticate'])) {
+      if (message["in"](['initialize', 'authenticate', 'find'])) {
         return this["_" + message.name](message);
       } else {
         handler = this._messages[message.name];
@@ -126,6 +127,53 @@
             }
           };
         })(this)
+      });
+    };
+
+    SocketHandler.prototype._find = function(message) {
+      var Model, data, error, model_name, _error, _id, _reply;
+      data = message.data;
+      _id = data._id;
+      model_name = data.model;
+      _reply = (function(_this) {
+        return function(reply_data) {
+          var reply;
+          reply = message.reply(reply_data);
+          return _this._sendMessage(reply);
+        };
+      })(this);
+      _error = (function(_this) {
+        return function(error) {
+          console.error(error);
+          return _reply({
+            data: null,
+            error: new Error("Model not found")
+          });
+        };
+      })(this);
+      Model = this._models[model_name];
+      if (!Model) {
+        error = new Error("Could not find model named '" + model_name + "'");
+        return _error(error);
+      }
+      return Model.find({
+        _id: _id,
+        callback: function(error, model) {
+          if (error) {
+            return _error(error);
+          }
+          if (model) {
+            return _reply({
+              error: null,
+              data: {
+                model: model
+              }
+            });
+          } else {
+            error = new Error("Could not find " + model_name + " with id " + _id);
+            return _error(error);
+          }
+        }
       });
     };
 

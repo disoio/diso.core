@@ -1,5 +1,5 @@
 (function() {
-  var Container, Mediator, RequestHandler, Server, SocketHandler, Store;
+  var Container, Mediator, RequestHandler, Server, SocketHandler;
 
   Server = require('./Server');
 
@@ -9,8 +9,6 @@
 
   Container = require('./ServerContainer');
 
-  Store = require('./ServerStore');
-
   Mediator = require('../Shared/Mediator');
 
   Server.RequestHandler = RequestHandler;
@@ -18,8 +16,6 @@
   Server.SocketHandler = SocketHandler;
 
   Server.Container = Container;
-
-  Server.Store = Store;
 
   Server.Mediator = Mediator;
 

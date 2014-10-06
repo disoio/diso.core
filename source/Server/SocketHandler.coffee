@@ -31,6 +31,8 @@ class SocketHandler
   # constructor 
   # ----------
   # **socket** : the socket 
+  #
+  # **models** : server side models
   # 
   # **jwt_secret** : jwt_secret used for decoding token
   # 
@@ -40,6 +42,7 @@ class SocketHandler
   #                  initial http render for initializeReply
   constructor : (args)->
     @_socket     = args.socket
+    @_models     = args.models
     @_jwt_secret = args.jwt_secret
     @_messages   = args.messages 
     @_init_store = args.init_store
@@ -71,7 +74,7 @@ class SocketHandler
     @_addUserIdFromToken(message)
     
     # initialize and authenticate messages are handled by framework
-    if message.in(['initialize', 'authenticate'])
+    if message.in(['initialize', 'authenticate', 'find'])
       @["_#{message.name}"](message)
 
     else
@@ -169,7 +172,47 @@ class SocketHandler
                 # @_sendError(error)
           )
     )
-  
+
+  # _find
+  # -----
+  _find : (message)->
+    data = message.data
+    
+    _id        = data._id
+    model_name = data.model
+
+    _reply = (reply_data)=>
+      reply = message.reply(reply_data)
+      @_sendMessage(reply)
+
+    _error = (error)=>
+      console.error(error)
+      _reply(
+        data  : null
+        error : new Error("Model not found")
+      )
+
+    Model = @_models[model_name]
+    unless Model
+      error = new Error("Could not find model named '#{model_name}'")
+      return _error(error)
+
+    Model.find(
+      _id      : _id
+      callback : (error, model)->
+        if error
+          return _error(error)
+
+        if model
+          _reply(
+            error : null
+            data  : { model : model }
+          )
+        else
+          error = new Error("Could not find #{model_name} with id #{_id}")
+          _error(error)
+    )
+
   # _addUserIdFromToken
   # -------------------
   # If message has token, decode it and add the associated user id

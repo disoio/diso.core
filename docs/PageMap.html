@@ -34,11 +34,6 @@
               </a>
             
               
-              <a class="source" href="ClientStore.html">
-                ClientStore.coffee
-              </a>
-            
-              
               <a class="source" href="index.html">
                 index.coffee
               </a>
@@ -56,11 +51,6 @@
               
               <a class="source" href="ServerContainer.html">
                 ServerContainer.coffee
-              </a>
-            
-              
-              <a class="source" href="ServerStore.html">
-                ServerStore.coffee
               </a>
             
               
@@ -228,14 +218,13 @@ constructor for its Page </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p><strong>store</strong> : store that will be passed to pages created
-            by this page map</p>
+              <p><strong>models</strong> : models used by pages to get data</p>
 <p><strong>map</strong> : map of routes to pages</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    <span class="hljs-property">@_store</span> = args.store
+    <span class="hljs-property">@_models</span> = args.models
     <span class="hljs-property">@_process</span>(args.map)
     <span class="hljs-property">@_router</span> = <span class="hljs-keyword">new</span> Router(<span class="hljs-property">@_routes</span>)</pre></div></div>
             
@@ -315,7 +304,7 @@ page constructor for that route to the request</p>
             
             <div class="content"><div class='highlight'><pre>        headers = request.headers
         page = <span class="hljs-keyword">new</span> Page(
-          store  : <span class="hljs-property">@_store</span>
+          models : <span class="hljs-property">@_models</span>
           route  : request.route
           origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
         )
@@ -444,7 +433,7 @@ to signal error</p>
     route = <span class="hljs-property">@_router</span>.match(path : path)
 
     <span class="hljs-keyword">new</span> Page(
-      store     : <span class="hljs-property">@_store</span>
+      models    : <span class="hljs-property">@_models</span>
       route     : route
       origin    : location.origin
       container : container
@@ -496,7 +485,7 @@ if no page matches the route. This is called by the
       <span class="hljs-keyword">throw</span> error
 
     <span class="hljs-keyword">new</span> Page(
-      store     : <span class="hljs-property">@_store</span>
+      models    : <span class="hljs-property">@_models</span>
       route     : matched_route
       origin    : location.origin
       container : container

@@ -62,6 +62,8 @@ class Server
   #
   # **messages**   : class that will be instantiated to handle page request messages
   #
+  # **models**     : Server side models used 
+  #
   # **jwt_secret** : JSON web token secret
   #
   # **favicon**    : path for user's favicon
@@ -93,6 +95,8 @@ class Server
     Messages     = args.messages
     @_messages   = new Messages()
 
+    @_models     = args.models
+
     #optional args
     static_config = args.static
 
@@ -109,11 +113,6 @@ class Server
         logo_url  : args.logo_url
         site_name : args.name
       )
-
-    store = if ('store' of args)
-      args.store
-    else
-      new Store()
 
     # TODO: to scale out this needs to use store 
     #       in separate process (redis/leveldb/memcache)
@@ -139,8 +138,8 @@ class Server
 
     # 4) [PageMap](./PageMap.html) is used for routing / page lookup
     page_map = new PageMap(
-      map   : map
-      store : store
+      map    : map
+      models : @_models
     )
 
     # 5) RequestHandler answers initial HTTP requests
@@ -188,6 +187,7 @@ class Server
     new SocketHandler(
       socket     : socket
       messages   : @_messages
+      models     : @_models
       jwt_secret : @_jwt_secret
       init_store : @_init_store
     )

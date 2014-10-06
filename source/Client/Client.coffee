@@ -8,12 +8,10 @@ Type = require('type-of-is')
 # Local dependencies
 # ------------------
 # [ClientContainer](./ClientContainer.html)  
-# [ClientStore](./ClientStore.html)  
 # [Mediator](./Mediator.html)  
 # [Message](./Message.html)  
 # [PageMap](./PageMap.html)  
 Container = require('./ClientContainer')
-Store     = require('./ClientStore')
 Mediator  = require('../Shared/Mediator')
 Message   = require('../Shared/Message')
 PageMap   = require('../Shared/PageMap')
@@ -68,9 +66,9 @@ class Client
   # -----------
   # **map** : map of routes to pages  
   # 
-  # *models*    : Client side models.. if present, client will traverse the
-  #                 message data and inflate plain json objects into instances
-  #                 of those models using the $model attr 
+  # **models**  : Client side models.client will traverse the message data 
+  #               and inflate plain json objects into instances of those 
+  #               models using the $model attr 
   # 
   # *reconnect* : If false, disables autoreconnect, otherwise should
   #                 be object that can specify the following configuration
@@ -88,33 +86,25 @@ class Client
     else
       constructed = true
 
-    for k in ['name', 'map']      
+    for k in ['name', 'map', 'models']      
       unless (k of args)
         error = new Error("Client missing required argument: #{k}")
         throw error
 
     @_name = args.name
+    map    = args.map
+    @_models = args.models
 
-    # can override default store when creating client
-    store = if ('store' of args)
-      args.store
-    else
-      new Store()
+    Message.setModels(@_models)
 
     # can override the default container when creating client
     @_container = if ('container' of args)
       args.container
     else
       new Container(
-        map   : args.map
-        store : store
+        map    : map
+        models : @_models
       )
-
-    # models are instances of [ClientModel](./ClientModel.html)
-    # if passed, they'll be used to inflate message data recieved 
-    # over socket
-    if ('models' of args)
-      Message.setModels(args.models)
 
     # reconnect arg can be object or false. If its an object, set 
     # the associated key value pairs, if its false disable reconnect
@@ -160,7 +150,8 @@ class Client
     @_auth(null)
 
   user : ()->
-    @_auth().user
+    user = @_auth().user
+    new @_models.User(user)
 
   # _clientError 
   # ------------

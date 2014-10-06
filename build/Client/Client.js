@@ -1,5 +1,5 @@
 (function() {
-  var $, Client, Container, Mediator, Message, PageMap, Store, Type, constructed,
+  var $, Client, Container, Mediator, Message, PageMap, Type, constructed,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $ = require('jquery');
@@ -7,8 +7,6 @@
   Type = require('type-of-is');
 
   Container = require('./ClientContainer');
-
-  Store = require('./ClientStore');
 
   Mediator = require('../Shared/Mediator');
 
@@ -42,13 +40,13 @@
       this._connect = __bind(this._connect, this);
       this.send = __bind(this.send, this);
       this._run = __bind(this._run, this);
-      var error, k, store, v, _i, _len, _ref, _ref1;
+      var error, k, map, v, _i, _len, _ref, _ref1;
       if (constructed) {
         throw new Error("Client already constructed");
       } else {
         constructed = true;
       }
-      _ref = ['name', 'map'];
+      _ref = ['name', 'map', 'models'];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         k = _ref[_i];
         if (!(k in args)) {
@@ -57,14 +55,13 @@
         }
       }
       this._name = args.name;
-      store = 'store' in args ? args.store : new Store();
+      map = args.map;
+      this._models = args.models;
+      Message.setModels(this._models);
       this._container = 'container' in args ? args.container : new Container({
-        map: args.map,
-        store: store
+        map: map,
+        models: this._models
       });
-      if ('models' in args) {
-        Message.setModels(args.models);
-      }
       if ('reconnect' in args) {
         if (args.reconnect === false) {
           this._reconnect.disabled = true;
@@ -105,7 +102,9 @@
     };
 
     Client.prototype.user = function() {
-      return this._auth().user;
+      var user;
+      user = this._auth().user;
+      return new this._models.User(user);
     };
 
     Client.prototype._clientError = function(message) {

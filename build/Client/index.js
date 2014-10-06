@@ -1,19 +1,15 @@
 (function() {
-  var Client, Container, Mediator, Model, Store;
+  var Client, Container, Mediator, Model;
 
   Client = require('./Client');
 
   Model = require('./ClientModel');
-
-  Store = require('./ClientStore');
 
   Container = require('./ClientContainer');
 
   Mediator = require('../Shared/Mediator');
 
   Client.Model = Model;
-
-  Client.Store = Store;
 
   Client.Container = Container;
 
