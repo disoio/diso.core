@@ -25,7 +25,6 @@ Ecstatic = require('ecstatic')
 RequestHandler = require('./RequestHandler')
 SocketHandler  = require('./SocketHandler')
 Container      = require('./ServerContainer')
-Store          = require('./ServerStore')
 PageMap        = require('../Shared/PageMap')
 
 # Server

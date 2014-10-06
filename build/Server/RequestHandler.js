@@ -1,9 +1,7 @@
 (function() {
-  var FORMAT, RequestHandler, ServerStore, parseAcceptHeader,
+  var FORMAT, RequestHandler, parseAcceptHeader,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
-
-  ServerStore = require('./ServerStore');
 
   parseAcceptHeader = require('./parseAcceptHeader');
 
@@ -20,9 +18,6 @@
       this._init_store = args.init_store;
       messages = args.messages;
       this._container = args.container;
-      this._store = new ServerStore({
-        messages: messages
-      });
     }
 
     RequestHandler.prototype.handle = function(request, response, next) {
@@ -33,7 +28,6 @@
       };
       return this._container.load({
         page: request.page,
-        store: this._store,
         callback: (function(_this) {
           return function(error) {
             if (error) {

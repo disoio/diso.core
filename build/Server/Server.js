@@ -1,5 +1,5 @@
 (function() {
-  var Connect, Container, Ecstatic, Http, PageMap, Path, RequestHandler, Server, SocketHandler, Store, Url, WS,
+  var Connect, Container, Ecstatic, Http, PageMap, Path, RequestHandler, Server, SocketHandler, Url, WS,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Http = require('http');
@@ -19,8 +19,6 @@
   SocketHandler = require('./SocketHandler');
 
   Container = require('./ServerContainer');
-
-  Store = require('./ServerStore');
 
   PageMap = require('../Shared/PageMap');
 

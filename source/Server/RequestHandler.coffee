@@ -1,8 +1,6 @@
 # Local dependencies
 # ------------------
-# [ServerStore](./ServerStore.html)  
 # [parseAcceptHeader](./parseAcceptHeader.html)  
-ServerStore = require('./ServerStore')
 parseAcceptHeader = require('./parseAcceptHeader')
 
 # Supported rendering formats
@@ -30,12 +28,6 @@ class RequestHandler
     messages     = args.messages
     @_container  = args.container
 
-    # Store used by container/page to fetch data
-    # Basically just a pass through to messages
-    @_store = new ServerStore(
-      messages : messages
-    )
-
   # handle
   # ------
   # this function is called by the [connect](https://github.com/senchalabs/connect) 
@@ -53,7 +45,6 @@ class RequestHandler
 
     @_container.load(
       page     : request.page
-      store    : @_store
       callback : (error)=>
         if error
           return _onError(error)

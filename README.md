@@ -1,7 +1,7 @@
 diso.core
 ===========
 
-0.0.11
+0.0.12
 
 Notes
 -----
@@ -75,7 +75,6 @@ Todo
 - styles, scripts
 - metadata updating / between redirects / client page changes
 - IF USER REQUIRED, SAVE ORIGINAL REQUEST AND REROUTE AFTER SUCCESSFUL AUTH
-- LET PAGES / VIEWS PUBSUB TO CLIENT STORE
 - PAGE TRANSITIONS
 - PAGE MODALS
 
