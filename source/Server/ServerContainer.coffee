@@ -74,7 +74,7 @@ class ServerContainer
   # The key used to place the page's constructor name and id
   # in the body tag for use in client sync
   pageKey : ()->
-    "#{@_page.constructor.name}:#{@_page.id}"
+    @_page.key()
 
   # status
   # ------

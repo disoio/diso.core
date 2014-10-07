@@ -381,7 +381,11 @@ element of the view with id_map passed via the initalizeReply</p>
   changePage : <span class="hljs-function"><span class="hljs-params">(new_page)</span>-&gt;</span>
     <span class="hljs-property">@_page</span>.remove()
     <span class="hljs-property">@_page</span> = new_page
-    $(<span class="hljs-string">'body'</span>).replaceWith(<span class="hljs-property">@_page</span>.html())
+    
+    $body = $(<span class="hljs-string">'body'</span>)
+    $body.html(<span class="hljs-property">@_page</span>.html())
+    $body.attr(Strings.PAGE_ATTR_NAME, <span class="hljs-property">@_page</span>.key())
+
     <span class="hljs-property">@_page</span>.run()
     <span class="hljs-property">@_pushHistory</span>(new_page.route.path()) <span class="hljs-comment"># or just new_page.url ? </span></pre></div></div>
             

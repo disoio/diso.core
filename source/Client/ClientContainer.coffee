@@ -115,7 +115,11 @@ class ClientContainer
   changePage : (new_page)->
     @_page.remove()
     @_page = new_page
-    $('body').replaceWith(@_page.html())
+    
+    $body = $('body')
+    $body.html(@_page.html())
+    $body.attr(Strings.PAGE_ATTR_NAME, @_page.key())
+
     @_page.run()
     @_pushHistory(new_page.route.path()) # or just new_page.url ? 
 

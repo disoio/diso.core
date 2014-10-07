@@ -83,9 +83,12 @@
     };
 
     ClientContainer.prototype.changePage = function(new_page) {
+      var $body;
       this._page.remove();
       this._page = new_page;
-      $('body').replaceWith(this._page.html());
+      $body = $('body');
+      $body.html(this._page.html());
+      $body.attr(Strings.PAGE_ATTR_NAME, this._page.key());
       this._page.run();
       return this._pushHistory(new_page.route.path());
     };

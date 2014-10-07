@@ -56,7 +56,7 @@
     };
 
     ServerContainer.prototype.pageKey = function() {
-      return "" + this._page.constructor.name + ":" + this._page.id;
+      return this._page.key();
     };
 
     ServerContainer.prototype.status = function() {
