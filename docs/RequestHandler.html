@@ -251,8 +251,10 @@ the response</p>
       <span class="hljs-built_in">console</span>.error(error)
       next(<span class="hljs-string">"500"</span>)
 
+    page = request.page
+
     <span class="hljs-property">@_container</span>.load(
-      page     : request.page
+      page     : page
       callback : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
         <span class="hljs-keyword">if</span> error
           <span class="hljs-keyword">return</span> _onError(error)</pre></div></div>
@@ -272,7 +274,7 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@_init_store</span>[<span class="hljs-property">@_container</span>.pageKey()] = <span class="hljs-property">@_container</span>.initData()
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@_init_store</span>[page.key()] = <span class="hljs-property">@_container</span>.initData()
 
         <span class="hljs-keyword">try</span>
           <span class="hljs-property">@_render</span>(

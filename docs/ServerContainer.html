@@ -329,7 +329,7 @@ used in sync on the client</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <h2 id="pagekey">pageKey</h2>
+              <h2 id="status">status</h2>
 
             </div>
             
@@ -342,13 +342,12 @@ used in sync on the client</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>The key used to place the page’s constructor name and id
-in the body tag for use in client sync</p>
+              <p>returns the http status</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  pageKey : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_page</span>.key()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  status : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-property">@_status</span></pre></div></div>
             
         </li>
         
@@ -359,7 +358,7 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <h2 id="status">status</h2>
+              <h2 id="headers">headers</h2>
 
             </div>
             
@@ -372,12 +371,12 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>returns the http status</p>
+              <p>returns and custom headers for the container’s page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  status : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_status</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  headers : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-property">@_page</span>.headers()</pre></div></div>
             
         </li>
         
@@ -388,7 +387,7 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <h2 id="headers">headers</h2>
+              <h2 id="html">html</h2>
 
             </div>
             
@@ -401,35 +400,6 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>returns and custom headers for the container’s page</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  headers : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_page</span>.headers()</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <h2 id="html">html</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
               <p>render this container as html</p>
 
             </div>
@@ -439,11 +409,11 @@ in the body tag for use in client sync</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>TODO</p>
 <link rel="shortcut icon" href="#{@favicon_url}" />
@@ -474,13 +444,42 @@ in the body tag for use in client sync</p>
         </li>
         
         
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <h2 id="text">text</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>render this container as text</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  text : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-property">@_page</span>.text()</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <h2 id="text">text</h2>
+              <h2 id="json">json</h2>
 
             </div>
             
@@ -493,12 +492,12 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>render this container as text</p>
+              <p>render this container as json</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  text : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_page</span>.text()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  json : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-property">@_page</span>.json()</pre></div></div>
             
         </li>
         
@@ -509,7 +508,7 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <h2 id="json">json</h2>
+              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
 
             </div>
             
@@ -522,12 +521,8 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>render this container as json</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  json : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_page</span>.json()</pre></div></div>
             
         </li>
         
@@ -538,7 +533,7 @@ in the body tag for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
+              <h2 id="_meta">_meta</h2>
 
             </div>
             
@@ -550,31 +545,6 @@ in the body tag for use in client sync</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-29">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <h2 id="_meta">_meta</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>pages should have a attribute or function ‘meta’ that provides 
 the following metadata
@@ -604,11 +574,11 @@ the following metadata
         </li>
         
         
-        <li id="section-31">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>Google rich snippets
 <a href="https://support.google.com/webmasters/answer/146750?hl=en">https://support.google.com/webmasters/answer/146750?hl=en</a></p>
@@ -625,11 +595,11 @@ the following metadata
         </li>
         
         
-        <li id="section-32">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>FB Open Graph 
 <a href="http://ogp.me">http://ogp.me</a></p>
@@ -649,11 +619,11 @@ the following metadata
         </li>
         
         
-        <li id="section-33">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>additional open graph properties specific to og:type</p>
 
@@ -666,11 +636,11 @@ the following metadata
         </li>
         
         
-        <li id="section-34">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>TODO: support html microdata</p>
 
@@ -692,11 +662,11 @@ the following metadata
         </li>
         
         
-        <li id="section-35">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h2 id="_title">_title</h2>
 
@@ -705,11 +675,11 @@ the following metadata
         </li>
         
         
-        <li id="section-36">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Title for this container’s page</p>
 
@@ -721,11 +691,11 @@ the following metadata
         </li>
         
         
-        <li id="section-37">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <h2 id="_pageattr">_pageAttr</h2>
 
@@ -734,11 +704,11 @@ the following metadata
         </li>
         
         
-        <li id="section-38">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>The attribute used to pass this page’s id and name in 
 the rendered html for use in client sync</p>

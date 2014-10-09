@@ -43,8 +43,10 @@ class RequestHandler
       console.error(error)
       next("500")
 
+    page = request.page
+
     @_container.load(
-      page     : request.page
+      page     : page
       callback : (error)=>
         if error
           return _onError(error)
@@ -52,7 +54,7 @@ class RequestHandler
         # persist the init data so can get later and 
         # send to client for initializeReply
         # TODO: CLEANUP 4 2 SCALE PLZ 4 WEB
-        @_init_store[@_container.pageKey()] = @_container.initData()
+        @_init_store[page.key()] = @_container.initData()
 
         try
           @_render(

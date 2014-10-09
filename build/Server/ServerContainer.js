@@ -55,10 +55,6 @@
       return result;
     };
 
-    ServerContainer.prototype.pageKey = function() {
-      return this._page.key();
-    };
-
     ServerContainer.prototype.status = function() {
       return this._status;
     };

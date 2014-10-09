@@ -21,19 +21,20 @@
     }
 
     RequestHandler.prototype.handle = function(request, response, next) {
-      var _onError;
+      var page, _onError;
       _onError = function(error) {
         console.error(error);
         return next("500");
       };
+      page = request.page;
       return this._container.load({
-        page: request.page,
+        page: page,
         callback: (function(_this) {
           return function(error) {
             if (error) {
               return _onError(error);
             }
-            _this._init_store[_this._container.pageKey()] = _this._container.initData();
+            _this._init_store[page.key()] = _this._container.initData();
             try {
               return _this._render({
                 request: request,

@@ -69,13 +69,6 @@ class ServerContainer
     result[Strings.PAGE_DATA] = @_page.data
     result
 
-  # pageKey
-  # -------
-  # The key used to place the page's constructor name and id
-  # in the body tag for use in client sync
-  pageKey : ()->
-    @_page.key()
-
   # status
   # ------
   # returns the http status
