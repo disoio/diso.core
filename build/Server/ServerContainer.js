@@ -154,7 +154,7 @@
     };
 
     ServerContainer.prototype._pageAttr = function() {
-      return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this.pageKey()) + "\"";
+      return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this._page.key()) + "\"";
     };
 
     return ServerContainer;

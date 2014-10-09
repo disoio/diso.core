@@ -198,7 +198,7 @@ class ServerContainer
   # The attribute used to pass this page's id and name in 
   # the rendered html for use in client sync
   _pageAttr : ()->
-    "#{Strings.PAGE_ATTR_NAME}=\"#{@pageKey()}\""
+    "#{Strings.PAGE_ATTR_NAME}=\"#{@_page.key()}\""
 
 
 module.exports = ServerContainer
