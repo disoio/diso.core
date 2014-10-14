@@ -2,8 +2,10 @@
 # ------------------
 # [jquery](https://github.com/jquery/jquery)  
 # [type-of-is](https://github.com/stephenhandley/type-of-is)
-$    = require('jquery')
-Type = require('type-of-is')
+# [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter)  
+$              = require('jquery')
+Type           = require('type-of-is')
+{EventEmitter} = require('events')
 
 # Local dependencies
 # ------------------
@@ -62,6 +64,10 @@ class Client
   # true when the socket is open
   _socket_open : false
 
+  # event emitter used as pubsub bus
+  _pubsub : null
+
+
   # constructor
   # -----------
   # **map** : map of routes to pages  
@@ -97,6 +103,8 @@ class Client
 
     Message.setModels(@_models)
 
+    @_pubsub = new EventEmitter()
+
     # can override the default container when creating client
     @_container = if ('container' of args)
       args.container
@@ -119,6 +127,8 @@ class Client
     # communication between client components. We
     Mediator.delegate(
       'send'          : @
+      'subscribe'     : @
+      'unsubscribe'   : @
       'authenticated' : @
       'user'          : @
       'goto'          : @_container
@@ -285,6 +295,41 @@ class Client
       reply_evt = message.replyEventName()
       Mediator.once(reply_evt, callback)
 
+  # subscribe 
+  # -------
+  # Register a callback for when a publish message
+  # is received from the server about a topic
+  subscribe : (args)=>
+    topic    = args.topic
+    callback = args.callback
+
+    @send(
+      message : {
+        name : 'subscribe'
+        data : {
+          topic : topic
+        }
+      }    
+    )
+    @_pubsub.on(topic, callback)
+
+  # unsubscribe
+  # -----------
+  # Unregister a callback for a publish message topic
+  unsubscribe : (args)=>
+    topic    = args.topic
+    callback = args.callback
+
+    @send(
+      message : {
+        name : 'unsubscribe'
+        data : {
+          topic : topic
+        }
+      }    
+    )
+    @_pubsub.removeListener(topic, callback)
+
   # _connect
   # --------
   # called to connect to server when the Client is 
@@ -331,8 +376,8 @@ class Client
 
     message = Message.parse(raw_message)
 
-    if message.in(['initializeReply', 'authenticateReply'])
-      @["_#{message.name}"](message)
+    if message.in(['initializeReply', 'authenticateReply', 'publish'])
+      @["_onMessage_#{message.name}"](message)
 
     message_event         = 'message'
     message_event_name    = "#{message_event}:#{message.name}"
@@ -342,17 +387,25 @@ class Client
     Mediator.emit(message_event_name, message)
     Mediator.emit(message_event_name_id, message)
 
-  # _initializeReply
+  # _onMessage_initializeReply
   # ----------------
-  _initializeReply : (message)->
+  _onMessage_initializeReply : (message)->
     @_run(message.data)
 
-  # _authenticateReply
+  # _onMessage_authenticateReply
   # ------------------
-  _authenticateReply : (message)->
+  _onMessage_authenticateReply : (message)->
     data = message.data
     Mediator.emit("client:authenticated", data)
     @_auth(data)
+
+  # _onMessage_publish
+  # ------------------
+  _onMessage_publish : (message)->
+    data       = message.data
+    topic      = data.topic
+    topic_data = data.data
+    @_pubsub.emit(topic, topic_data)
 
   # _onError
   # --------

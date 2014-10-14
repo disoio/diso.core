@@ -373,8 +373,8 @@ message for use by handler </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>, <span class="hljs-string">'find'</span>])
-      @[<span class="hljs-string">"_<span class="hljs-subst">#{message.name}</span>"</span>](message)
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> message.<span class="hljs-keyword">in</span>([<span class="hljs-string">'initialize'</span>, <span class="hljs-string">'authenticate'</span>, <span class="hljs-string">'find'</span>, <span class="hljs-string">'subscribe'</span>])
+      @[<span class="hljs-string">"_onMessage_<span class="hljs-subst">#{message.name}</span>"</span>](message)
 
     <span class="hljs-keyword">else</span>
       handler = <span class="hljs-property">@_messages</span>[message.name]
@@ -426,7 +426,7 @@ message for use by handler </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <h2 id="_initialize">_initialize</h2>
+              <h2 id="_onmessage_initialize">_onMessage_initialize</h2>
 
             </div>
             
@@ -445,7 +445,7 @@ used by the server side render of the requested page</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _initialize : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  _onMessage_initialize : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
     page_key   = message.data.page_key
     init_data = <span class="hljs-property">@_init_store</span>[page_key]
     reply     = message.reply(data : init_data)
@@ -460,7 +460,7 @@ used by the server side render of the requested page</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <h2 id="_authenticate-">_authenticate </h2>
+              <h2 id="_onmessage_authenticate-">_onMessage_authenticate </h2>
 
             </div>
             
@@ -485,7 +485,7 @@ and respond with a user object having the following methods
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _authenticate : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  _onMessage_authenticate : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
     <span class="hljs-property">@_messages</span>.authenticate(
       message  : message, 
       callback : <span class="hljs-function"><span class="hljs-params">(error, user)</span>=&gt;</span>
@@ -562,7 +562,7 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <h2 id="_find">_find</h2>
+              <h2 id="_onmessage_find">_onMessage_find</h2>
 
             </div>
             
@@ -578,7 +578,7 @@ TODO: should send client message this failed?
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _find : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+            <div class="content"><div class='highlight'><pre>  _onMessage_find : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
     data = message.data
     
     _id        = data._id
@@ -625,7 +625,7 @@ TODO: should send client message this failed?
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <h2 id="_adduseridfromtoken">_addUserIdFromToken</h2>
+              <h2 id="_onmessage_subscribe">_onMessage_subscribe</h2>
 
             </div>
             
@@ -637,6 +637,37 @@ TODO: should send client message this failed?
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Allow client (socket) to subscribe to a given channel</p>
+<p><strong>topic</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onMessage_subscribe : <span class="hljs-function"><span class="hljs-params">(message)</span>=&gt;</span>
+    data = message.data
+    topic = data.topic</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h2 id="_adduseridfromtoken">_addUserIdFromToken</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>If message has token, decode it and add the associated user id
 to the message for later processing</p>
@@ -651,11 +682,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>check token expiration</p>
 
@@ -674,11 +705,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <h2 id="_sendmessage">_sendMessage</h2>
 
@@ -687,11 +718,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Send a message to the client</p>
 <p><strong>message</strong> : message to send</p>
@@ -706,11 +737,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <h2 id="_sendmessageall">_sendMessageAll</h2>
 
@@ -719,11 +750,11 @@ to the message for later processing</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Send a message to all clients</p>
 <p><strong>message</strong> : message to send</p>

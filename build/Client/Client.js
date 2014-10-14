@@ -1,10 +1,12 @@
 (function() {
-  var $, Client, Container, Mediator, Message, PageMap, Type, constructed,
+  var $, Client, Container, EventEmitter, Mediator, Message, PageMap, Type, constructed,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $ = require('jquery');
 
   Type = require('type-of-is');
+
+  EventEmitter = require('events').EventEmitter;
 
   Container = require('./ClientContainer');
 
@@ -31,6 +33,8 @@
 
     Client.prototype._socket_open = false;
 
+    Client.prototype._pubsub = null;
+
     function Client(args) {
       this._reconnectDelay = __bind(this._reconnectDelay, this);
       this._onClose = __bind(this._onClose, this);
@@ -38,6 +42,8 @@
       this._onMessage = __bind(this._onMessage, this);
       this._onOpen = __bind(this._onOpen, this);
       this._connect = __bind(this._connect, this);
+      this.unsubscribe = __bind(this.unsubscribe, this);
+      this.subscribe = __bind(this.subscribe, this);
       this.send = __bind(this.send, this);
       this._run = __bind(this._run, this);
       var error, k, map, v, _i, _len, _ref, _ref1;
@@ -58,6 +64,7 @@
       map = args.map;
       this._models = args.models;
       Message.setModels(this._models);
+      this._pubsub = new EventEmitter();
       this._container = 'container' in args ? args.container : new Container({
         map: map,
         models: this._models
@@ -75,6 +82,8 @@
       }
       Mediator.delegate({
         'send': this,
+        'subscribe': this,
+        'unsubscribe': this,
         'authenticated': this,
         'user': this,
         'goto': this._container
@@ -201,6 +210,36 @@
       }
     };
 
+    Client.prototype.subscribe = function(args) {
+      var callback, topic;
+      topic = args.topic;
+      callback = args.callback;
+      this.send({
+        message: {
+          name: 'subscribe',
+          data: {
+            topic: topic
+          }
+        }
+      });
+      return this._pubsub.on(topic, callback);
+    };
+
+    Client.prototype.unsubscribe = function(args) {
+      var callback, topic;
+      topic = args.topic;
+      callback = args.callback;
+      this.send({
+        message: {
+          name: 'unsubscribe',
+          data: {
+            topic: topic
+          }
+        }
+      });
+      return this._pubsub.removeListener(topic, callback);
+    };
+
     Client.prototype._connect = function() {
       var event, socket_url;
       socket_url = "ws://" + window.location.host;
@@ -225,8 +264,8 @@
       raw_message = event.data;
       Mediator.emit('client:receive', raw_message);
       message = Message.parse(raw_message);
-      if (message["in"](['initializeReply', 'authenticateReply'])) {
-        this["_" + message.name](message);
+      if (message["in"](['initializeReply', 'authenticateReply', 'publish'])) {
+        this["_onMessage_" + message.name](message);
       }
       message_event = 'message';
       message_event_name = "" + message_event + ":" + message.name;
@@ -236,15 +275,23 @@
       return Mediator.emit(message_event_name_id, message);
     };
 
-    Client.prototype._initializeReply = function(message) {
+    Client.prototype._onMessage_initializeReply = function(message) {
       return this._run(message.data);
     };
 
-    Client.prototype._authenticateReply = function(message) {
+    Client.prototype._onMessage_authenticateReply = function(message) {
       var data;
       data = message.data;
       Mediator.emit("client:authenticated", data);
       return this._auth(data);
+    };
+
+    Client.prototype._onMessage_publish = function(message) {
+      var data, topic, topic_data;
+      data = message.data;
+      topic = data.topic;
+      topic_data = data.data;
+      return this._pubsub.emit(topic, topic_data);
     };
 
     Client.prototype._onError = function(error) {

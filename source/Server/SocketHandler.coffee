@@ -74,8 +74,8 @@ class SocketHandler
     @_addUserIdFromToken(message)
     
     # initialize and authenticate messages are handled by framework
-    if message.in(['initialize', 'authenticate', 'find'])
-      @["_#{message.name}"](message)
+    if message.in(['initialize', 'authenticate', 'find', 'subscribe', 'unsubscribe'])
+      @["_onMessage_#{message.name}"](message)
 
     else
       handler = @_messages[message.name]
@@ -106,19 +106,19 @@ class SocketHandler
     console.error(error)
     #TODO handle error bettr
 
-  # _initialize
+  # _onMessage_initialize
   # -----------
   # Respond to the initialize message with the id map and data 
   # used by the server side render of the requested page
   # 
   # **message** : message from client with page_key 
-  _initialize : (message)->
+  _onMessage_initialize : (message)->
     page_key   = message.data.page_key
     init_data = @_init_store[page_key]
     reply     = message.reply(data : init_data)
     @_sendMessage(reply)
 
-  # _authenticate 
+  # _onMessage_authenticate 
   # -------------
   # Delegates to an authenticate message in the user provided
   # messages object and then encodes a jwt token that the client
@@ -130,7 +130,7 @@ class SocketHandler
   # **id**         : required, returns unique identifier for user
   # *saveToken*    : optional, saves token
   # *tokenExpires* : optional, returns token expiry time
-  _authenticate : (message)->
+  _onMessage_authenticate : (message)->
     @_messages.authenticate(
       message  : message, 
       callback : (error, user)=>
@@ -173,9 +173,9 @@ class SocketHandler
           )
     )
 
-  # _find
+  # _onMessage_find
   # -----
-  _find : (message)->
+  _onMessage_find : (message)->
     data = message.data
     
     _id        = data._id
@@ -212,6 +212,26 @@ class SocketHandler
           error = new Error("Could not find #{model_name} with id #{_id}")
           _error(error)
     )
+
+  # _onMessage_subscribe
+  # ----------
+  # Allow client (socket) to subscribe to a given channel
+  #
+  # **topic**
+  _onMessage_subscribe : (message)=>
+    data = message.data
+    topic = data.topic
+
+  # _onMessage_unsubscribe
+  # ----------
+  # Allow client (socket) to subscribe to a given channel
+  #
+  # **topic**
+  _onMessage_unsubscribe : (message)=>
+    data = message.data
+    topic = data.topic
+
+
 
   # _addUserIdFromToken
   # -------------------

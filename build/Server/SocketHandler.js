@@ -20,6 +20,7 @@
       this._sendMessageAll = __bind(this._sendMessageAll, this);
       this._sendMessage = __bind(this._sendMessage, this);
       this._addUserIdFromToken = __bind(this._addUserIdFromToken, this);
+      this._onMessage_subscribe = __bind(this._onMessage_subscribe, this);
       this._onError = __bind(this._onError, this);
       this._onClose = __bind(this._onClose, this);
       this._onMessage = __bind(this._onMessage, this);
@@ -43,8 +44,8 @@
         return;
       }
       this._addUserIdFromToken(message);
-      if (message["in"](['initialize', 'authenticate', 'find'])) {
-        return this["_" + message.name](message);
+      if (message["in"](['initialize', 'authenticate', 'find', 'subscribe'])) {
+        return this["_onMessage_" + message.name](message);
       } else {
         handler = this._messages[message.name];
         if (handler) {
@@ -80,7 +81,7 @@
       return console.error(error);
     };
 
-    SocketHandler.prototype._initialize = function(message) {
+    SocketHandler.prototype._onMessage_initialize = function(message) {
       var init_data, page_key, reply;
       page_key = message.data.page_key;
       init_data = this._init_store[page_key];
@@ -90,7 +91,7 @@
       return this._sendMessage(reply);
     };
 
-    SocketHandler.prototype._authenticate = function(message) {
+    SocketHandler.prototype._onMessage_authenticate = function(message) {
       return this._messages.authenticate({
         message: message,
         callback: (function(_this) {
@@ -130,7 +131,7 @@
       });
     };
 
-    SocketHandler.prototype._find = function(message) {
+    SocketHandler.prototype._onMessage_find = function(message) {
       var Model, data, error, model_name, _error, _id, _reply;
       data = message.data;
       _id = data._id;
@@ -175,6 +176,12 @@
           }
         }
       });
+    };
+
+    SocketHandler.prototype._onMessage_subscribe = function(message) {
+      var data, topic;
+      data = message.data;
+      return topic = data.topic;
     };
 
     SocketHandler.prototype._addUserIdFromToken = function(message) {
