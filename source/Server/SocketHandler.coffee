@@ -1,20 +1,13 @@
 # NPM dependencies
-# ------------------
+# ----------------
 # [type-of-is](https://github.com/stephenhandley/type-of-is)  
-# [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)  
 Type = require('type-of-is')
-JWT  = require('jwt-simple')
 
 # Local dependencies
 # ------------------
 # [Message](./Message.html)  
 Message = require('../Shared/Message')
 
-# strings used to by JWT
-TOKEN = {
-  Expires : 'exp'
-  Issuer  : 'iss'
-}
 
 # RequestHandler
 # ==============
@@ -34,7 +27,9 @@ class SocketHandler
   #
   # **models** : server side models
   # 
-  # **jwt_secret** : jwt_secret used for decoding token
+  # **jwt** : jwt object used for decoding / encoding tokens
+  #           and for augmenting message with user_id / user
+  #           when token is present
   # 
   # **message** : object of handlers for messages
   # 
@@ -43,12 +38,12 @@ class SocketHandler
   constructor : (args)->
     @_socket     = args.socket
     @_models     = args.models
-    @_jwt_secret = args.jwt_secret
     @_messages   = args.messages 
     @_init_store = args.init_store
-    
+    @_jwt        = args.jwt
+
     @constructor._sockets[@_socket.id] = @_socket
-      
+    
     @_socket.on('message', @_onMessage)
     @_socket.on('close', @_onClose)
     @_socket.on('error', @_onError)
@@ -69,35 +64,52 @@ class SocketHandler
       # TODO: how to best handle client errors on server
       return 
 
-    # this decodes the token (if present) and adds user_id to 
-    # message for use by handler 
-    @_addUserIdFromToken(message)
-    
-    # initialize and authenticate messages are handled by framework
-    if message.in(['initialize', 'authenticate', 'find', 'subscribe', 'unsubscribe'])
-      @["_onMessage_#{message.name}"](message)
+    _doReply = (reply_data)=>
+      reply = message.reply(reply_data)
+      @_sendMessage(reply)
 
-    else
-      handler = @_messages[message.name]
+    # this decodes the token (if present) and adds user_id or
+    # user (if User.findForJwt is defined) to the message 
+    # for use by next message handler 
+    @_jwt.handleMessage(
+      message  : message
+      callback : (error)=>
+        if error
+          console.error(error)
+          _doReply(
+            error : "Error processing token"
+          )
 
-      if handler
-        handler(
-          message  : message
-          callback : (error, data)=>
-            reply = message.reply(
-              error : error
-              data  : data
-            )
-            @_sendMessage(reply)
-        )
+        else
+          # certain messages handle internally by framework
+          internal_messages = [
+            'initialize', 'authenticate', 'find', 
+            'subscribe', 'unsubscribe'
+          ]
 
-      else
-        error = "Message:#{message.name} is not supported"
-        console.error(error)
-        reply = message.reply(
-          error : error
-        )
-        @_sendMessage(reply)
+          if message.in(internal_messages)
+            @["_onMessage_#{message.name}"](message)
+
+          else
+            handler = @_messages[message.name]
+
+            if handler
+              handler(
+                message  : message
+                callback : (error, data)=>
+                  _doReply(
+                    error : error
+                    data  : data
+                  )
+              )
+
+            else
+              error = "Message:#{message.name} is not supported"
+              console.error(error)
+              _doReply(
+                error : error
+              )
+    )
 
   _onClose : ()=>
     delete @constructor._sockets[@_socket.id]
@@ -113,7 +125,7 @@ class SocketHandler
   # 
   # **message** : message from client with page_key 
   _onMessage_initialize : (message)->
-    page_key   = message.data.page_key
+    page_key  = message.data.page_key
     init_data = @_init_store[page_key]
     reply     = message.reply(data : init_data)
     @_sendMessage(reply)
@@ -123,47 +135,39 @@ class SocketHandler
   # Delegates to an authenticate message in the user provided
   # messages object and then encodes a jwt token that the client
   # will include in subsequent request. 
+  #
   # **message** : the message from client with auth data
   #
   # messages.authenticate should process the incoming message 
   # and respond with a user object having the following methods
+  #
   # **id**         : required, returns unique identifier for user
+  #
   # *saveToken*    : optional, saves token
+  #
   # *tokenExpires* : optional, returns token expiry time
+  #
+  # TODO: considering moving some of the JWT related stuff into 
+  #       JWT and save token prior to response? 
   _onMessage_authenticate : (message)->
     @_messages.authenticate(
       message  : message, 
       callback : (error, user)=>
-        unless error             
-          body = {}
-          body[TOKEN.Issuer] = user.id()
-          
-          expires = if Type(user.tokenExpires, Function)
-            user.tokenExpires()
-          else
-            null
-
-          if expires
-            body[TOKEN.Expires] = expires
-
-          token = JWT.encode(body, @_jwt_secret)
-
-          data = {
-            token   : token
-            expires : expires
-            user    : user
-          }
+        jwt_data = if error
+          null
+        else
+          @_jwt.encode(user)
 
         reply = message.reply(
           error : error
-          data  : data
+          data  : jwt_data
         )
         @_sendMessage(reply)
 
         # after sending token, have user save it if its supported
         if (!error and Type(user.saveToken, Function))
           user.saveToken(
-            token    : token
+            token    : jwt_data.token
             callback : (error)->
               if error
                 console.error(error)
@@ -174,7 +178,7 @@ class SocketHandler
     )
 
   # _onMessage_find
-  # -----
+  # ---------------
   _onMessage_find : (message)->
     data = message.data
     
@@ -230,29 +234,6 @@ class SocketHandler
   _onMessage_unsubscribe : (message)=>
     data = message.data
     topic = data.topic
-
-
-
-  # _addUserIdFromToken
-  # -------------------
-  # If message has token, decode it and add the associated user id
-  # to the message for later processing
-  #
-  # **message** : message to process
-  _addUserIdFromToken : (message)=>
-    if message.token
-      body = JWT.decode(message.token, @_jwt_secret)
-
-      # check token expiration
-      expires = body[TOKEN.Expires]
-      expired = if expires
-        now = Date.now()
-        (expires < now)
-      else
-        false
-
-      unless expired
-        message.user_id = body[TOKEN.Issuer]
    
   # _sendMessage
   # ------------

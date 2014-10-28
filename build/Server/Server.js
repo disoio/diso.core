@@ -1,5 +1,5 @@
 (function() {
-  var Connect, Container, Ecstatic, Http, PageMap, Path, RequestHandler, Server, SocketHandler, Url, WS,
+  var Connect, Container, Ecstatic, Http, JWT, PageMap, Path, RequestHandler, Server, SocketHandler, Url, WS,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Http = require('http');
@@ -20,11 +20,13 @@
 
   Container = require('./ServerContainer');
 
+  JWT = require('./JWT');
+
   PageMap = require('../Shared/PageMap');
 
   Server = (function() {
     function Server(args) {
-      var Messages, arg, body_parser, connect, container, favicon, map, page_map, request_handler, required_args, static_config, _i, _len, _static;
+      var Messages, arg, body_parser, connect, container, favicon, jwt_secret, map, page_map, request_handler, required_args, static_config, _i, _len, _static;
       if (args == null) {
         args = {};
       }
@@ -36,13 +38,13 @@
           throw new Error("diso.core.Server: Missing argument " + arg);
         }
       }
+      jwt_secret = args.jwt_secret;
       map = args.map;
-      this._jwt_secret = args.jwt_secret;
       favicon = args.favicon;
       this._name = args.name;
+      this._models = args.models;
       Messages = args.messages;
       this._messages = new Messages();
-      this._models = args.models;
       static_config = args["static"];
       if ('request' in args) {
         RequestHandler = args.request;
@@ -67,13 +69,15 @@
         favicon = Connect.favicon(favicon);
       }
       body_parser = Connect.bodyParser();
+      this._jwt = new JWT({
+        secret: jwt_secret,
+        models: this._models
+      });
       page_map = new PageMap({
         map: map,
         models: this._models
       });
       request_handler = new RequestHandler({
-        messages: this._messages,
-        cache: this._cache,
         init_store: this._init_store,
         container: container
       });
@@ -84,7 +88,7 @@
       if (favicon) {
         connect.use(favicon);
       }
-      connect.use(body_parser).use(page_map).use(request_handler);
+      connect.use(body_parser).use(this._jwt).use(page_map).use(request_handler);
       this._http_server = Http.createServer(connect);
     }
 
@@ -101,7 +105,7 @@
         socket: socket,
         messages: this._messages,
         models: this._models,
-        jwt_secret: this._jwt_secret,
+        jwt: this._jwt,
         init_store: this._init_store
       });
     };

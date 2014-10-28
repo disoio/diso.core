@@ -39,6 +39,11 @@
               </a>
             
               
+              <a class="source" href="JWT.html">
+                JWT.coffee
+              </a>
+            
+              
               <a class="source" href="RequestHandler.html">
                 RequestHandler.coffee
               </a>
@@ -142,12 +147,9 @@ Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'d
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>helper for throwing errors when page missing</p>
+              <h2 id="local-dependencies">Local dependencies</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_missingPageError</span> = <span class="hljs-params">(route)</span>-&gt;</span>
-  <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Missing page for route: <span class="hljs-subst">#{route.name}</span>"</span>)</pre></div></div>
             
         </li>
         
@@ -158,9 +160,11 @@ Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'d
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <h1 id="pagemap">PageMap</h1>
+              <p><a href="./Mediator.html">Mediator</a></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>Mediator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./Mediator'</span>)</pre></div></div>
             
         </li>
         
@@ -170,6 +174,35 @@ Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'d
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>helper for throwing errors when page missing</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">_missingPageError</span> = <span class="hljs-params">(route)</span>-&gt;</span>
+  <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Missing page for route: <span class="hljs-subst">#{route.name}</span>"</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h1 id="pagemap">PageMap</h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
               <p>This class handles routing and page lookup</p>
 
@@ -183,11 +216,11 @@ Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'d
         </li>
         
         
-        <li id="section-6">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-6">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>object that maps from a route name to the 
 constructor for its Page </p>
@@ -199,11 +232,11 @@ constructor for its Page </p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <h2 id="constructor">constructor</h2>
 
@@ -212,11 +245,11 @@ constructor for its Page </p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p><strong>models</strong> : models used by pages to get data</p>
 <p><strong>map</strong> : map of routes to pages</p>
@@ -231,38 +264,13 @@ constructor for its Page </p>
         </li>
         
         
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
-              </div>
-              <h2 id="-route-handling-lookup-"><em>ROUTE HANDLING / LOOKUP</em></h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
         <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <h2 id="handle">handle</h2>
+              <h2 id="-route-handling-lookup-"><em>ROUTE HANDLING / LOOKUP</em></h2>
 
             </div>
             
@@ -274,6 +282,31 @@ constructor for its Page </p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <h2 id="handle">handle</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>this function is called by the <a href="https://github.com/senchalabs/connect">connect</a> 
 middleware pipeline on server. It looks up a page for 
@@ -292,11 +325,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>if a page is found matching the route, add to request</p>
 
@@ -305,9 +338,11 @@ page constructor for that route to the request</p>
             <div class="content"><div class='highlight'><pre>        headers = request.headers
         page = <span class="hljs-keyword">new</span> Page(
           models : <span class="hljs-property">@_models</span>
+          user   : request.user
           route  : request.route
           origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
-        )
+        )  
+
         request.page = page
         next()
       <span class="hljs-keyword">else</span></pre></div></div>
@@ -315,11 +350,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>trigger an error for a missing page</p>
 
@@ -332,11 +367,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <h2 id="page-">page </h2>
 
@@ -345,11 +380,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Lookup and return a page by its name</p>
 <p><strong>name</strong> : the name of the page</p>
@@ -362,11 +397,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <h2 id="sync">sync</h2>
 
@@ -375,11 +410,11 @@ page constructor for that route to the request</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Create the page for the client. This is called in the 
 initial client loading process by the ClientContainer’s 
@@ -401,11 +436,11 @@ to the page. </p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>unless we can find a page matching the name return false
 to signal error</p>
@@ -419,11 +454,11 @@ to signal error</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>lookup the route for the current url</p>
 
@@ -438,16 +473,17 @@ to signal error</p>
       origin    : location.origin
       container : container
       data      : data
+      user      : Mediator.user()
     )</pre></div></div>
             
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <h2 id="route">route</h2>
 
@@ -456,11 +492,11 @@ to signal error</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Lookup and create a page for the given route throws error
 if no page matches the route. This is called by the 
@@ -489,32 +525,8 @@ if no page matches the route. This is called by the
       route     : matched_route
       origin    : location.origin
       container : container
+      user      : Mediator.user()
     )</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
-              </div>
-              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              
-            </div>
             
         </li>
         
@@ -525,7 +537,7 @@ if no page matches the route. This is called by the
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
-              <h2 id="_process">_process</h2>
+              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
 
             </div>
             
@@ -537,6 +549,31 @@ if no page matches the route. This is called by the
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <h2 id="_process">_process</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Process the map to yield list of routes for router
 and also allow for page lookup via route name and 
@@ -559,11 +596,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>add route for base route</p>
 
@@ -578,11 +615,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>add routes for all subroutes</p>
 
@@ -600,11 +637,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <h2 id="_addroute">_addRoute</h2>
 
@@ -613,11 +650,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Add a route to the router</p>
 <p><strong>name</strong> : route name
@@ -637,11 +674,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h2 id="_pageforroutename">_pageForRouteName</h2>
 
@@ -650,11 +687,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>Lookup and return the page class for a given route name
 returns null if no page is found matching route’s name</p>

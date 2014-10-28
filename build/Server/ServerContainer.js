@@ -36,15 +36,19 @@
       var callback;
       this._page = args.page;
       callback = args.callback;
-      return this._page.load((function(_this) {
-        return function(error, data) {
-          if (!error) {
-            _this._page.setData(data);
-            _this._page.build();
-          }
-          return callback(error);
-        };
-      })(this));
+      if (this._page.canLoad()) {
+        return this._page.load((function(_this) {
+          return function(error, data) {
+            if (!error) {
+              _this._page.setData(data);
+              _this._page.build();
+            }
+            return callback(error);
+          };
+        })(this));
+      } else {
+        return callback(null, null);
+      }
     };
 
     ServerContainer.prototype.initData = function() {

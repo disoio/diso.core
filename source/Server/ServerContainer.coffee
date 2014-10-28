@@ -51,13 +51,17 @@ class ServerContainer
     @_page   = args.page
     callback = args.callback
 
-    @_page.load((error, data)=>
-      unless error
-        @_page.setData(data)
-        @_page.build()
-      
-      callback(error)
-    )
+    if @_page.canLoad()
+      @_page.load((error, data)=>
+        unless error
+          @_page.setData(data)
+          @_page.build()
+        
+        callback(error)
+      )
+
+    else
+      callback(null, null)
 
   # initData
   # --------

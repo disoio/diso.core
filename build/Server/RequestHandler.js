@@ -14,16 +14,14 @@
   RequestHandler = (function() {
     function RequestHandler(args) {
       this._render = __bind(this._render, this);
-      var messages;
       this._init_store = args.init_store;
-      messages = args.messages;
       this._container = args.container;
     }
 
     RequestHandler.prototype.handle = function(request, response, next) {
       var page, _onError;
       _onError = function(error) {
-        console.error(error);
+        console.error(error.stack);
         return next("500");
       };
       page = request.page;

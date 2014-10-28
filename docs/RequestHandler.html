@@ -39,6 +39,11 @@
               </a>
             
               
+              <a class="source" href="JWT.html">
+                JWT.coffee
+              </a>
+            
+              
               <a class="source" href="RequestHandler.html">
                 RequestHandler.coffee
               </a>
@@ -204,15 +209,13 @@
               <p><strong>init_store</strong> : the cache where initial render / idmap data is 
                  stored for later retrieval to answer initialize 
                  socket message</p>
-<p><strong>messages</strong> : the user specified messages handler passed to the server</p>
 <p><strong>container</strong> : the container that handles page rendering</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    <span class="hljs-property">@_init_store</span> = args.init_store
-    messages     = args.messages
-    <span class="hljs-property">@_container</span>  = args.container</pre></div></div>
+    <span class="hljs-property">@_init_store</span>  = args.init_store
+    <span class="hljs-property">@_container</span>   = args.container</pre></div></div>
             
         </li>
         
@@ -248,7 +251,7 @@ the response</p>
             
             <div class="content"><div class='highlight'><pre>  handle : <span class="hljs-function"><span class="hljs-params">(request, response, next)</span>-&gt;</span>
 <span class="hljs-function">    <span class="hljs-title">_onError</span> = <span class="hljs-params">(error)</span>-&gt;</span>
-      <span class="hljs-built_in">console</span>.error(error)
+      <span class="hljs-built_in">console</span>.error(error.stack)
       next(<span class="hljs-string">"500"</span>)
 
     page = request.page
@@ -282,7 +285,7 @@ TODO: CLEANUP 4 2 SCALE PLZ 4 WEB</p>
             response : response
           )
         <span class="hljs-keyword">catch</span> error
-          _onError(error)  
+          _onError(error)
     )</pre></div></div>
             
         </li>

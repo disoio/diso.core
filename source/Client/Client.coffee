@@ -138,7 +138,8 @@ class Client
     if ('WebSocket' of window)
       @_connect()
     else
-      # TODO: better handling of this .. optional fall back to $.ajax? 
+      # TODO: better handling of this: fall back to $.ajax
+      #       and long polling
       @_clientError("WebSockets not supported by browser")
     
     # After document is ready set flag, emit event, and then 

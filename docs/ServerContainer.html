@@ -39,6 +39,11 @@
               </a>
             
               
+              <a class="source" href="JWT.html">
+                JWT.coffee
+              </a>
+            
+              
               <a class="source" href="RequestHandler.html">
                 RequestHandler.coffee
               </a>
@@ -279,13 +284,17 @@ the client to use for sync. </p>
     <span class="hljs-property">@_page</span>   = args.page
     callback = args.callback
 
-    <span class="hljs-property">@_page</span>.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
-      <span class="hljs-keyword">unless</span> error
-        <span class="hljs-property">@_page</span>.setData(data)
-        <span class="hljs-property">@_page</span>.build()
-      
-      callback(error)
-    )</pre></div></div>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_page</span>.canLoad()
+      <span class="hljs-property">@_page</span>.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
+        <span class="hljs-keyword">unless</span> error
+          <span class="hljs-property">@_page</span>.setData(data)
+          <span class="hljs-property">@_page</span>.build()
+        
+        callback(error)
+      )
+
+    <span class="hljs-keyword">else</span>
+      callback(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>)</pre></div></div>
             
         </li>
         

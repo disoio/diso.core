@@ -39,6 +39,11 @@
               </a>
             
               
+              <a class="source" href="JWT.html">
+                JWT.coffee
+              </a>
+            
+              
               <a class="source" href="RequestHandler.html">
                 RequestHandler.coffee
               </a>
@@ -186,13 +191,14 @@ Ecstatic = <span class="hljs-built_in">require</span>(<span class="hljs-string">
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./Container.html">Container</a><br><a href="./PageMap.html">PageMap</a>  </p>
+              <p><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./Container.html">Container</a><br><a href="./JWT.html">JWT</a><br><a href="./PageMap.html">PageMap</a>  </p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>RequestHandler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./RequestHandler'</span>)
 SocketHandler  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./SocketHandler'</span>)
 Container      = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerContainer'</span>)
+JWT            = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./JWT'</span>)
 PageMap        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/PageMap'</span>)</pre></div></div>
             
         </li>
@@ -286,16 +292,15 @@ the socket connection, and all rendering happens in the client. </p>
     <span class="hljs-keyword">for</span> arg <span class="hljs-keyword">in</span> required_args
       <span class="hljs-keyword">unless</span> args[arg]
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"diso.core.Server: Missing argument <span class="hljs-subst">#{arg}</span>"</span>)
+    
+    jwt_secret = args.jwt_secret
+    map        = args.map
+    favicon    = args.favicon
+    <span class="hljs-property">@_name</span>     = args.name
+    <span class="hljs-property">@_models</span>   = args.models
 
-    map          = args.map
-    <span class="hljs-property">@_jwt_secret</span> = args.jwt_secret
-    favicon      = args.favicon
-    <span class="hljs-property">@_name</span>       = args.name
-
-    Messages     = args.messages
-    <span class="hljs-property">@_messages</span>   = <span class="hljs-keyword">new</span> Messages()
-
-    <span class="hljs-property">@_models</span>     = args.models</pre></div></div>
+    Messages   = args.messages
+    <span class="hljs-property">@_messages</span> = <span class="hljs-keyword">new</span> Messages()</pre></div></div>
             
         </li>
         
@@ -429,12 +434,12 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
-              <p>4) <a href="./PageMap.html">PageMap</a> is used for routing / page lookup</p>
+              <p>4) JWT</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
-      map    : map
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_jwt</span> = <span class="hljs-keyword">new</span> JWT(
+      secret : jwt_secret
       models : <span class="hljs-property">@_models</span>
     )</pre></div></div>
             
@@ -447,15 +452,13 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>5) RequestHandler answers initial HTTP requests</p>
+              <p>5) <a href="./PageMap.html">PageMap</a> is used for routing / page lookup</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    request_handler = <span class="hljs-keyword">new</span> RequestHandler(
-      messages   : <span class="hljs-property">@_messages</span>
-      cache      : <span class="hljs-property">@_cache</span>
-      init_store : <span class="hljs-property">@_init_store</span>
-      container  : container
+            <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
+      map    : map
+      models : <span class="hljs-property">@_models</span>
     )</pre></div></div>
             
         </li>
@@ -466,6 +469,24 @@ the socket connection, and all rendering happens in the client. </p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>6) RequestHandler answers initial HTTP requests</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    request_handler = <span class="hljs-keyword">new</span> RequestHandler(
+      init_store   : <span class="hljs-property">@_init_store</span>
+      container    : container
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Create the connect middleware pipeline</p>
 
@@ -481,23 +502,9 @@ the socket connection, and all rendering happens in the client. </p>
 
     connect
       .use(body_parser)
+      .use(<span class="hljs-property">@_jwt</span>)
       .use(page_map)
       .use(request_handler)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
-              <p>create the server</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_http_server</span> = Http.createServer(connect)</pre></div></div>
             
         </li>
         
@@ -508,9 +515,11 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <h2 id="listen">listen</h2>
+              <p>create the server</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_http_server</span> = Http.createServer(connect)</pre></div></div>
             
         </li>
         
@@ -521,8 +530,21 @@ the socket connection, and all rendering happens in the client. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
+              <h2 id="listen">listen</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
               <p>Listen for HTTP connections on port number passed as argument
-Also attach EngineIO to handle subsequent WebSocket upgrade</p>
+and setup the WebSocket listener</p>
 <p><strong>port</strong> : port to listen on</p>
 
             </div>
@@ -535,11 +557,11 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <h2 id="_onsocketconnection">_onSocketConnection</h2>
 
@@ -548,13 +570,13 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p>Handle a WebSocket/EngineIO connection</p>
+              <p>Handle an incoming WebSocket connection</p>
 <p><strong>socket</strong> :the socket this connection is made on</p>
 
             </div>
@@ -564,7 +586,7 @@ Also attach EngineIO to handle subsequent WebSocket upgrade</p>
       socket     : socket
       messages   : <span class="hljs-property">@_messages</span>
       models     : <span class="hljs-property">@_models</span>
-      jwt_secret : <span class="hljs-property">@_jwt_secret</span>
+      jwt        : <span class="hljs-property">@_jwt</span>
       init_store : <span class="hljs-property">@_init_store</span>
     )
 

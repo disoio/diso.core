@@ -21,10 +21,12 @@ Ecstatic = require('ecstatic')
 # [RequestHandler](./RequestHandler.html)  
 # [SocketHandler](./SocketHandler.html)  
 # [Container](./Container.html)  
+# [JWT](./JWT.html)  
 # [PageMap](./PageMap.html)  
 RequestHandler = require('./RequestHandler')
 SocketHandler  = require('./SocketHandler')
 Container      = require('./ServerContainer')
+JWT            = require('./JWT')
 PageMap        = require('../Shared/PageMap')
 
 # Server
@@ -85,16 +87,15 @@ class Server
     for arg in required_args
       unless args[arg]
         throw new Error("diso.core.Server: Missing argument #{arg}")
+    
+    jwt_secret = args.jwt_secret
+    map        = args.map
+    favicon    = args.favicon
+    @_name     = args.name
+    @_models   = args.models
 
-    map          = args.map
-    @_jwt_secret = args.jwt_secret
-    favicon      = args.favicon
-    @_name       = args.name
-
-    Messages     = args.messages
-    @_messages   = new Messages()
-
-    @_models     = args.models
+    Messages   = args.messages
+    @_messages = new Messages()
 
     #optional args
     static_config = args.static
@@ -135,18 +136,22 @@ class Server
     # 3) body parser
     body_parser = Connect.bodyParser()
 
-    # 4) [PageMap](./PageMap.html) is used for routing / page lookup
+    # 4) JWT
+    @_jwt = new JWT(
+      secret : jwt_secret
+      models : @_models
+    )
+
+    # 5) [PageMap](./PageMap.html) is used for routing / page lookup
     page_map = new PageMap(
       map    : map
       models : @_models
     )
 
-    # 5) RequestHandler answers initial HTTP requests
+    # 6) RequestHandler answers initial HTTP requests
     request_handler = new RequestHandler(
-      messages   : @_messages
-      cache      : @_cache
-      init_store : @_init_store
-      container  : container
+      init_store   : @_init_store
+      container    : container
     )
     
     # Create the connect middleware pipeline
@@ -160,6 +165,7 @@ class Server
 
     connect
       .use(body_parser)
+      .use(@_jwt)
       .use(page_map)
       .use(request_handler)
 
@@ -169,7 +175,7 @@ class Server
   # listen
   # ------
   # Listen for HTTP connections on port number passed as argument
-  # Also attach EngineIO to handle subsequent WebSocket upgrade
+  # and setup the WebSocket listener
   #
   # **port** : port to listen on
   listen : (port)->
@@ -179,7 +185,7 @@ class Server
   
   # _onSocketConnection
   # -------------------
-  # Handle a WebSocket/EngineIO connection
+  # Handle an incoming WebSocket connection
   #
   # **socket** :the socket this connection is made on
   _onSocketConnection : (socket)=>
@@ -187,7 +193,7 @@ class Server
       socket     : socket
       messages   : @_messages
       models     : @_models
-      jwt_secret : @_jwt_secret
+      jwt        : @_jwt
       init_store : @_init_store
     )
 

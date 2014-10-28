@@ -5,6 +5,11 @@
 Type   = require('type-of-is')
 Router = require('diso.router')
 
+# Local dependencies
+# ------------------
+# [Mediator](./Mediator.html)
+Mediator = require('./Mediator')
+
 # helper for throwing errors when page missing
 _missingPageError = (route)->
   new Error("Missing page for route: #{route.name}")
@@ -51,9 +56,11 @@ class PageMap
         headers = request.headers
         page = new Page(
           models : @_models
+          user   : request.user
           route  : request.route
           origin : "#{headers.protocol}#{headers.host}"
-        )
+        )  
+
         request.page = page
         next()
       else
@@ -106,6 +113,7 @@ class PageMap
       origin    : location.origin
       container : container
       data      : data
+      user      : Mediator.user()
     )
 
   # route
@@ -137,6 +145,7 @@ class PageMap
       route     : matched_route
       origin    : location.origin
       container : container
+      user      : Mediator.user()
     )
 
 

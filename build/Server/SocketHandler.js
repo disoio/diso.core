@@ -1,17 +1,10 @@
 (function() {
-  var JWT, Message, SocketHandler, TOKEN, Type,
+  var Message, SocketHandler, Type,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Type = require('type-of-is');
 
-  JWT = require('jwt-simple');
-
   Message = require('../Shared/Message');
-
-  TOKEN = {
-    Expires: 'exp',
-    Issuer: 'iss'
-  };
 
   SocketHandler = (function() {
     SocketHandler._sockets = {};
@@ -19,16 +12,16 @@
     function SocketHandler(args) {
       this._sendMessageAll = __bind(this._sendMessageAll, this);
       this._sendMessage = __bind(this._sendMessage, this);
-      this._addUserIdFromToken = __bind(this._addUserIdFromToken, this);
+      this._onMessage_unsubscribe = __bind(this._onMessage_unsubscribe, this);
       this._onMessage_subscribe = __bind(this._onMessage_subscribe, this);
       this._onError = __bind(this._onError, this);
       this._onClose = __bind(this._onClose, this);
       this._onMessage = __bind(this._onMessage, this);
       this._socket = args.socket;
       this._models = args.models;
-      this._jwt_secret = args.jwt_secret;
       this._messages = args.messages;
       this._init_store = args.init_store;
+      this._jwt = args.jwt;
       this.constructor._sockets[this._socket.id] = this._socket;
       this._socket.on('message', this._onMessage);
       this._socket.on('close', this._onClose);
@@ -36,41 +29,58 @@
     }
 
     SocketHandler.prototype._onMessage = function(raw_message) {
-      var error, handler, message, reply;
+      var message, _doReply;
       console.log("RCV " + raw_message);
       message = Message.parse(raw_message);
       if (message.isError()) {
         console.error("Client error: " + message.error);
         return;
       }
-      this._addUserIdFromToken(message);
-      if (message["in"](['initialize', 'authenticate', 'find', 'subscribe'])) {
-        return this["_onMessage_" + message.name](message);
-      } else {
-        handler = this._messages[message.name];
-        if (handler) {
-          return handler({
-            message: message,
-            callback: (function(_this) {
-              return function(error, data) {
-                var reply;
-                reply = message.reply({
-                  error: error,
-                  data: data
-                });
-                return _this._sendMessage(reply);
-              };
-            })(this)
-          });
-        } else {
-          error = "Message:" + message.name + " is not supported";
-          console.error(error);
-          reply = message.reply({
-            error: error
-          });
-          return this._sendMessage(reply);
-        }
-      }
+      _doReply = (function(_this) {
+        return function(reply_data) {
+          var reply;
+          reply = message.reply(reply_data);
+          return _this._sendMessage(reply);
+        };
+      })(this);
+      return this._jwt.handleMessage({
+        message: message,
+        callback: (function(_this) {
+          return function(error) {
+            var handler, internal_messages;
+            if (error) {
+              console.error(error);
+              return _doReply({
+                error: "Error processing token"
+              });
+            } else {
+              internal_messages = ['initialize', 'authenticate', 'find', 'subscribe', 'unsubscribe'];
+              if (message["in"](internal_messages)) {
+                return _this["_onMessage_" + message.name](message);
+              } else {
+                handler = _this._messages[message.name];
+                if (handler) {
+                  return handler({
+                    message: message,
+                    callback: function(error, data) {
+                      return _doReply({
+                        error: error,
+                        data: data
+                      });
+                    }
+                  });
+                } else {
+                  error = "Message:" + message.name + " is not supported";
+                  console.error(error);
+                  return _doReply({
+                    error: error
+                  });
+                }
+              }
+            }
+          };
+        })(this)
+      });
     };
 
     SocketHandler.prototype._onClose = function() {
@@ -96,29 +106,16 @@
         message: message,
         callback: (function(_this) {
           return function(error, user) {
-            var body, data, expires, reply, token;
-            if (!error) {
-              body = {};
-              body[TOKEN.Issuer] = user.id();
-              expires = Type(user.tokenExpires, Function) ? user.tokenExpires() : null;
-              if (expires) {
-                body[TOKEN.Expires] = expires;
-              }
-              token = JWT.encode(body, _this._jwt_secret);
-              data = {
-                token: token,
-                expires: expires,
-                user: user
-              };
-            }
+            var jwt_data, reply;
+            jwt_data = error ? null : _this._jwt.encode(user);
             reply = message.reply({
               error: error,
-              data: data
+              data: jwt_data
             });
             _this._sendMessage(reply);
             if (!error && Type(user.saveToken, Function)) {
               return user.saveToken({
-                token: token,
+                token: jwt_data.token,
                 callback: function(error) {
                   if (error) {
                     return console.error(error);
@@ -184,16 +181,10 @@
       return topic = data.topic;
     };
 
-    SocketHandler.prototype._addUserIdFromToken = function(message) {
-      var body, expired, expires, now;
-      if (message.token) {
-        body = JWT.decode(message.token, this._jwt_secret);
-        expires = body[TOKEN.Expires];
-        expired = expires ? (now = Date.now(), expires < now) : false;
-        if (!expired) {
-          return message.user_id = body[TOKEN.Issuer];
-        }
-      }
+    SocketHandler.prototype._onMessage_unsubscribe = function(message) {
+      var data, topic;
+      data = message.data;
+      return topic = data.topic;
     };
 
     SocketHandler.prototype._sendMessage = function(message) {

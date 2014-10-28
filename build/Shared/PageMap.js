@@ -1,9 +1,11 @@
 (function() {
-  var PageMap, Router, Type, _missingPageError;
+  var Mediator, PageMap, Router, Type, _missingPageError;
 
   Type = require('type-of-is');
 
   Router = require('diso.router');
+
+  Mediator = require('./Mediator');
 
   _missingPageError = function(route) {
     return new Error("Missing page for route: " + route.name);
@@ -33,6 +35,7 @@
             headers = request.headers;
             page = new Page({
               models: _this._models,
+              user: request.user,
               route: request.route,
               origin: "" + headers.protocol + headers.host
             });
@@ -69,7 +72,8 @@
         route: route,
         origin: location.origin,
         container: container,
-        data: data
+        data: data,
+        user: Mediator.user()
       });
     };
 
@@ -90,7 +94,8 @@
         models: this._models,
         route: matched_route,
         origin: location.origin,
-        container: container
+        container: container,
+        user: Mediator.user()
       });
     };
 

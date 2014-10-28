@@ -20,13 +20,10 @@ class RequestHandler
   #                  stored for later retrieval to answer initialize 
   #                  socket message
   #
-  # **messages** : the user specified messages handler passed to the server
-  #
   # **container** : the container that handles page rendering
   constructor : (args)->
-    @_init_store = args.init_store
-    messages     = args.messages
-    @_container  = args.container
+    @_init_store  = args.init_store
+    @_container   = args.container
 
   # handle
   # ------
@@ -40,7 +37,7 @@ class RequestHandler
   # **request,response,next**: the standard connect middleware trio
   handle : (request, response, next)->
     _onError = (error)->
-      console.error(error)
+      console.error(error.stack)
       next("500")
 
     page = request.page
@@ -62,7 +59,7 @@ class RequestHandler
             response : response
           )
         catch error
-          _onError(error)  
+          _onError(error)
     )
 
   # *INTERNAL METHODS*
