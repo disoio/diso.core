@@ -1,10 +1,12 @@
 (function() {
-  var Message, SocketHandler, Type,
+  var Message, SocketHandler, Strings, Type,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Type = require('type-of-is');
 
   Message = require('../Shared/Message');
+
+  Strings = require('../Shared/Strings');
 
   SocketHandler = (function() {
     SocketHandler._sockets = {};
@@ -22,6 +24,7 @@
       this._messages = args.messages;
       this._init_store = args.init_store;
       this._jwt = args.jwt;
+      this._page_map = args.page_map;
       this.constructor._sockets[this._socket.id] = this._socket;
       this._socket.on('message', this._onMessage);
       this._socket.on('close', this._onClose);
@@ -92,13 +95,35 @@
     };
 
     SocketHandler.prototype._onMessage_initialize = function(message) {
-      var init_data, page_key, reply;
-      page_key = message.data.page_key;
+      var data, doReply, init_data, page, page_key;
+      data = message.data;
+      doReply = (function(_this) {
+        return function(error, data) {
+          var reply;
+          reply = message.reply({
+            error: error,
+            data: data
+          });
+          return _this._sendMessage(reply);
+        };
+      })(this);
+      page_key = data.page_key;
       init_data = this._init_store[page_key];
-      reply = message.reply({
-        data: init_data
+      if (!data.reload) {
+        return doReply(null, init_data);
+      }
+      page = this._page_map.lookup({
+        location: data.location,
+        user: message.user
       });
-      return this._sendMessage(reply);
+      return page.load((function(_this) {
+        return function(error, data) {
+          if (!error) {
+            init_data[Strings.PAGE_DATA] = data;
+          }
+          return doReply(error, init_data);
+        };
+      })(this));
     };
 
     SocketHandler.prototype._onMessage_authenticate = function(message) {

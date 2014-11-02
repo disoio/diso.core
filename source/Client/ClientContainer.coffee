@@ -20,51 +20,98 @@ Strings  = require('../Shared/Strings')
 # with the clientside page, perform navigation between and 
 # within pages via HTML5 history api
 class ClientContainer
+
+  _$body : null
+
   constructor : (args)->
     # [PageMap](./PageMap.html) is used for routing / page lookup
     @_page_map = new PageMap(args)
     @_initializeHistory()
 
+  $body : ()->
+    unless @_$body
+      @_$body = $('body')
+
+    @_$body
+  
+  # pageKey
+  # -------
   pageKey : ()->
-    $('body').attr(Strings.PAGE_ATTR_NAME)
+    @$body().attr(Strings.PAGE_ATTR_NAME)
 
-  # sync
-  # ----
-  # This method use the data sent in the initializeReply message to 
-  # create a page and sync it with the server-rendered html that is 
-  # in the current dom. 
-  # 
-  # A page is created using the body attribute of its constructor name
-  # and passed the page_data from initializeReply. The id_map in that 
-  # same message is then used to traverse the dom of and attach the 
-  # view objects created in the client to their associated containers,
-  # and update their ids to match those sent in the id_map (which are 
-  # the ids that are present in the dom)
-  # 
-  # **init_data** : the initial data received from initializeReply. This 
-  #                 should have two attributes: 'id_map' and 'page_data'
-  sync : (init_data)->
-    id_map    = init_data[Strings.ID_MAP]
-    page_data = init_data[Strings.PAGE_DATA]
+  # pageId
+  # -------
+  pageId : ()->
+    @pageKey().split(':')[1]
 
-    [page_name, page_id] = @pageKey().split(':')
-
-    unless page_name
-      error = new Error("HTML body is missing #{Strings.PAGE_ATTR_NAME} attribute")
-      return error
-
-    # use the page map to retrieve the page by this name
-    @_page = @_page_map.sync(
-      name      : page_name
-      location  : window.location
-      data      : page_data
-      container : @
+  # run
+  # ---
+  # The initializeReply contains two pieces of data that the client 
+  # needs: initial_data used to render the page on the server, and an
+  # id_map of views that make up the page. The client looks up the name 
+  # of the page via the "data-page" body attribute, and then instantiates
+  # the page of that name with initial_data and id_map. The page syncs 
+  # with the dom and handles user interaction, delegating to Mediator.send
+  # to relay messages to/from the server via this client's send method
+  #
+  # **init_data** : ... 
+  run : (init_data)->
+    # use the page map to retrieve page for this location
+    @_page = @_page_map.lookup(
+      location : window.location
+      user     : Mediator.user()
     )
 
     unless @_page
-      error = new Error("No page named #{page_name}")
-      return error
+      error = new Error("No page matched during sync")
+      console.error(error)
+      return
 
+    page_data = init_data[Strings.PAGE_DATA]
+    @_page.setData(page_data)
+
+    is_loading = @isLoading()
+
+    # if loading temporarily set body to loading 
+    # view before sync. it will get reset by the
+    # call to page.build after sync. otherwise
+    # call build to setup the existing, already
+    # fully loaded page
+    if is_loading
+      @_page.setBodyToLoadingView()
+    else
+      @_page.buildAndSetBody()
+
+    id_map = init_data[Strings.ID_MAP]
+    @_sync(id_map)
+    
+    # if the page was loading, then we need to 
+    # rerender it with the data we just pulled 
+    # down in initializeReply
+    if is_loading
+      page = @_page
+      @_page.replaceLoadingWithBuild()
+      page_id = @pageId()
+      @_page.setId(page_id)
+
+    @_page.run()
+
+  # _sync
+  # -----
+  # This method uses the data sent in the initializeReply message to 
+  # create a page and sync it with the server-rendered html that is 
+  # in the current dom. 
+  # 
+  # A page is created using the window's location and then passed the 
+  # data that was sent down in the initializeReply. The id_map in that 
+  # message used to traverse the dom of and attach the view objects 
+  # created in the client to their associated containers, and update 
+  # their ids to match those sent in the id_map (which are the ids 
+  # that are present in the dom)
+  # 
+  # **id_map** : the id map used for syncing this page and its views
+  #              with the existing dom
+  _sync : (id_map)->
     # used to traverse the view hierarchy and sync each 
     # element of the view with id_map passed via the initalizeReply
     _syncView = (args)->
@@ -99,29 +146,30 @@ class ClientContainer
           view : subview
         )
 
-    # have the page build its views
-    @_page.build()
-
     # sync the page (it will take care of syncing its subviews)
     _syncView(
-      id   : page_id
+      id   : @pageId()
       map  : id_map
       view : @_page
     )
 
-    # run the page (i.e. call setup on each view)
-    @_page.run()
-
+  # changePage
+  # ----------
   changePage : (new_page)->
     @_page.remove()
     @_page = new_page
     
-    $body = $('body')
+    $body = @$body()
     $body.html(@_page.html())
     $body.attr(Strings.PAGE_ATTR_NAME, @_page.key())
 
     @_page.run()
     @_pushHistory(new_page.route.path()) # or just new_page.url ? 
+
+  # needsUser
+  # ---------
+  isLoading : ()->
+    @$body().data(Strings.IS_LOADING)
 
   # goto
   # ----
@@ -135,10 +183,10 @@ class ClientContainer
       Mediator.emit('client:error', error)
 
     # get a new page for this route from the page map
-    new_page = @_page_map.route(
+    new_page = @_page_map.lookup(
       route     : route
       location  : window.location
-      container : @
+      user      : Mediator.user()
     )
 
     unless new_page
@@ -157,7 +205,7 @@ class ClientContainer
         return clientError(error)
 
       new_page.setData(data)
-      new_page.build()
+      new_page.buildAndSetBody()
 
       @changePage(new_page)
     )

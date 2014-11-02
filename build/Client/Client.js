@@ -111,9 +111,13 @@
     };
 
     Client.prototype.user = function() {
-      var user;
-      user = this._auth().user;
-      return new this._models.User(user);
+      var user_data;
+      if (this.authenticated()) {
+        user_data = this._auth().user;
+        return new this._models.User(user_data);
+      } else {
+        return null;
+      }
     };
 
     Client.prototype._clientError = function(message) {
@@ -123,23 +127,41 @@
     };
 
     Client.prototype._init = function() {
-      var page_key;
+      var data, k, location, _i, _len, _ref;
       if (!(this._dom_ready && this._socket_open)) {
         return;
       }
-      page_key = this._container.pageKey();
-      return this.send({
-        message: {
-          name: 'initialize',
-          data: {
-            page_key: page_key
+      data = {
+        page_key: this._container.pageKey(),
+        reload: false
+      };
+      if (this._container.isLoading()) {
+        if (this.authenticated()) {
+          location = {};
+          _ref = ['origin', 'pathname', 'search', 'hash'];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            k = _ref[_i];
+            location[k] = window.location[k];
           }
+          data.reload = true;
+          data.location = location;
+        } else {
+          console.log('# go to signin page');
+          null;
         }
-      });
+      }
+      if (data) {
+        return this.send({
+          message: {
+            name: 'initialize',
+            data: data
+          }
+        });
+      }
     };
 
     Client.prototype._run = function(init_data) {
-      this._container.sync(init_data);
+      this._container.run(init_data);
       return Mediator.emit('client:ready');
     };
 

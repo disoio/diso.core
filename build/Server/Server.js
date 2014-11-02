@@ -26,7 +26,7 @@
 
   Server = (function() {
     function Server(args) {
-      var Messages, arg, body_parser, connect, container, favicon, jwt_secret, map, page_map, request_handler, required_args, static_config, _i, _len, _static;
+      var Messages, arg, body_parser, connect, container, favicon, jwt_secret, map, request_handler, required_args, static_config, _i, _len, _static;
       if (args == null) {
         args = {};
       }
@@ -73,7 +73,7 @@
         secret: jwt_secret,
         models: this._models
       });
-      page_map = new PageMap({
+      this._page_map = new PageMap({
         map: map,
         models: this._models
       });
@@ -88,7 +88,7 @@
       if (favicon) {
         connect.use(favicon);
       }
-      connect.use(body_parser).use(this._jwt).use(page_map).use(request_handler);
+      connect.use(body_parser).use(this._jwt).use(this._page_map).use(request_handler);
       this._http_server = Http.createServer(connect);
     }
 
@@ -106,7 +106,8 @@
         messages: this._messages,
         models: this._models,
         jwt: this._jwt,
-        init_store: this._init_store
+        init_store: this._init_store,
+        page_map: this._page_map
       });
     };
 

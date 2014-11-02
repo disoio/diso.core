@@ -336,12 +336,13 @@ page constructor for that route to the request</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        headers = request.headers
+
         page = <span class="hljs-keyword">new</span> Page(
           models : <span class="hljs-property">@_models</span>
           user   : request.user
           route  : request.route
           origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
-        )  
+        ) 
 
         request.page = page
         next()
@@ -403,7 +404,7 @@ page constructor for that route to the request</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <h2 id="sync">sync</h2>
+              <h2 id="lookup">lookup</h2>
 
             </div>
             
@@ -416,22 +417,37 @@ page constructor for that route to the request</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
-              <p>Create the page for the client. This is called in the 
-initial client loading process by the ClientContainer’s 
-sync method. It takes care of passing the initial data 
-to the page. </p>
-<p><strong>name</strong> : the name of the page </p>
+              <p>Lookup and create a page for the given route throws error
+if no page matches the route. </p>
+<p><strong>route</strong> : the route to use for lookup</p>
 <p><strong>location</strong> : the current window.location</p>
-<p><strong>container</strong> : the container for this page</p>
-<p><strong>data</strong> : the data for the page</p>
+<p><strong>user</strong> : the current user</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  sync : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    name      = args.name
-    location  = args.location
-    container = args.container
-    data      = args.data</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  lookup : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span> 
+    route    = args.route
+    location = args.location
+    user     = args.user
+
+    matched_route = <span class="hljs-keyword">if</span> route
+      <span class="hljs-property">@_router</span>.match(route : route)
+    <span class="hljs-keyword">else</span>
+      path  = location.pathname + location.search + location.hash
+      <span class="hljs-property">@_router</span>.match(path : path)  
+
+    Page = <span class="hljs-property">@_pageForRouteName</span>(matched_route.name)
+
+    <span class="hljs-keyword">unless</span> Page 
+      error = _missingPageError(matched_route)
+      <span class="hljs-keyword">throw</span> error
+
+    <span class="hljs-keyword">new</span> Page(
+      models    : <span class="hljs-property">@_models</span>
+      user      : user
+      route     : matched_route
+      origin    : location.origin
+    )</pre></div></div>
             
         </li>
         
@@ -442,14 +458,9 @@ to the page. </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>unless we can find a page matching the name return false
-to signal error</p>
+              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    Page = <span class="hljs-property">@page</span>(name)
-    <span class="hljs-keyword">unless</span> Page
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span></pre></div></div>
             
         </li>
         
@@ -460,21 +471,8 @@ to signal error</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>lookup the route for the current url</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    path = location.pathname + location.search + location.hash
-    route = <span class="hljs-property">@_router</span>.match(path : path)
-
-    <span class="hljs-keyword">new</span> Page(
-      models    : <span class="hljs-property">@_models</span>
-      route     : route
-      origin    : location.origin
-      container : container
-      data      : data
-      user      : Mediator.user()
-    )</pre></div></div>
             
         </li>
         
@@ -485,7 +483,7 @@ to signal error</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <h2 id="route">route</h2>
+              <h2 id="_process">_process</h2>
 
             </div>
             
@@ -497,83 +495,6 @@ to signal error</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              <p>Lookup and create a page for the given route throws error
-if no page matches the route. This is called by the 
-<a href="../Shared/ClientContainer.html">ClientContainer</a>‘s goto method</p>
-<p><strong>route</strong> : the route to use for lookup</p>
-<p><strong>location</strong> : the current window.location</p>
-<p><strong>container</strong> : the container for this page</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  route : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span> 
-    route     = args.route
-    location  = args.location
-    container = args.container
-
-    matched_route = <span class="hljs-property">@_router</span>.match(route : route)
-
-    Page = <span class="hljs-property">@_pageForRouteName</span>(matched_route.name)
-
-    <span class="hljs-keyword">unless</span> Page 
-      error = _missingPageError(matched_route)
-      <span class="hljs-keyword">throw</span> error
-
-    <span class="hljs-keyword">new</span> Page(
-      models    : <span class="hljs-property">@_models</span>
-      route     : matched_route
-      origin    : location.origin
-      container : container
-      user      : Mediator.user()
-    )</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-25">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
-              </div>
-              <h2 id="-internal-methods-"><em>INTERNAL METHODS</em></h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-26">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-27">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
-              </div>
-              <h2 id="_process">_process</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-28">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Process the map to yield list of routes for router
 and also allow for page lookup via route name and 
@@ -596,11 +517,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>add route for base route</p>
 
@@ -615,11 +536,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>add routes for all subroutes</p>
 
@@ -637,11 +558,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <h2 id="_addroute">_addRoute</h2>
 
@@ -650,11 +571,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Add a route to the router</p>
 <p><strong>name</strong> : route name
@@ -674,11 +595,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <h2 id="_pageforroutename">_pageForRouteName</h2>
 
@@ -687,11 +608,11 @@ constructor name</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <p>Lookup and return the page class for a given route name
 returns null if no page is found matching route’s name</p>

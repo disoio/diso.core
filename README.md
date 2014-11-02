@@ -1,7 +1,7 @@
 diso.core
 ===========
 
-0.0.17
+0.0.18
 
 Notes
 -----
@@ -68,19 +68,9 @@ https://github.com/visionmedia/express/blob/master/examples/route-map/index.js#L
 Todo
 -----
 
-
-- If page needs user, skip initial request
-- How to handle that redirect in requesthandler
 - headers, status from page load -> container
 - styles, scripts
 - metadata updating / between redirects / client page changes
-- IF USER REQUIRED, SAVE ORIGINAL REQUEST AND REROUTE AFTER SUCCESSFUL AUTH
 - PAGE TRANSITIONS
 - PAGE MODALS
-
-
-
-
 - Introduce queue / messaging intermediary so that socket connections can be scaled across multiple servers. in process, requesthandler / ServerActions need to be replaceable with acceptor pattern that converts http request into "pageRequest" that is pushed onto queue and handled by consumers
-
-- where should session setup / token verify occur? seems like consumers would be better choice, since likely will need to pull the user record from db, and request handling layer shouldn't be concerned

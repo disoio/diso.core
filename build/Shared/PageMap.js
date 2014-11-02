@@ -53,38 +53,16 @@
       return this._pages[name];
     };
 
-    PageMap.prototype.sync = function(args) {
-      var Page, container, data, location, name, path, route;
-      name = args.name;
-      location = args.location;
-      container = args.container;
-      data = args.data;
-      Page = this.page(name);
-      if (!Page) {
-        return false;
-      }
-      path = location.pathname + location.search + location.hash;
-      route = this._router.match({
-        path: path
-      });
-      return new Page({
-        models: this._models,
-        route: route,
-        origin: location.origin,
-        container: container,
-        data: data,
-        user: Mediator.user()
-      });
-    };
-
-    PageMap.prototype.route = function(args) {
-      var Page, container, error, location, matched_route, route;
+    PageMap.prototype.lookup = function(args) {
+      var Page, error, location, matched_route, path, route, user;
       route = args.route;
       location = args.location;
-      container = args.container;
-      matched_route = this._router.match({
+      user = args.user;
+      matched_route = route ? this._router.match({
         route: route
-      });
+      }) : (path = location.pathname + location.search + location.hash, this._router.match({
+        path: path
+      }));
       Page = this._pageForRouteName(matched_route.name);
       if (!Page) {
         error = _missingPageError(matched_route);
@@ -92,10 +70,9 @@
       }
       return new Page({
         models: this._models,
+        user: user,
         route: matched_route,
-        origin: location.origin,
-        container: container,
-        user: Mediator.user()
+        origin: location.origin
       });
     };
 

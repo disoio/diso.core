@@ -54,12 +54,13 @@ class PageMap
       if Page
         # if a page is found matching the route, add to request
         headers = request.headers
+
         page = new Page(
           models : @_models
           user   : request.user
           route  : request.route
           origin : "#{headers.protocol}#{headers.host}"
-        )  
+        ) 
 
         request.page = page
         next()
@@ -77,62 +78,26 @@ class PageMap
   page : (name)->
     @_pages[name]
 
-  # sync
-  # ----
-  # Create the page for the client. This is called in the 
-  # initial client loading process by the ClientContainer's 
-  # sync method. It takes care of passing the initial data 
-  # to the page. 
-  # 
-  # **name** : the name of the page 
-  #
-  # **location** : the current window.location
-  # 
-  # **container** : the container for this page
-  #
-  # **data** : the data for the page
-  sync : (args)->
-    name      = args.name
-    location  = args.location
-    container = args.container
-    data      = args.data
-
-    # unless we can find a page matching the name return false
-    # to signal error
-    Page = @page(name)
-    unless Page
-      return false
-    
-    # lookup the route for the current url
-    path = location.pathname + location.search + location.hash
-    route = @_router.match(path : path)
-
-    new Page(
-      models    : @_models
-      route     : route
-      origin    : location.origin
-      container : container
-      data      : data
-      user      : Mediator.user()
-    )
-
-  # route
-  # -----
+  # lookup
+  # ------
   # Lookup and create a page for the given route throws error
-  # if no page matches the route. This is called by the 
-  # [ClientContainer](../Shared/ClientContainer.html)'s goto method
-  # 
+  # if no page matches the route. 
+  #
   # **route** : the route to use for lookup
   #
   # **location** : the current window.location
   # 
-  # **container** : the container for this page
-  route : (args)-> 
-    route     = args.route
-    location  = args.location
-    container = args.container
+  # **user** : the current user
+  lookup : (args)-> 
+    route    = args.route
+    location = args.location
+    user     = args.user
 
-    matched_route = @_router.match(route : route)
+    matched_route = if route
+      @_router.match(route : route)
+    else
+      path  = location.pathname + location.search + location.hash
+      @_router.match(path : path)  
 
     Page = @_pageForRouteName(matched_route.name)
 
@@ -142,10 +107,9 @@ class PageMap
 
     new Page(
       models    : @_models
+      user      : user
       route     : matched_route
       origin    : location.origin
-      container : container
-      user      : Mediator.user()
     )
 
 

@@ -15,7 +15,6 @@ Strings = require('../Shared/Strings')
 # The container provides all the HTML needed outside of the body tag. 
 # as well as 
 class ServerContainer
-  _init_page_data : null
   _status : 200
 
   # constructor
@@ -51,17 +50,19 @@ class ServerContainer
     @_page   = args.page
     callback = args.callback
 
-    if @_page.canLoad()
+    if @_page.needsUser()
+      @_page.setData({})
+      @_page.setBodyToLoadingView()
+      callback(null)
+
+    else    
       @_page.load((error, data)=>
         unless error
           @_page.setData(data)
-          @_page.build()
-        
+          @_page.buildAndSetBody()
+
         callback(error)
       )
-
-    else
-      callback(null, null)
 
   # initData
   # --------
@@ -69,8 +70,8 @@ class ServerContainer
   # used in sync on the client
   initData : ()->
     result = {}
-    result[Strings.ID_MAP] = @_idMap()
-    result[Strings.PAGE_DATA] = @_page.data
+    result[Strings.ID_MAP]    = @_idMap()
+    result[Strings.PAGE_DATA] = @_page.page_data
     result
 
   # status
@@ -91,6 +92,7 @@ class ServerContainer
   html : ()->
     # TODO
     # <link rel="shortcut icon" href="#{@favicon_url}" />
+    
     """
       <!DOCTYPE html>
       <html>
@@ -106,7 +108,7 @@ class ServerContainer
           #{@_page.head()}        
         </head>
         
-        <body #{@_pageAttr()}>
+        <body #{@_pageAttr()} #{@_isLoadingAttr()}>
           #{@_page.html()}
         </body>
       </html>
@@ -204,5 +206,11 @@ class ServerContainer
   _pageAttr : ()->
     "#{Strings.PAGE_ATTR_NAME}=\"#{@_page.key()}\""
 
+  # _isLoadingAttr
+  # --------------
+  # Used by the client to determine whether the server was
+  # able to render the full page or whether its loading
+  _isLoadingAttr : ()->
+    "data-#{Strings.IS_LOADING}=\"#{@_page.needsUser()}\""
 
 module.exports = ServerContainer

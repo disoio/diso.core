@@ -8,8 +8,6 @@
   Strings = require('../Shared/Strings');
 
   ServerContainer = (function() {
-    ServerContainer.prototype._init_page_data = null;
-
     ServerContainer.prototype._status = 200;
 
     function ServerContainer(args) {
@@ -36,18 +34,20 @@
       var callback;
       this._page = args.page;
       callback = args.callback;
-      if (this._page.canLoad()) {
+      if (this._page.needsUser()) {
+        this._page.setData({});
+        this._page.setBodyToLoadingView();
+        return callback(null);
+      } else {
         return this._page.load((function(_this) {
           return function(error, data) {
             if (!error) {
               _this._page.setData(data);
-              _this._page.build();
+              _this._page.buildAndSetBody();
             }
             return callback(error);
           };
         })(this));
-      } else {
-        return callback(null, null);
       }
     };
 
@@ -55,7 +55,7 @@
       var result;
       result = {};
       result[Strings.ID_MAP] = this._idMap();
-      result[Strings.PAGE_DATA] = this._page.data;
+      result[Strings.PAGE_DATA] = this._page.page_data;
       return result;
     };
 
@@ -91,7 +91,7 @@
           }));
         }
         return _results;
-      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
+      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageAttr()) + " " + (this._isLoadingAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
     };
 
     ServerContainer.prototype.text = function() {
@@ -159,6 +159,10 @@
 
     ServerContainer.prototype._pageAttr = function() {
       return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this._page.key()) + "\"";
+    };
+
+    ServerContainer.prototype._isLoadingAttr = function() {
+      return "data-" + Strings.IS_LOADING + "=\"" + (this._page.needsUser()) + "\"";
     };
 
     return ServerContainer;

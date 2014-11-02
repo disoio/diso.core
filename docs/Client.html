@@ -556,11 +556,7 @@ init the client.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  logout : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@_auth</span>(<span class="hljs-literal">null</span>)
-
-  user : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    user = <span class="hljs-property">@_auth</span>().user
-    <span class="hljs-keyword">new</span> <span class="hljs-property">@_models</span>.User(user)</pre></div></div>
+    <span class="hljs-property">@_auth</span>(<span class="hljs-literal">null</span>)</pre></div></div>
             
         </li>
         
@@ -571,7 +567,7 @@ init the client.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <h2 id="_clienterror-">_clientError </h2>
+              <h2 id="user">user</h2>
 
             </div>
             
@@ -583,6 +579,38 @@ init the client.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  user : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@authenticated</span>()
+      user_data = <span class="hljs-property">@_auth</span>().user
+      <span class="hljs-keyword">new</span> <span class="hljs-property">@_models</span>.User(user_data)
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <h2 id="_clienterror-">_clientError </h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>Emit an error in the client</p>
 <p><strong>message</strong> : error message</p>
@@ -596,11 +624,11 @@ init the client.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-30">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
               <h2 id="_init">_init</h2>
 
@@ -609,11 +637,11 @@ init the client.</p>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>This method only runs through its full body after two conditions
 have been met  </p>
@@ -628,53 +656,30 @@ have been met  </p>
     <span class="hljs-keyword">unless</span> <span class="hljs-property">@_dom_ready</span> <span class="hljs-keyword">and</span> <span class="hljs-property">@_socket_open</span>
       <span class="hljs-keyword">return</span>
 
-    page_key = <span class="hljs-property">@_container</span>.pageKey()
-    <span class="hljs-property">@send</span>(
-      message : {
-        name : <span class="hljs-string">'initialize'</span>
-        data : {
-          page_key : page_key
+    data = {
+      page_key : <span class="hljs-property">@_container</span>.pageKey()
+      reload   : <span class="hljs-literal">false</span>
+    }
+
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_container</span>.isLoading()
+      <span class="hljs-keyword">if</span> <span class="hljs-property">@authenticated</span>()
+        location = {}
+        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> [<span class="hljs-string">'origin'</span>, <span class="hljs-string">'pathname'</span>, <span class="hljs-string">'search'</span>, <span class="hljs-string">'hash'</span>]
+          location[k] = <span class="hljs-built_in">window</span>.location[k]
+
+        data.reload   = <span class="hljs-literal">true</span>
+        data.location = location
+      <span class="hljs-keyword">else</span>     
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'# go to signin page'</span>)
+        <span class="hljs-literal">null</span>
+
+    <span class="hljs-keyword">if</span> data
+      <span class="hljs-property">@send</span>(
+        message : {
+          name : <span class="hljs-string">'initialize'</span>
+          data : data
         }
-      }
-    )</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
-              </div>
-              <h2 id="_run">_run</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-31">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
-              </div>
-              <p>The initializeReply contains two pieces of data that the client 
-needs: initial_data used to render the page on the server, and an
-id_map of views that make up the page. The client looks up the name 
-of the page via the “data-page” body attribute, and then instantiates
-the page of that name with initial_data and id_map. The page syncs 
-with the dom and handles user interaction, delegating to Mediator.send
-to relay messages to/from the server via this client’s send method</p>
-<p><strong>init_data</strong> : the initial data received from initializeReply. This 
-                should have two attributes: ‘id_map’ and ‘page_data’</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  _run : <span class="hljs-function"><span class="hljs-params">(init_data)</span>=&gt;</span>
-    <span class="hljs-property">@_container</span>.sync(init_data)
-    Mediator.emit(<span class="hljs-string">'client:ready'</span>)</pre></div></div>
+      )</pre></div></div>
             
         </li>
         
@@ -685,7 +690,7 @@ to relay messages to/from the server via this client’s send method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <h2 id="_auth">_auth</h2>
+              <h2 id="_run">_run</h2>
 
             </div>
             
@@ -697,6 +702,37 @@ to relay messages to/from the server via this client’s send method</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p><strong>init_data</strong> : the initial data received from initializeReply. This 
+                should have two attributes: ‘id_map’ and ‘page_data’</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _run : <span class="hljs-function"><span class="hljs-params">(init_data)</span>=&gt;</span>
+    <span class="hljs-property">@_container</span>.run(init_data) 
+    Mediator.emit(<span class="hljs-string">'client:ready'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <h2 id="_auth">_auth</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p>Accessor for auth object. If passed one argument it will 
 set the auth var and check expiration. If auth is null or 
@@ -714,11 +750,11 @@ return the auth object, otherwise null.</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>remove the auth key from client and localStorage</p>
 
@@ -731,11 +767,11 @@ return the auth object, otherwise null.</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>check auth expiration, remove auth from local storage
 if expired</p>
@@ -755,11 +791,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>its a write</p>
 
@@ -770,11 +806,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>we have auth data, set it and check expiry</p>
 
@@ -786,11 +822,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>set if not expired</p>
 
@@ -805,11 +841,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
               <p>if single argument is null/falselike remove auth (logout)</p>
 
@@ -822,11 +858,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-40">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
               <p>its a read</p>
 
@@ -844,38 +880,13 @@ if expired</p>
         </li>
         
         
-        <li id="section-41">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
-              </div>
-              <h2 id="-websocket-methods-"><em>WebSocket Methods</em></h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-42">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
         <li id="section-43">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-43">&#182;</a>
               </div>
-              <h2 id="send">send</h2>
+              <h2 id="-websocket-methods-"><em>WebSocket Methods</em></h2>
 
             </div>
             
@@ -887,6 +898,31 @@ if expired</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <h2 id="send">send</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>send a message to the server</p>
 <p><strong>message</strong> : the message to send</p>
@@ -908,11 +944,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-45">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>add the auth token if present</p>
 
@@ -932,11 +968,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-46">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <h2 id="subscribe-">subscribe </h2>
 
@@ -945,11 +981,11 @@ if expired</p>
         </li>
         
         
-        <li id="section-47">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Register a callback for when a publish message
 is received from the server about a topic</p>
@@ -973,11 +1009,11 @@ is received from the server about a topic</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <h2 id="unsubscribe">unsubscribe</h2>
 
@@ -986,11 +1022,11 @@ is received from the server about a topic</p>
         </li>
         
         
-        <li id="section-49">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
               </div>
               <p>Unregister a callback for a publish message topic</p>
 
@@ -1013,11 +1049,11 @@ is received from the server about a topic</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-52">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <h2 id="_connect">_connect</h2>
 
@@ -1026,11 +1062,11 @@ is received from the server about a topic</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>called to connect to server when the Client is 
 initially constructed and called to reconnect 
@@ -1057,11 +1093,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <h2 id="_onopen">_onOpen</h2>
 
@@ -1070,11 +1106,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
               <p>callback for when the socket is opened </p>
 
@@ -1096,11 +1132,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
               <h2 id="_onmessage">_onMessage</h2>
 
@@ -1109,11 +1145,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-57">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-57">&#182;</a>
               </div>
               <p>callback for when a message is received</p>
 
@@ -1139,41 +1175,13 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-56">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
-              </div>
-              <h2 id="_onmessage_initializereply">_onMessage_initializeReply</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-57">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-57">&#182;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  _onMessage_initializeReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    <span class="hljs-property">@_run</span>(message.data)</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-58">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-58">&#182;</a>
               </div>
-              <h2 id="_onmessage_authenticatereply">_onMessage_authenticateReply</h2>
+              <h2 id="_onmessage_initializereply">_onMessage_initializeReply</h2>
 
             </div>
             
@@ -1189,10 +1197,8 @@ after the client loses connectivity</p>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _onMessage_authenticateReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    data = message.data
-    Mediator.emit(<span class="hljs-string">"client:authenticated"</span>, data)
-    <span class="hljs-property">@_auth</span>(data)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _onMessage_initializeReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    <span class="hljs-property">@_run</span>(message.data)</pre></div></div>
             
         </li>
         
@@ -1203,7 +1209,7 @@ after the client loses connectivity</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
-              <h2 id="_onmessage_publish">_onMessage_publish</h2>
+              <h2 id="_onmessage_authenticatereply">_onMessage_authenticateReply</h2>
 
             </div>
             
@@ -1219,11 +1225,10 @@ after the client loses connectivity</p>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _onMessage_publish : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    data       = message.data
-    topic      = data.topic
-    topic_data = data.data
-    <span class="hljs-property">@_pubsub</span>.emit(topic, topic_data)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _onMessage_authenticateReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    data = message.data
+    Mediator.emit(<span class="hljs-string">"client:authenticated"</span>, data)
+    <span class="hljs-property">@_auth</span>(data)</pre></div></div>
             
         </li>
         
@@ -1234,7 +1239,7 @@ after the client loses connectivity</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
-              <h2 id="_onerror">_onError</h2>
+              <h2 id="_onmessage_publish">_onMessage_publish</h2>
 
             </div>
             
@@ -1250,9 +1255,11 @@ after the client loses connectivity</p>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _onError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
-    <span class="hljs-built_in">console</span>.error(error)
-    <span class="hljs-property">@_clientError</span>(<span class="hljs-string">"Socket error"</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _onMessage_publish : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
+    data       = message.data
+    topic      = data.topic
+    topic_data = data.data
+    <span class="hljs-property">@_pubsub</span>.emit(topic, topic_data)</pre></div></div>
             
         </li>
         
@@ -1263,7 +1270,7 @@ after the client loses connectivity</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
-              <h2 id="_onclose">_onClose</h2>
+              <h2 id="_onerror">_onError</h2>
 
             </div>
             
@@ -1275,6 +1282,35 @@ after the client loses connectivity</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-65">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onError : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
+    <span class="hljs-built_in">console</span>.error(error)
+    <span class="hljs-property">@_clientError</span>(<span class="hljs-string">"Socket error"</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-66">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-66">&#182;</a>
+              </div>
+              <h2 id="_onclose">_onClose</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-67">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>Callback for when client’s socket connection to the
 server closes</p>
@@ -1292,11 +1328,11 @@ server closes</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <h2 id="_reconnectdelay">_reconnectDelay</h2>
 
@@ -1305,11 +1341,11 @@ server closes</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>Calculate delay time before reconnect using exponential backoff 
 algorithm so that reconnection attempts by different users are 
@@ -1344,11 +1380,11 @@ spread out in time rather than all at once</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>Set the Mediator on the Client</p>
 

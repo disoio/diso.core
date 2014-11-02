@@ -182,7 +182,6 @@ as well as </p>
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServerContainer</span></span>
-  _init_page_data : <span class="hljs-literal">null</span>
   _status : <span class="hljs-number">200</span></pre></div></div>
             
         </li>
@@ -284,17 +283,19 @@ the client to use for sync. </p>
     <span class="hljs-property">@_page</span>   = args.page
     callback = args.callback
 
-    <span class="hljs-keyword">if</span> <span class="hljs-property">@_page</span>.canLoad()
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_page</span>.needsUser()
+      <span class="hljs-property">@_page</span>.setData({})
+      <span class="hljs-property">@_page</span>.setBodyToLoadingView()
+      callback(<span class="hljs-literal">null</span>)
+
+    <span class="hljs-keyword">else</span>    
       <span class="hljs-property">@_page</span>.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
         <span class="hljs-keyword">unless</span> error
           <span class="hljs-property">@_page</span>.setData(data)
-          <span class="hljs-property">@_page</span>.build()
-        
-        callback(error)
-      )
+          <span class="hljs-property">@_page</span>.buildAndSetBody()
 
-    <span class="hljs-keyword">else</span>
-      callback(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>)</pre></div></div>
+        callback(error)
+      )</pre></div></div>
             
         </li>
         
@@ -325,8 +326,8 @@ used in sync on the client</p>
             
             <div class="content"><div class='highlight'><pre>  initData : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
     result = {}
-    result[Strings.ID_MAP] = <span class="hljs-property">@_idMap</span>()
-    result[Strings.PAGE_DATA] = <span class="hljs-property">@_page</span>.data
+    result[Strings.ID_MAP]    = <span class="hljs-property">@_idMap</span>()
+    result[Strings.PAGE_DATA] = <span class="hljs-property">@_page</span>.page_data
     result</pre></div></div>
             
         </li>
@@ -429,7 +430,8 @@ used in sync on the client</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-string">"""
+            <div class="content"><div class='highlight'><pre>    
+    <span class="hljs-string">"""
       &lt;!DOCTYPE html&gt;
       &lt;html&gt;
         &lt;head&gt;
@@ -444,7 +446,7 @@ used in sync on the client</p>
           <span class="hljs-subst">#{<span class="hljs-property">@_page</span>.head()}</span>        
         &lt;/head&gt;
         
-        &lt;body <span class="hljs-subst">#{<span class="hljs-property">@_pageAttr</span>()}</span>&gt;
+        &lt;body <span class="hljs-subst">#{<span class="hljs-property">@_pageAttr</span>()}</span> <span class="hljs-subst">#{<span class="hljs-property">@_isLoadingAttr</span>()}</span>&gt;
           <span class="hljs-subst">#{<span class="hljs-property">@_page</span>.html()}</span>
         &lt;/body&gt;
       &lt;/html&gt;
@@ -725,8 +727,37 @@ the rendered html for use in client sync</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  _pageAttr : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-string">"<span class="hljs-subst">#{Strings.PAGE_ATTR_NAME}</span>=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.key()}</span>\""</span>
+    <span class="hljs-string">"<span class="hljs-subst">#{Strings.PAGE_ATTR_NAME}</span>=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.key()}</span>\""</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <h2 id="_isloadingattr">_isLoadingAttr</h2>
 
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Used by the client to determine whether the server was
+able to render the full page or whether its loading</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _isLoadingAttr : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-string">"data-<span class="hljs-subst">#{Strings.IS_LOADING}</span>=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.needsUser()}</span>\""</span>
 
 <span class="hljs-built_in">module</span>.exports = ServerContainer</pre></div></div>
             

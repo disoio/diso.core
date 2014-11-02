@@ -456,7 +456,7 @@ the socket connection, and all rendering happens in the client. </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    page_map = <span class="hljs-keyword">new</span> PageMap(
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_page_map</span> = <span class="hljs-keyword">new</span> PageMap(
       map    : map
       models : <span class="hljs-property">@_models</span>
     )</pre></div></div>
@@ -503,7 +503,7 @@ the socket connection, and all rendering happens in the client. </p>
     connect
       .use(body_parser)
       .use(<span class="hljs-property">@_jwt</span>)
-      .use(page_map)
+      .use(<span class="hljs-property">@_page_map</span>)
       .use(request_handler)</pre></div></div>
             
         </li>
@@ -588,6 +588,7 @@ and setup the WebSocket listener</p>
       models     : <span class="hljs-property">@_models</span>
       jwt        : <span class="hljs-property">@_jwt</span>
       init_store : <span class="hljs-property">@_init_store</span>
+      page_map   : <span class="hljs-property">@_page_map</span>
     )
 
 <span class="hljs-built_in">module</span>.exports = Server</pre></div></div>

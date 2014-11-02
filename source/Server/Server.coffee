@@ -143,7 +143,7 @@ class Server
     )
 
     # 5) [PageMap](./PageMap.html) is used for routing / page lookup
-    page_map = new PageMap(
+    @_page_map = new PageMap(
       map    : map
       models : @_models
     )
@@ -166,7 +166,7 @@ class Server
     connect
       .use(body_parser)
       .use(@_jwt)
-      .use(page_map)
+      .use(@_page_map)
       .use(request_handler)
 
     # create the server
@@ -195,6 +195,7 @@ class Server
       models     : @_models
       jwt        : @_jwt
       init_store : @_init_store
+      page_map   : @_page_map
     )
 
 module.exports = Server

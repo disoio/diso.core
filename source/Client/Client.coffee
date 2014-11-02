@@ -160,9 +160,14 @@ class Client
   logout : ()->
     @_auth(null)
 
+  # user
+  # ----
   user : ()->
-    user = @_auth().user
-    new @_models.User(user)
+    if @authenticated()
+      user_data = @_auth().user
+      new @_models.User(user_data)
+    else
+      null
 
   # _clientError 
   # ------------
@@ -183,31 +188,38 @@ class Client
     unless @_dom_ready and @_socket_open
       return
 
-    page_key = @_container.pageKey()
-    @send(
-      message : {
-        name : 'initialize'
-        data : {
-          page_key : page_key
+    data = {
+      page_key : @_container.pageKey()
+      reload   : false
+    }
+
+    if @_container.isLoading()
+      if @authenticated()
+        location = {}
+        for k in ['origin', 'pathname', 'search', 'hash']
+          location[k] = window.location[k]
+
+        data.reload   = true
+        data.location = location
+      else     
+        console.log('# go to signin page')
+        null
+
+    if data
+      @send(
+        message : {
+          name : 'initialize'
+          data : data
         }
-      }
-    )
+      )
 
 
   # _run
   # -----------
-  # The initializeReply contains two pieces of data that the client 
-  # needs: initial_data used to render the page on the server, and an
-  # id_map of views that make up the page. The client looks up the name 
-  # of the page via the "data-page" body attribute, and then instantiates
-  # the page of that name with initial_data and id_map. The page syncs 
-  # with the dom and handles user interaction, delegating to Mediator.send
-  # to relay messages to/from the server via this client's send method
-  #
   # **init_data** : the initial data received from initializeReply. This 
   #                 should have two attributes: 'id_map' and 'page_data'
   _run : (init_data)=>
-    @_container.sync(init_data)
+    @_container.run(init_data) 
     Mediator.emit('client:ready')
 
   # _auth

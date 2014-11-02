@@ -5,8 +5,10 @@ Type = require('type-of-is')
 
 # Local dependencies
 # ------------------
-# [Message](./Message.html)  
+# [Message](./Message.html) 
+# [Strings](./Strings.html)
 Message = require('../Shared/Message')
+Strings = require('../Shared/Strings')
 
 
 # RequestHandler
@@ -35,12 +37,16 @@ class SocketHandler
   # 
   # **init_store** : the store used for getting data from 
   #                  initial http render for initializeReply
+  #
+  # **page_map** : the page map used for retrieving pages 
+  #                for initializeReply
   constructor : (args)->
     @_socket     = args.socket
     @_models     = args.models
     @_messages   = args.messages 
     @_init_store = args.init_store
     @_jwt        = args.jwt
+    @_page_map   = args.page_map
 
     @constructor._sockets[@_socket.id] = @_socket
     
@@ -125,10 +131,31 @@ class SocketHandler
   # 
   # **message** : message from client with page_key 
   _onMessage_initialize : (message)->
-    page_key  = message.data.page_key
+    data = message.data
+    
+    doReply = (error, data)=>
+      reply = message.reply(
+        error : error
+        data  : data
+      )
+      @_sendMessage(reply)
+
+    page_key = data.page_key
     init_data = @_init_store[page_key]
-    reply     = message.reply(data : init_data)
-    @_sendMessage(reply)
+
+    unless data.reload
+      return doReply(null, init_data)
+
+    page = @_page_map.lookup(
+      location : data.location
+      user     : message.user
+    )
+    page.load((error, data)=>
+      unless error
+        init_data[Strings.PAGE_DATA] = data
+
+      doReply(error, init_data)
+    )
 
   # _onMessage_authenticate 
   # -------------
