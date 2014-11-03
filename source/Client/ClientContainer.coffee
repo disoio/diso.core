@@ -14,6 +14,9 @@ Mediator = require('../Shared/Mediator')
 PageMap  = require('../Shared/PageMap')
 Strings  = require('../Shared/Strings')
 
+clientError = (error)->
+  Mediator.emit('client:error', error)
+
 # ClientContainer
 # ===============
 # Used by the client to sync the initial serverside render
@@ -22,6 +25,8 @@ Strings  = require('../Shared/Strings')
 class ClientContainer
 
   _$body : null
+
+  _has_changed_page : false
 
   constructor : (args)->
     # [PageMap](./PageMap.html) is used for routing / page lookup
@@ -96,6 +101,42 @@ class ClientContainer
 
     @_page.run()
 
+  # needsUser
+  # ---------
+  isLoading : ()->
+    @$body().data(Strings.IS_LOADING)
+
+  # goto
+  # ----
+  # Make a transition between pages
+  # 
+  # **route** : the route for new page
+  goto : (args)=>
+    route = args.route
+
+    # get a new page for this route from the page map
+    new_page = @_page_map.lookup(
+      route     : route
+      location  : window.location
+      user      : Mediator.user()
+    )
+
+    unless new_page
+      error = new Error("No page for #{route.name}")
+      return clientError(error)
+
+    if @_supportsHistory()
+      @_changePage(
+        page : new_page
+        push : true
+      )
+    else
+      # TODO: make this way more robust
+      #       for starters pass the JWT-token via get param or header
+      window.location = new_page.route.path()
+
+
+
   # _sync
   # -----
   # This method uses the data sent in the initializeReply message to 
@@ -153,61 +194,33 @@ class ClientContainer
       view : @_page
     )
 
-  # changePage
-  # ----------
-  changePage : (new_page)->
-    @_page.remove()
-    @_page = new_page
-    
-    $body = @$body()
-    $body.html(@_page.html())
-    $body.attr(Strings.PAGE_ATTR_NAME, @_page.key())
+  # _changePage
+  # -----------
+  _changePage : (args)->
+    new_page     = args.page
+    push_history = args.push
 
-    @_page.run()
-    @_pushHistory(new_page.route.path()) # or just new_page.url ? 
+    @_has_changed_page = true
 
-  # needsUser
-  # ---------
-  isLoading : ()->
-    @$body().data(Strings.IS_LOADING)
-
-  # goto
-  # ----
-  # Make a transition between pages
-  # 
-  # **route** : the route for new page
-  goto : (args)=>
-    route = args.route
-
-    clientError = (error)->
-      Mediator.emit('client:error', error)
-
-    # get a new page for this route from the page map
-    new_page = @_page_map.lookup(
-      route     : route
-      location  : window.location
-      user      : Mediator.user()
-    )
-
-    unless new_page
-      error = new Error("No page for #{route.name}")
-      return clientError(error)
-
-    # TODO: make this way more robust
-    #       for starters pass the JWT-token via get param or header
-    unless @_supportsHistory()
-      window.location = new_page.route.path()
-      return
-
-    # load the new page 
     new_page.load((error, data)=>
       if error
         return clientError(error)
 
       new_page.setData(data)
       new_page.buildAndSetBody()
+    
+      @_page.remove()
+    
+      $body = @$body()
+      $body.html(new_page.html())
+      $body.attr(Strings.PAGE_ATTR_NAME, new_page.key())
 
-      @changePage(new_page)
+      new_page.run()
+
+      if push_history
+        @_pushHistory(new_page.route.path()) # or new_page.url
+
+      @_page = new_page
     )
 
   # *HISTORY METHODS*
@@ -222,7 +235,7 @@ class ClientContainer
   _initializeHistory : ()->
     if @_supportsHistory()
       $(window).on('popstate', @_onPopState)
-  
+        
   # _supportsHistory
   # ----------------
   # returns true if the user's browser supports HTML5 history
@@ -233,9 +246,17 @@ class ClientContainer
   # _onPopState
   # -----------
   # called when user presses back button  
-  # TODO: handle this correctly / integrate with router
-  _onPopState : ()=>
-    console.log("HANDLE POP STATE YO:" + document.location)
+  _onPopState : (event)=>
+    if @_has_changed_page
+      new_page = @_page_map.lookup(
+        location  : window.location
+        user      : Mediator.user()
+      )
+      
+      @_changePage(
+        page : new_page
+        push : false
+      )
 
   # _pushHistory
   # -----------

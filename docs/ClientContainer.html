@@ -154,7 +154,10 @@ Router = <span class="hljs-built_in">require</span>(<span class="hljs-string">'d
             
             <div class="content"><div class='highlight'><pre>Mediator = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Mediator'</span>)
 PageMap  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/PageMap'</span>)
-Strings  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Strings'</span>)</pre></div></div>
+Strings  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Strings'</span>)
+<span class="hljs-function">
+<span class="hljs-title">clientError</span> = <span class="hljs-params">(error)</span>-&gt;</span>
+  Mediator.emit(<span class="hljs-string">'client:error'</span>, error)</pre></div></div>
             
         </li>
         
@@ -187,6 +190,8 @@ within pages via HTML5 history api</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ClientContainer</span></span>
 
   _$body : <span class="hljs-literal">null</span>
+
+  _has_changed_page : <span class="hljs-literal">false</span>
 
   constructor : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span></pre></div></div>
             
@@ -388,7 +393,7 @@ down in initializeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <h2 id="_sync">_sync</h2>
+              <h2 id="needsuser">needsUser</h2>
 
             </div>
             
@@ -400,6 +405,110 @@ down in initializeReply</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  isLoading : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-property">@$body</span>().data(Strings.IS_LOADING)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <h2 id="goto">goto</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Make a transition between pages</p>
+<p><strong>route</strong> : the route for new page</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  goto : <span class="hljs-function"><span class="hljs-params">(args)</span>=&gt;</span>
+    route = args.route</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>get a new page for this route from the page map</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    new_page = <span class="hljs-property">@_page_map</span>.lookup(
+      route     : route
+      location  : <span class="hljs-built_in">window</span>.location
+      user      : Mediator.user()
+    )
+
+    <span class="hljs-keyword">unless</span> new_page
+      error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"No page for <span class="hljs-subst">#{route.name}</span>"</span>)
+      <span class="hljs-keyword">return</span> clientError(error)
+
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_supportsHistory</span>()
+      <span class="hljs-property">@_changePage</span>(
+        page : new_page
+        push : <span class="hljs-literal">true</span>
+      )
+    <span class="hljs-keyword">else</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>TODO: make this way more robust
+      for starters pass the JWT-token via get param or header</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-built_in">window</span>.location = new_page.route.path()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <h2 id="_sync">_sync</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>This method uses the data sent in the initializeReply message to 
 create a page and sync it with the server-rendered html that is 
@@ -420,11 +529,11 @@ that are present in the dom)</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>used to traverse the view hierarchy and sync each 
 element of the view with id_map passed via the initalizeReply</p>
@@ -452,11 +561,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>recurse on subviews</p>
 
@@ -478,11 +587,11 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>sync the page (it will take care of syncing its subviews)</p>
 
@@ -497,122 +606,15 @@ element of the view with id_map passed via the initalizeReply</p>
         </li>
         
         
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
-              <h2 id="changepage">changePage</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  changePage : <span class="hljs-function"><span class="hljs-params">(new_page)</span>-&gt;</span>
-    <span class="hljs-property">@_page</span>.remove()
-    <span class="hljs-property">@_page</span> = new_page
-    
-    $body = <span class="hljs-property">@$body</span>()
-    $body.html(<span class="hljs-property">@_page</span>.html())
-    $body.attr(Strings.PAGE_ATTR_NAME, <span class="hljs-property">@_page</span>.key())
-
-    <span class="hljs-property">@_page</span>.run()
-    <span class="hljs-property">@_pushHistory</span>(new_page.route.path()) <span class="hljs-comment"># or just new_page.url ? </span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
-              </div>
-              <h2 id="needsuser">needsUser</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  isLoading : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@$body</span>().data(Strings.IS_LOADING)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-25">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
-              </div>
-              <h2 id="goto">goto</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-26">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
-              </div>
-              <p>Make a transition between pages</p>
-<p><strong>route</strong> : the route for new page</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  goto : <span class="hljs-function"><span class="hljs-params">(args)</span>=&gt;</span>
-    route = args.route
-<span class="hljs-function">
-    <span class="hljs-title">clientError</span> = <span class="hljs-params">(error)</span>-&gt;</span>
-      Mediator.emit(<span class="hljs-string">'client:error'</span>, error)</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <p>get a new page for this route from the page map</p>
+              <h2 id="_changepage">_changePage</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    new_page = <span class="hljs-property">@_page_map</span>.lookup(
-      route     : route
-      location  : <span class="hljs-built_in">window</span>.location
-      user      : Mediator.user()
-    )
-
-    <span class="hljs-keyword">unless</span> new_page
-      error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"No page for <span class="hljs-subst">#{route.name}</span>"</span>)
-      <span class="hljs-keyword">return</span> clientError(error)</pre></div></div>
             
         </li>
         
@@ -623,14 +625,35 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
-              <p>TODO: make this way more robust
-      for starters pass the JWT-token via get param or header</p>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">unless</span> <span class="hljs-property">@_supportsHistory</span>()
-      <span class="hljs-built_in">window</span>.location = new_page.route.path()
-      <span class="hljs-keyword">return</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _changePage : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    new_page     = args.page
+    push_history = args.push
+
+    <span class="hljs-property">@_has_changed_page</span> = <span class="hljs-literal">true</span>
+
+    new_page.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
+      <span class="hljs-keyword">if</span> error
+        <span class="hljs-keyword">return</span> clientError(error)
+
+      new_page.setData(data)
+      new_page.buildAndSetBody()
+    
+      <span class="hljs-property">@_page</span>.remove()
+    
+      $body = <span class="hljs-property">@$body</span>()
+      $body.html(new_page.html())
+      $body.attr(Strings.PAGE_ATTR_NAME, new_page.key())
+
+      new_page.run()
+
+      <span class="hljs-keyword">if</span> push_history
+        <span class="hljs-property">@_pushHistory</span>(new_page.route.path()) <span class="hljs-comment"># or new_page.url</span>
+
+      <span class="hljs-property">@_page</span> = new_page
+    )</pre></div></div>
             
         </li>
         
@@ -641,19 +664,9 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
-              <p>load the new page </p>
+              <h2 id="-history-methods-"><em>HISTORY METHODS</em></h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    new_page.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
-      <span class="hljs-keyword">if</span> error
-        <span class="hljs-keyword">return</span> clientError(error)
-
-      new_page.setData(data)
-      new_page.buildAndSetBody()
-
-      <span class="hljs-property">@changePage</span>(new_page)
-    )</pre></div></div>
             
         </li>
         
@@ -664,8 +677,7 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-30">&#182;</a>
               </div>
-              <h2 id="-history-methods-"><em>HISTORY METHODS</em></h2>
-
+              
             </div>
             
         </li>
@@ -677,7 +689,8 @@ element of the view with id_map passed via the initalizeReply</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
-              
+              <h2 id="_initializehistory">_initializeHistory</h2>
+
             </div>
             
         </li>
@@ -688,19 +701,6 @@ element of the view with id_map passed via the initalizeReply</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
-              </div>
-              <h2 id="_initializehistory">_initializeHistory</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-33">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <p>Initialize the html5 history api. Using the browser api rather 
 than adapter and falling back to full page loads if it isn’t 
@@ -716,11 +716,11 @@ support
         </li>
         
         
-        <li id="section-34">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h2 id="_supportshistory">_supportsHistory</h2>
 
@@ -729,11 +729,11 @@ support
         </li>
         
         
-        <li id="section-35">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>returns true if the user’s browser supports HTML5 history
 <a href="http://caniuse.com/#search=history">http://caniuse.com/#search=history</a></p>
@@ -746,15 +746,40 @@ support
         </li>
         
         
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <h2 id="_onpopstate">_onPopState</h2>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
-              <h2 id="_onpopstate">_onPopState</h2>
+              <p>called when user presses back button  </p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  _onPopState : <span class="hljs-function"><span class="hljs-params">(event)</span>=&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@_has_changed_page</span>
+      new_page = <span class="hljs-property">@_page_map</span>.lookup(
+        location  : <span class="hljs-built_in">window</span>.location
+        user      : Mediator.user()
+      )
+      
+      <span class="hljs-property">@_changePage</span>(
+        page : new_page
+        push : <span class="hljs-literal">false</span>
+      )</pre></div></div>
             
         </li>
         
@@ -765,12 +790,9 @@ support
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
-              <p>called when user presses back button<br>TODO: handle this correctly / integrate with router</p>
+              <h2 id="_pushhistory">_pushHistory</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  _onPopState : <span class="hljs-function"><span class="hljs-params">()</span>=&gt;</span>
-    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"HANDLE POP STATE YO:"</span> + <span class="hljs-built_in">document</span>.location)</pre></div></div>
             
         </li>
         
@@ -780,19 +802,6 @@ support
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-38">&#182;</a>
-              </div>
-              <h2 id="_pushhistory">_pushHistory</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-39">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>add url to the history. this will change the location bar to url</p>
 

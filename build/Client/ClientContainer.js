@@ -1,5 +1,5 @@
 (function() {
-  var $, ClientContainer, Mediator, PageMap, Router, Strings,
+  var $, ClientContainer, Mediator, PageMap, Router, Strings, clientError,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $ = require('jquery');
@@ -12,8 +12,14 @@
 
   Strings = require('../Shared/Strings');
 
+  clientError = function(error) {
+    return Mediator.emit('client:error', error);
+  };
+
   ClientContainer = (function() {
     ClientContainer.prototype._$body = null;
+
+    ClientContainer.prototype._has_changed_page = false;
 
     function ClientContainer(args) {
       this._onPopState = __bind(this._onPopState, this);
@@ -67,6 +73,32 @@
       return this._page.run();
     };
 
+    ClientContainer.prototype.isLoading = function() {
+      return this.$body().data(Strings.IS_LOADING);
+    };
+
+    ClientContainer.prototype.goto = function(args) {
+      var error, new_page, route;
+      route = args.route;
+      new_page = this._page_map.lookup({
+        route: route,
+        location: window.location,
+        user: Mediator.user()
+      });
+      if (!new_page) {
+        error = new Error("No page for " + route.name);
+        return clientError(error);
+      }
+      if (this._supportsHistory()) {
+        return this._changePage({
+          page: new_page,
+          push: true
+        });
+      } else {
+        return window.location = new_page.route.path();
+      }
+    };
+
     ClientContainer.prototype._sync = function(id_map) {
       var _syncView;
       _syncView = function(args) {
@@ -106,48 +138,28 @@
       });
     };
 
-    ClientContainer.prototype.changePage = function(new_page) {
-      var $body;
-      this._page.remove();
-      this._page = new_page;
-      $body = this.$body();
-      $body.html(this._page.html());
-      $body.attr(Strings.PAGE_ATTR_NAME, this._page.key());
-      this._page.run();
-      return this._pushHistory(new_page.route.path());
-    };
-
-    ClientContainer.prototype.isLoading = function() {
-      return this.$body().data(Strings.IS_LOADING);
-    };
-
-    ClientContainer.prototype.goto = function(args) {
-      var clientError, error, new_page, route;
-      route = args.route;
-      clientError = function(error) {
-        return Mediator.emit('client:error', error);
-      };
-      new_page = this._page_map.lookup({
-        route: route,
-        location: window.location,
-        user: Mediator.user()
-      });
-      if (!new_page) {
-        error = new Error("No page for " + route.name);
-        return clientError(error);
-      }
-      if (!this._supportsHistory()) {
-        window.location = new_page.route.path();
-        return;
-      }
+    ClientContainer.prototype._changePage = function(args) {
+      var new_page, push_history;
+      new_page = args.page;
+      push_history = args.push;
+      this._has_changed_page = true;
       return new_page.load((function(_this) {
         return function(error, data) {
+          var $body;
           if (error) {
             return clientError(error);
           }
           new_page.setData(data);
           new_page.buildAndSetBody();
-          return _this.changePage(new_page);
+          _this._page.remove();
+          $body = _this.$body();
+          $body.html(new_page.html());
+          $body.attr(Strings.PAGE_ATTR_NAME, new_page.key());
+          new_page.run();
+          if (push_history) {
+            _this._pushHistory(new_page.route.path());
+          }
+          return _this._page = new_page;
         };
       })(this));
     };
@@ -163,8 +175,18 @@
       return !!((_ref = window.history) != null ? _ref.pushState : void 0);
     };
 
-    ClientContainer.prototype._onPopState = function() {
-      return console.log("HANDLE POP STATE YO:" + document.location);
+    ClientContainer.prototype._onPopState = function(event) {
+      var new_page;
+      if (this._has_changed_page) {
+        new_page = this._page_map.lookup({
+          location: window.location,
+          user: Mediator.user()
+        });
+        return this._changePage({
+          page: new_page,
+          push: false
+        });
+      }
     };
 
     ClientContainer.prototype._pushHistory = function(url) {
