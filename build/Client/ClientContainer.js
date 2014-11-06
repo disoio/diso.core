@@ -43,7 +43,7 @@
       return this.pageKey().split(':')[1];
     };
 
-    ClientContainer.prototype.run = function(init_data) {
+    ClientContainer.prototype.setup = function(init_data) {
       var error, id_map, is_loading, page, page_data, page_id;
       this._page = this._page_map.lookup({
         location: window.location,
@@ -70,7 +70,7 @@
         page_id = this.pageId();
         this._page.setId(page_id);
       }
-      return this._page.run();
+      return this._page.setup();
     };
 
     ClientContainer.prototype.isLoading = function() {
@@ -155,7 +155,7 @@
           $body = _this.$body();
           $body.html(new_page.html());
           $body.attr(Strings.PAGE_ATTR_NAME, new_page.key());
-          new_page.run();
+          new_page.setup();
           if (push_history) {
             _this._pushHistory(new_page.route.path());
           }

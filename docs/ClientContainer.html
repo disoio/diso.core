@@ -282,7 +282,7 @@ within pages via HTML5 history api</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <h2 id="run">run</h2>
+              <h2 id="setup">setup</h2>
 
             </div>
             
@@ -306,7 +306,7 @@ to relay messages to/from the server via this client’s send method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  run : <span class="hljs-function"><span class="hljs-params">(init_data)</span>-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  setup : <span class="hljs-function"><span class="hljs-params">(init_data)</span>-&gt;</span></pre></div></div>
             
         </li>
         
@@ -382,7 +382,7 @@ down in initializeReply</p>
       page_id = <span class="hljs-property">@pageId</span>()
       <span class="hljs-property">@_page</span>.setId(page_id)
 
-    <span class="hljs-property">@_page</span>.run()</pre></div></div>
+    <span class="hljs-property">@_page</span>.setup()</pre></div></div>
             
         </li>
         
@@ -647,7 +647,7 @@ element of the view with id_map passed via the initalizeReply</p>
       $body.html(new_page.html())
       $body.attr(Strings.PAGE_ATTR_NAME, new_page.key())
 
-      new_page.run()
+      new_page.setup()
 
       <span class="hljs-keyword">if</span> push_history
         <span class="hljs-property">@_pushHistory</span>(new_page.route.path()) <span class="hljs-comment"># or new_page.url</span>

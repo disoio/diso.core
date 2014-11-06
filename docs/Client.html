@@ -221,7 +221,7 @@ waits for 2 things to happen</p>
 <li><strong>domready</strong> event fires in browser</li>
 <li><strong>initializeReply</strong> message arrives from server</li>
 </ol>
-<p>After those both happen then the <strong>_run</strong> method takes care of syncing
+<p>After those both happen then the <strong>_setup</strong> method takes care of syncing
 the current page with the dom. The page’s views then handle user 
 interaction and use the client’s <strong>send</strong> method (via the <a href="./Mediator.html">Mediator</a>) 
 to send data to and from the server</p>
@@ -376,8 +376,8 @@ on clientside e.g. from browser console </p>
         error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Client missing required argument: <span class="hljs-subst">#{k}</span>"</span>)
         <span class="hljs-keyword">throw</span> error
 
-    <span class="hljs-property">@_name</span> = args.name
-    map    = args.map
+    <span class="hljs-property">@_name</span>   = args.name
+    map      = args.map
     <span class="hljs-property">@_models</span> = args.models
 
     Message.setModels(<span class="hljs-property">@_models</span>)
@@ -690,7 +690,7 @@ have been met  </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <h2 id="_run">_run</h2>
+              <h2 id="_setup">_setup</h2>
 
             </div>
             
@@ -703,13 +703,12 @@ have been met  </p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
-              <p><strong>init_data</strong> : the initial data received from initializeReply. This 
-                should have two attributes: ‘id_map’ and ‘page_data’</p>
+              <p><strong>init_data</strong> : the initial data received from initializeReply. </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _run : <span class="hljs-function"><span class="hljs-params">(init_data)</span>=&gt;</span>
-    <span class="hljs-property">@_container</span>.run(init_data) 
+            <div class="content"><div class='highlight'><pre>  _setup : <span class="hljs-function"><span class="hljs-params">(init_data)</span>=&gt;</span>
+    <span class="hljs-property">@_container</span>.setup(init_data) 
     Mediator.emit(<span class="hljs-string">'client:ready'</span>)</pre></div></div>
             
         </li>
@@ -1198,7 +1197,7 @@ after the client loses connectivity</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  _onMessage_initializeReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    <span class="hljs-property">@_run</span>(message.data)</pre></div></div>
+    <span class="hljs-property">@_setup</span>(message.data)</pre></div></div>
             
         </li>
         

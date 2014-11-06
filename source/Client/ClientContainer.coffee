@@ -49,8 +49,8 @@ class ClientContainer
   pageId : ()->
     @pageKey().split(':')[1]
 
-  # run
-  # ---
+  # setup
+  # -----
   # The initializeReply contains two pieces of data that the client 
   # needs: initial_data used to render the page on the server, and an
   # id_map of views that make up the page. The client looks up the name 
@@ -60,7 +60,7 @@ class ClientContainer
   # to relay messages to/from the server via this client's send method
   #
   # **init_data** : ... 
-  run : (init_data)->
+  setup : (init_data)->
     # use the page map to retrieve page for this location
     @_page = @_page_map.lookup(
       location : window.location
@@ -99,7 +99,7 @@ class ClientContainer
       page_id = @pageId()
       @_page.setId(page_id)
 
-    @_page.run()
+    @_page.setup()
 
   # needsUser
   # ---------
@@ -215,7 +215,7 @@ class ClientContainer
       $body.html(new_page.html())
       $body.attr(Strings.PAGE_ATTR_NAME, new_page.key())
 
-      new_page.run()
+      new_page.setup()
 
       if push_history
         @_pushHistory(new_page.route.path()) # or new_page.url

@@ -45,7 +45,7 @@
       this.unsubscribe = __bind(this.unsubscribe, this);
       this.subscribe = __bind(this.subscribe, this);
       this.send = __bind(this.send, this);
-      this._run = __bind(this._run, this);
+      this._setup = __bind(this._setup, this);
       var error, k, map, v, _i, _len, _ref, _ref1;
       if (constructed) {
         throw new Error("Client already constructed");
@@ -160,8 +160,8 @@
       }
     };
 
-    Client.prototype._run = function(init_data) {
-      this._container.run(init_data);
+    Client.prototype._setup = function(init_data) {
+      this._container.setup(init_data);
       return Mediator.emit('client:ready');
     };
 
@@ -298,7 +298,7 @@
     };
 
     Client.prototype._onMessage_initializeReply = function(message) {
-      return this._run(message.data);
+      return this._setup(message.data);
     };
 
     Client.prototype._onMessage_authenticateReply = function(message) {

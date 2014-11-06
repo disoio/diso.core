@@ -36,7 +36,7 @@ constructed = false
 # 1. **domready** event fires in browser
 # 2. **initializeReply** message arrives from server
 #
-# After those both happen then the **_run** method takes care of syncing
+# After those both happen then the **_setup** method takes care of syncing
 # the current page with the dom. The page's views then handle user 
 # interaction and use the client's **send** method (via the [Mediator](./Mediator.html)) 
 # to send data to and from the server
@@ -97,8 +97,8 @@ class Client
         error = new Error("Client missing required argument: #{k}")
         throw error
 
-    @_name = args.name
-    map    = args.map
+    @_name   = args.name
+    map      = args.map
     @_models = args.models
 
     Message.setModels(@_models)
@@ -214,12 +214,11 @@ class Client
       )
 
 
-  # _run
-  # -----------
-  # **init_data** : the initial data received from initializeReply. This 
-  #                 should have two attributes: 'id_map' and 'page_data'
-  _run : (init_data)=>
-    @_container.run(init_data) 
+  # _setup
+  # ------
+  # **init_data** : the initial data received from initializeReply. 
+  _setup : (init_data)=>
+    @_container.setup(init_data) 
     Mediator.emit('client:ready')
 
   # _auth
@@ -403,7 +402,7 @@ class Client
   # _onMessage_initializeReply
   # ----------------
   _onMessage_initializeReply : (message)->
-    @_run(message.data)
+    @_setup(message.data)
 
   # _onMessage_authenticateReply
   # ------------------

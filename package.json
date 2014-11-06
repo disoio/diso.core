@@ -1,6 +1,6 @@
 {
   "name": "diso.core",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "description": "Client / Server",
   "license": "MIT",
   "main": "index.js",
