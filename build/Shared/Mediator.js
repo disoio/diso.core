@@ -1,5 +1,5 @@
 (function() {
-  var EventEmitter, Mediator, Type,
+  var EventEmitter, Mediator, Type, mediator,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -34,6 +34,10 @@
 
   })(EventEmitter);
 
-  module.exports = new Mediator();
+  mediator = new Mediator();
+
+  mediator.setMaxListeners(50);
+
+  module.exports = mediator;
 
 }).call(this);

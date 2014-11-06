@@ -225,8 +225,12 @@
       <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(method, target)</span>=&gt;</span>
         @[method] = <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
           target[method].apply(target, arguments)
-    
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-keyword">new</span> Mediator()</pre></div></div>
+
+
+mediator = <span class="hljs-keyword">new</span> Mediator()
+mediator.setMaxListeners(<span class="hljs-number">50</span>)
+
+<span class="hljs-built_in">module</span>.exports = mediator</pre></div></div>
             
         </li>
         

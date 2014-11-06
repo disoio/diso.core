@@ -23,5 +23,9 @@ class Mediator extends EventEmitter
       do (method, target)=>
         @[method] = ()->
           target[method].apply(target, arguments)
-    
-module.exports = new Mediator()
+
+
+mediator = new Mediator()
+mediator.setMaxListeners(50)
+
+module.exports = mediator
