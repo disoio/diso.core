@@ -509,8 +509,8 @@ constructor name</p>
         <span class="hljs-keyword">unless</span> route[attr]
           <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"You're missing <span class="hljs-subst">#{attr}</span> for '<span class="hljs-subst">#{name}</span>' in app's map"</span>)
 
-      page  = route.page
-      route = route.route
+      page       = route.page
+      base_route = route.route
 
       <span class="hljs-property">@_pages</span>[page.name] = page</pre></div></div>
             
@@ -529,7 +529,7 @@ constructor name</p>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-property">@_addRoute</span>(
         name  : name
-        route : route
+        route : base_route
         page  : page
       )</pre></div></div>
             
@@ -546,14 +546,15 @@ constructor name</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">for</span> name,subroute <span class="hljs-keyword">of</span> map.subroutes
-        subroute = route + subroute
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (<span class="hljs-string">'subroutes'</span> <span class="hljs-keyword">of</span> route)
+        <span class="hljs-keyword">for</span> name,subroute <span class="hljs-keyword">of</span> route.subroutes
+          full_subroute = base_route + subroute
 
-        <span class="hljs-property">@_addRoute</span>(
-          name  : name
-          route : subroute
-          page  : page
-        )</pre></div></div>
+          <span class="hljs-property">@_addRoute</span>(
+            name  : name
+            route : full_subroute
+            page  : page
+          )</pre></div></div>
             
         </li>
         

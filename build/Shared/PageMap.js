@@ -77,7 +77,7 @@
     };
 
     PageMap.prototype._process = function(map) {
-      var attr, name, page, route, subroute, _i, _len, _ref, _results;
+      var attr, base_route, full_subroute, name, page, route, subroute, _i, _len, _ref, _results;
       _results = [];
       for (name in map) {
         route = map[name];
@@ -89,28 +89,32 @@
           }
         }
         page = route.page;
-        route = route.route;
+        base_route = route.route;
         this._pages[page.name] = page;
         this._addRoute({
           name: name,
-          route: route,
+          route: base_route,
           page: page
         });
-        _results.push((function() {
-          var _ref1, _results1;
-          _ref1 = map.subroutes;
-          _results1 = [];
-          for (name in _ref1) {
-            subroute = _ref1[name];
-            subroute = route + subroute;
-            _results1.push(this._addRoute({
-              name: name,
-              route: subroute,
-              page: page
-            }));
-          }
-          return _results1;
-        }).call(this));
+        if ('subroutes' in route) {
+          _results.push((function() {
+            var _ref1, _results1;
+            _ref1 = route.subroutes;
+            _results1 = [];
+            for (name in _ref1) {
+              subroute = _ref1[name];
+              full_subroute = base_route + subroute;
+              _results1.push(this._addRoute({
+                name: name,
+                route: full_subroute,
+                page: page
+              }));
+            }
+            return _results1;
+          }).call(this));
+        } else {
+          _results.push(void 0);
+        }
       }
       return _results;
     };

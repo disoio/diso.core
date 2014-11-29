@@ -129,27 +129,28 @@ class PageMap
         unless route[attr]
           throw new Error("You're missing #{attr} for '#{name}' in app's map")
 
-      page  = route.page
-      route = route.route
+      page       = route.page
+      base_route = route.route
 
       @_pages[page.name] = page
 
       # add route for base route
       @_addRoute(
         name  : name
-        route : route
+        route : base_route
         page  : page
       )
 
       # add routes for all subroutes
-      for name,subroute of map.subroutes
-        subroute = route + subroute
+      if ('subroutes' of route)
+        for name,subroute of route.subroutes
+          full_subroute = base_route + subroute
 
-        @_addRoute(
-          name  : name
-          route : subroute
-          page  : page
-        )
+          @_addRoute(
+            name  : name
+            route : full_subroute
+            page  : page
+          )
 
   # _addRoute
   # ---------
