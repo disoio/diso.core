@@ -511,7 +511,7 @@ init the client.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <h2 id="authorized">authorized</h2>
+              <h2 id="authenticated">authenticated</h2>
 
             </div>
             
@@ -777,10 +777,14 @@ if expired</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">checkAuthExpiration</span> = <span class="hljs-params">()</span>=&gt;</span>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">checkAuth</span> = <span class="hljs-params">()</span>=&gt;</span>
       <span class="hljs-keyword">unless</span> <span class="hljs-property">@__auth</span>
         <span class="hljs-keyword">return</span>
 
+      <span class="hljs-keyword">unless</span> <span class="hljs-property">@__auth</span>.user
+        removeAuth()
+        <span class="hljs-keyword">return</span>
+        
       expired = (<span class="hljs-property">@__auth</span>.expires <span class="hljs-keyword">and</span> (<span class="hljs-property">@__auth</span>.expires &lt; Date.now()))
       <span class="hljs-keyword">if</span> expired
         removeAuth()
@@ -816,7 +820,7 @@ if expired</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-property">@__auth</span> = auth
-        checkAuthExpiration()</pre></div></div>
+        checkAuth()</pre></div></div>
             
         </li>
         
@@ -872,7 +876,7 @@ if expired</p>
         <span class="hljs-keyword">if</span> raw_auth
           <span class="hljs-property">@__auth</span> = JSON.parse(raw_auth)
 
-      checkAuthExpiration()
+      checkAuth()
 
       <span class="hljs-property">@__auth</span></pre></div></div>
             

@@ -150,8 +150,8 @@ class Client
       @_init()
     )
 
-  # authorized
-  # ----------
+  # authenticated
+  # -------------
   authenticated : ()->
     !!@_auth()
 
@@ -240,10 +240,14 @@ class Client
 
     # check auth expiration, remove auth from local storage
     # if expired
-    checkAuthExpiration = ()=>
+    checkAuth = ()=>
       unless @__auth
         return
 
+      unless @__auth.user
+        removeAuth()
+        return
+        
       expired = (@__auth.expires and (@__auth.expires < Date.now()))
       if expired
         removeAuth()
@@ -253,7 +257,7 @@ class Client
       if auth
         # we have auth data, set it and check expiry
         @__auth = auth
-        checkAuthExpiration()
+        checkAuth()
 
         # set if not expired
         if @__auth
@@ -271,7 +275,7 @@ class Client
         if raw_auth
           @__auth = JSON.parse(raw_auth)
 
-      checkAuthExpiration()
+      checkAuth()
 
       @__auth
 

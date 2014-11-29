@@ -166,7 +166,7 @@
     };
 
     Client.prototype._auth = function(auth) {
-      var checkAuthExpiration, key, raw_auth, removeAuth;
+      var checkAuth, key, raw_auth, removeAuth;
       key = "" + this._name + ":auth";
       removeAuth = (function(_this) {
         return function() {
@@ -174,10 +174,14 @@
           return _this.__auth = null;
         };
       })(this);
-      checkAuthExpiration = (function(_this) {
+      checkAuth = (function(_this) {
         return function() {
           var expired;
           if (!_this.__auth) {
+            return;
+          }
+          if (!_this.__auth.user) {
+            removeAuth();
             return;
           }
           expired = _this.__auth.expires && (_this.__auth.expires < Date.now());
@@ -189,7 +193,7 @@
       if (arguments.length === 1) {
         if (auth) {
           this.__auth = auth;
-          checkAuthExpiration();
+          checkAuth();
           if (this.__auth) {
             raw_auth = JSON.stringify(this.__auth);
             return localStorage.setItem(key, raw_auth);
@@ -204,7 +208,7 @@
             this.__auth = JSON.parse(raw_auth);
           }
         }
-        checkAuthExpiration();
+        checkAuth();
         return this.__auth;
       }
     };

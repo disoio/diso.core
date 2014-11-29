@@ -1,7 +1,7 @@
 diso.core
 ===========
 
-0.0.21
+0.0.22
 
 Notes
 -----
@@ -36,6 +36,8 @@ Research
 - https://github.com/walmartlabs/lazojs/wiki/Overview
 - http://facebook.github.io/react/docs/flux-todo-list.html
 - http://react-components.com
+- http://lhorie.github.io/mithril/index.html
+
 
 ## security
 - http://www.christian-schneider.net/CrossSiteWebSocketHijacking.html
