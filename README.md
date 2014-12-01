@@ -1,7 +1,7 @@
 diso.core
 ===========
 
-0.0.23
+0.0.24
 
 Notes
 -----
@@ -32,6 +32,11 @@ Client/Server/Derp
 
 Research
 --------
+
+## documentation
+- https://github.com/tschaub/grunt-gh-pages
+
+
 ## frameworks to check out
 - https://github.com/walmartlabs/lazojs/wiki/Overview
 - http://facebook.github.io/react/docs/flux-todo-list.html

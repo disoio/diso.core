@@ -50,11 +50,13 @@
         message: message,
         callback: (function(_this) {
           return function(error) {
-            var handler, internal_messages;
+            var handler, internal_messages, msg;
             if (error) {
+              msg = "JWT processing failed";
+              console.error("" + msg + ":");
               console.error(error);
               return _doReply({
-                error: "Error processing token"
+                error: msg
               });
             } else {
               internal_messages = ['initialize', 'authenticate', 'find', 'subscribe', 'unsubscribe'];

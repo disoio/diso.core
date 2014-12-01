@@ -80,7 +80,7 @@
       this.name = args.name;
       this.id = args.id || ShortId.generate();
       this.token = args.token;
-      this.data = inflate(args.data || {});
+      this.data = 'data' in args ? inflate(args.data) : {};
       this.error = null;
       if (args.error) {
         this.error = args.error;
@@ -127,7 +127,7 @@
         token: this.token
       };
       if (this.error) {
-        message.error = this.error;
+        message.error = this.error.message;
       }
       if (this.data) {
         message.data = this.data;

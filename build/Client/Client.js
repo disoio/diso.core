@@ -146,7 +146,7 @@
           data.reload = true;
           data.location = location;
         } else {
-          console.log('# go to signin page');
+          console.log('TODO !! # go to signin page');
           null;
         }
       }
@@ -302,7 +302,12 @@
     };
 
     Client.prototype._onMessage_initializeReply = function(message) {
-      return this._setup(message.data);
+      if (message.isError()) {
+        console.log("TODO !! ERROR IN INITIALIZE.");
+        return console.log(message.error);
+      } else {
+        return this._setup(message.data);
+      }
     };
 
     Client.prototype._onMessage_authenticateReply = function(message) {

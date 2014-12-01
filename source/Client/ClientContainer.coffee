@@ -121,10 +121,6 @@ class ClientContainer
       user      : Mediator.user()
     )
 
-    unless new_page
-      error = new Error("No page for #{route.name}")
-      return clientError(error)
-
     if @_supportsHistory()
       @_changePage(
         page : new_page
@@ -134,8 +130,6 @@ class ClientContainer
       # TODO: make this way more robust
       #       for starters pass the JWT-token via get param or header
       window.location = new_page.route.path()
-
-
 
   # _sync
   # -----

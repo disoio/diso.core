@@ -461,10 +461,6 @@ down in initializeReply</p>
       user      : Mediator.user()
     )
 
-    <span class="hljs-keyword">unless</span> new_page
-      error = <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"No page for <span class="hljs-subst">#{route.name}</span>"</span>)
-      <span class="hljs-keyword">return</span> clientError(error)
-
     <span class="hljs-keyword">if</span> <span class="hljs-property">@_supportsHistory</span>()
       <span class="hljs-property">@_changePage</span>(
         page : new_page

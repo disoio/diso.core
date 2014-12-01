@@ -478,7 +478,10 @@ it to lookup the associated model</p>
     <span class="hljs-property">@name</span>  = args.name
     <span class="hljs-property">@id</span>    = args.id || ShortId.generate()
     <span class="hljs-property">@token</span> = args.token
-    <span class="hljs-property">@data</span>  = inflate(args.data || {})
+    <span class="hljs-property">@data</span>  = <span class="hljs-keyword">if</span> (<span class="hljs-string">'data'</span> <span class="hljs-keyword">of</span> args)
+      inflate(args.data)
+    <span class="hljs-keyword">else</span>
+      {}
 
     <span class="hljs-property">@error</span> = <span class="hljs-literal">null</span>
     <span class="hljs-keyword">if</span> args.error
@@ -678,7 +681,7 @@ in order to trigger load callback once the data is available</p>
     }
 
     <span class="hljs-keyword">if</span> <span class="hljs-property">@error</span> 
-      message.error = <span class="hljs-property">@error</span>
+      message.error = <span class="hljs-property">@error</span>.message
     
     <span class="hljs-keyword">if</span> <span class="hljs-property">@data</span>
       message.data = <span class="hljs-property">@data</span>

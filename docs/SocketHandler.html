@@ -360,9 +360,11 @@ for use by next message handler </p>
       message  : message
       callback : <span class="hljs-function"><span class="hljs-params">(error)</span>=&gt;</span>
         <span class="hljs-keyword">if</span> error
+          msg = <span class="hljs-string">"JWT processing failed"</span>
+          <span class="hljs-built_in">console</span>.error(<span class="hljs-string">"<span class="hljs-subst">#{msg}</span>:"</span>)
           <span class="hljs-built_in">console</span>.error(error)
           _doReply(
-            error : <span class="hljs-string">"Error processing token"</span>
+            error : msg
           )
 
         <span class="hljs-keyword">else</span></pre></div></div>

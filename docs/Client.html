@@ -670,7 +670,7 @@ have been met  </p>
         data.reload   = <span class="hljs-literal">true</span>
         data.location = location
       <span class="hljs-keyword">else</span>     
-        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'# go to signin page'</span>)
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'TODO !! # go to signin page'</span>)
         <span class="hljs-literal">null</span>
 
     <span class="hljs-keyword">if</span> data
@@ -1201,7 +1201,7 @@ after the client loses connectivity</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  _onMessage_initializeReply : <span class="hljs-function"><span class="hljs-params">(message)</span>-&gt;</span>
-    <span class="hljs-property">@_setup</span>(message.data)</pre></div></div>
+    <span class="hljs-keyword">if</span> message.isError()</pre></div></div>
             
         </li>
         
@@ -1212,9 +1212,14 @@ after the client loses connectivity</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-60">&#182;</a>
               </div>
-              <h2 id="_onmessage_authenticatereply">_onMessage_authenticateReply</h2>
+              <p>TODO: This should show error page</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"TODO !! ERROR IN INITIALIZE."</span>)
+      <span class="hljs-built_in">console</span>.log(message.error)
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-property">@_setup</span>(message.data)</pre></div></div>
             
         </li>
         
@@ -1224,6 +1229,19 @@ after the client loses connectivity</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <h2 id="_onmessage_authenticatereply">_onMessage_authenticateReply</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
               </div>
               
             </div>
@@ -1236,11 +1254,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-62">
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <h2 id="_onmessage_publish">_onMessage_publish</h2>
 
@@ -1249,11 +1267,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-63">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
               
             </div>
@@ -1267,11 +1285,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <h2 id="_onerror">_onError</h2>
 
@@ -1280,11 +1298,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               
             </div>
@@ -1296,11 +1314,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <h2 id="_onclose">_onClose</h2>
 
@@ -1309,11 +1327,11 @@ after the client loses connectivity</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>Callback for when client’s socket connection to the
 server closes</p>
@@ -1331,11 +1349,11 @@ server closes</p>
         </li>
         
         
-        <li id="section-68">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <h2 id="_reconnectdelay">_reconnectDelay</h2>
 
@@ -1344,11 +1362,11 @@ server closes</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>Calculate delay time before reconnect using exponential backoff 
 algorithm so that reconnection attempts by different users are 
@@ -1383,11 +1401,11 @@ spread out in time rather than all at once</p>
         </li>
         
         
-        <li id="section-70">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>Set the Mediator on the Client</p>
 

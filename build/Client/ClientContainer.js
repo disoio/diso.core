@@ -78,17 +78,13 @@
     };
 
     ClientContainer.prototype.goto = function(args) {
-      var error, new_page, route;
+      var new_page, route;
       route = args.route;
       new_page = this._page_map.lookup({
         route: route,
         location: window.location,
         user: Mediator.user()
       });
-      if (!new_page) {
-        error = new Error("No page for " + route.name);
-        return clientError(error);
-      }
       if (this._supportsHistory()) {
         return this._changePage({
           page: new_page,

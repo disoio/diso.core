@@ -202,7 +202,7 @@ class Client
         data.reload   = true
         data.location = location
       else     
-        console.log('# go to signin page')
+        console.log('TODO !! # go to signin page')
         null
 
     if data
@@ -406,7 +406,12 @@ class Client
   # _onMessage_initializeReply
   # ----------------
   _onMessage_initializeReply : (message)->
-    @_setup(message.data)
+    if message.isError()
+      # TODO: This should show error page
+      console.log("TODO !! ERROR IN INITIALIZE.")
+      console.log(message.error)
+    else
+      @_setup(message.data)
 
   # _onMessage_authenticateReply
   # ------------------

@@ -81,9 +81,11 @@ class SocketHandler
       message  : message
       callback : (error)=>
         if error
+          msg = "JWT processing failed"
+          console.error("#{msg}:")
           console.error(error)
           _doReply(
-            error : "Error processing token"
+            error : msg
           )
 
         else

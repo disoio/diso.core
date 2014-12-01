@@ -126,7 +126,10 @@ class Message
     @name  = args.name
     @id    = args.id || ShortId.generate()
     @token = args.token
-    @data  = inflate(args.data || {})
+    @data  = if ('data' of args)
+      inflate(args.data)
+    else
+      {}
 
     @error = null
     if args.error
@@ -192,7 +195,7 @@ class Message
     }
 
     if @error 
-      message.error = @error
+      message.error = @error.message
     
     if @data
       message.data = @data
