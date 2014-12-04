@@ -86,6 +86,7 @@
         'unsubscribe': this,
         'authenticated': this,
         'user': this,
+        'logout': this,
         'goto': this._container
       });
       if ('WebSocket' in window) {

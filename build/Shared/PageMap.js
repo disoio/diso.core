@@ -1,11 +1,9 @@
 (function() {
-  var Mediator, PageMap, Router, Type, _missingPageError;
+  var PageMap, Router, Type, _missingPageError;
 
   Type = require('type-of-is');
 
   Router = require('diso.router');
-
-  Mediator = require('./Mediator');
 
   _missingPageError = function(route) {
     return new Error("Missing page for route: " + route.name);

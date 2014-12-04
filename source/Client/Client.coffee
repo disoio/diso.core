@@ -131,6 +131,7 @@ class Client
       'unsubscribe'   : @
       'authenticated' : @
       'user'          : @
+      'logout'        : @
       'goto'          : @_container
     )
 

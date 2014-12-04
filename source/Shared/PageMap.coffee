@@ -5,11 +5,6 @@
 Type   = require('type-of-is')
 Router = require('diso.router')
 
-# Local dependencies
-# ------------------
-# [Mediator](./Mediator.html)
-Mediator = require('./Mediator')
-
 # helper for throwing errors when page missing
 _missingPageError = (route)->
   new Error("Missing page for route: #{route.name}")
