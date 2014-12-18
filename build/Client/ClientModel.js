@@ -1,7 +1,9 @@
 (function() {
-  var Cache, ClientModel, EventEmitter, Mediator, Message, _cache, _events;
+  var Cache, ClientModel, EventEmitter, Mediator, Message, Type, _cache, _events;
 
   EventEmitter = require('events').EventEmitter;
+
+  Type = require('type-of-is');
 
   Mediator = require('../Shared/Mediator');
 
@@ -115,6 +117,21 @@
       key = _key(args);
       event = _event(key);
       return _events.removeListener(event, args.callback);
+    };
+
+    ClientModel.mixin = function(mixins) {
+      var mixin, _i, _len, _results;
+      if (!Type(mixins, Array)) {
+        mixins = [mixins];
+      }
+      _results = [];
+      for (_i = 0, _len = mixins.length; _i < _len; _i++) {
+        mixin = mixins[_i];
+        _results.push(mixin.mix({
+          into: this
+        }));
+      }
+      return _results;
     };
 
     ClientModel.prototype.setData = function(data) {

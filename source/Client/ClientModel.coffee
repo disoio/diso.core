@@ -3,6 +3,10 @@
 # [EventEmitter](http://nodejs.org/api/events.html#events_class_events_eventemitter) 
 {EventEmitter} = require('events')
 
+# NPM Dependencies
+# ----------------
+Type = require('type-of-is')
+
 # Local dependencies
 # ------------------ 
 # [Mediator](./Mediator.html)  
@@ -143,7 +147,7 @@ class ClientModel
     _events.on(event, callback)
 
   # @unsubscribe
-  # -----------
+  # ------------
   # Unsubscribe from updates on objects in store
   #
   # **callback** : callback to unsubscribe
@@ -158,6 +162,17 @@ class ClientModel
     key      = _key(args)
     event    = _event(key)
     _events.removeListener(event, args.callback)
+
+  # @mixin
+  # ------
+  # use dotmix mixins 
+  # https://github.com/stephenhandley/dotmix
+  @mixin : (mixins)->
+    unless Type(mixins, Array)
+      mixins = [mixins]
+
+    for mixin in mixins
+      mixin.mix(into : @)
   
   # setData
   # -------
@@ -168,8 +183,6 @@ class ClientModel
 
 module.exports = ClientModel
 
-
-    
   
 # Mediator.on('message:invalidateCache', @_invalidateCache)
 
