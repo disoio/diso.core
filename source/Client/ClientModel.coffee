@@ -40,8 +40,15 @@ _key : (args)->
 # _event
 # ------
 # Returns the event emit / subscribed to for a given key
-_event : (key)->
+_event = (key)->
   "update:#{key}"
+
+# _setData
+# --------
+_setData = (args)->
+  {obj, data} = args
+  for k,v of data
+    obj[k] = v
 
 # ClientModel
 # ===========
@@ -53,7 +60,10 @@ class ClientModel
   # -----------
   # **data** : data for this model
   constructor : (data)->
-    @setData(data)
+    _setData(
+      obj  : @
+      data : data
+    )
 
   # @get
   # ---
@@ -178,8 +188,10 @@ class ClientModel
   # -------
   # **data** : data to set for this model
   setData : (data)->
-    for k,v of data
-      @[k] = v
+    _setData(
+      obj  : @
+      data : data
+    )
 
 module.exports = ClientModel
 

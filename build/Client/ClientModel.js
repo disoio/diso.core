@@ -1,5 +1,5 @@
 (function() {
-  var Cache, ClientModel, EventEmitter, Mediator, Message, Type, _cache, _events;
+  var Cache, ClientModel, EventEmitter, Mediator, Message, Type, _cache, _event, _events, _setData;
 
   EventEmitter = require('events').EventEmitter;
 
@@ -27,15 +27,30 @@
         }
         return key;
       }
-    },
-    _event: function(key) {
-      return "update:" + key;
     }
   });
 
+  _event = function(key) {
+    return "update:" + key;
+  };
+
+  _setData = function(args) {
+    var data, k, obj, v, _results;
+    obj = args.obj, data = args.data;
+    _results = [];
+    for (k in data) {
+      v = data[k];
+      _results.push(obj[k] = v);
+    }
+    return _results;
+  };
+
   ClientModel = (function() {
     function ClientModel(data) {
-      this.setData(data);
+      _setData({
+        obj: this,
+        data: data
+      });
     }
 
     ClientModel.get = function(args) {
@@ -135,13 +150,10 @@
     };
 
     ClientModel.prototype.setData = function(data) {
-      var k, v, _results;
-      _results = [];
-      for (k in data) {
-        v = data[k];
-        _results.push(this[k] = v);
-      }
-      return _results;
+      return _setData({
+        obj: this,
+        data: data
+      });
     };
 
     return ClientModel;
