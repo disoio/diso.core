@@ -1,6 +1,6 @@
 {
   "name": "diso.core",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Client / Server",
   "license": "MIT",
   "main": "index.js",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "connect": "~2.16.2",
-    "diso.router": "~6.0.2",
+    "diso.router": "~6.0.3",
     "ecstatic": "~0.5.1",
     "jquery": "~2.1.0",
     "jwt-simple": "~0.2.0",
