@@ -103,6 +103,24 @@
       })(this));
     }
 
+    Client.prototype.platform = function() {
+      var _android, _ipad, _iphone, _ipod, _is;
+      _is = function(ua) {
+        return navigator.userAgent.indexOf(ua) > 0;
+      };
+      _android = _is('Android');
+      _iphone = _is('iPhone');
+      _ipad = _is('iPad');
+      _ipod = _is('iPod');
+      if (_android) {
+        return 'android';
+      } else if (_iphone || _ipad || _ipod) {
+        return 'ios';
+      } else {
+        return null;
+      }
+    };
+
     Client.prototype.authenticated = function() {
       return !!this._auth();
     };

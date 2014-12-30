@@ -151,6 +151,22 @@ class Client
       @_init()
     )
 
+  platform : ()->
+    _is = (ua)->
+      (navigator.userAgent.indexOf(ua) > 0)
+
+    _android = _is('Android')
+    _iphone  = _is('iPhone')
+    _ipad    = _is('iPad')
+    _ipod    = _is('iPod')
+
+    if _android
+      'android'
+    else if (_iphone or _ipad or _ipod)
+      'ios'
+    else
+      null
+
   # authenticated
   # -------------
   authenticated : ()->

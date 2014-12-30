@@ -501,7 +501,23 @@ init the client.</p>
       <span class="hljs-property">@_dom_ready</span> = <span class="hljs-literal">true</span>
       Mediator.emit(<span class="hljs-string">'client:domready'</span>)
       <span class="hljs-property">@_init</span>()
-    )</pre></div></div>
+    )
+
+  platform : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+<span class="hljs-function">    <span class="hljs-title">_is</span> = <span class="hljs-params">(ua)</span>-&gt;</span>
+      (navigator.userAgent.indexOf(ua) &gt; <span class="hljs-number">0</span>)
+
+    _android = _is(<span class="hljs-string">'Android'</span>)
+    _iphone  = _is(<span class="hljs-string">'iPhone'</span>)
+    _ipad    = _is(<span class="hljs-string">'iPad'</span>)
+    _ipod    = _is(<span class="hljs-string">'iPod'</span>)
+
+    <span class="hljs-keyword">if</span> _android
+      <span class="hljs-string">'android'</span>
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_iphone <span class="hljs-keyword">or</span> _ipad <span class="hljs-keyword">or</span> _ipod)
+      <span class="hljs-string">'ios'</span>
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
