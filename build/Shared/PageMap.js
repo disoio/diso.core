@@ -27,15 +27,16 @@
     PageMap.prototype.handle = function(request, response, next) {
       return this._router.handle(request, response, (function(_this) {
         return function() {
-          var Page, error, headers, page;
+          var Page, error, headers, page, protocol;
           Page = _this._pageForRouteName(request.route.name);
           if (Page) {
             headers = request.headers;
+            protocol = request.connection.encrypted ? 'https' : 'http';
             page = new Page({
               models: _this._models,
               user: request.user,
               route: request.route,
-              origin: "" + headers.protocol + headers.host
+              origin: "" + protocol + "://" + headers.host
             });
             request.page = page;
             return next();

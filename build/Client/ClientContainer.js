@@ -36,7 +36,7 @@
     };
 
     ClientContainer.prototype.pageKey = function() {
-      return this.$body().attr(Strings.PAGE_ATTR_NAME);
+      return this.$body().attr(Strings.PAGE_KEY_ATTR_NAME);
     };
 
     ClientContainer.prototype.pageId = function() {
@@ -150,7 +150,7 @@
           _this._page.remove();
           $body = _this.$body();
           $body.html(new_page.html());
-          $body.attr(Strings.PAGE_ATTR_NAME, new_page.key());
+          $body.attr(Strings.PAGE_KEY_ATTR_NAME, new_page.key());
           new_page.setup();
           if (push_history) {
             _this._pushHistory(new_page.route.path());

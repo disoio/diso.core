@@ -309,11 +309,16 @@ page constructor for that route to the request</p>
             
             <div class="content"><div class='highlight'><pre>        headers = request.headers
 
+        protocol = <span class="hljs-keyword">if</span> request.connection.encrypted
+          <span class="hljs-string">'https'</span>
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-string">'http'</span>
+
         page = <span class="hljs-keyword">new</span> Page(
           models : <span class="hljs-property">@_models</span>
           user   : request.user
           route  : request.route
-          origin : <span class="hljs-string">"<span class="hljs-subst">#{headers.protocol}</span><span class="hljs-subst">#{headers.host}</span>"</span>
+          origin : <span class="hljs-string">"<span class="hljs-subst">#{protocol}</span>://<span class="hljs-subst">#{headers.host}</span>"</span>
         ) 
 
         request.page = page

@@ -108,7 +108,7 @@ class ServerContainer
           #{@_page.head()}        
         </head>
         
-        <body #{@_pageAttr()} #{@_isLoadingAttr()}>
+        <body #{@_pageIdAttr()} #{@_pageKeyAttr()} #{@_isLoadingAttr()}>
           #{@_page.html()}
         </body>
       </html>
@@ -199,12 +199,18 @@ class ServerContainer
   _title : ()->
     @_page.title() || @_site_name
 
-  # _pageAttr
-  # ---------
+  # _pageKeyAttr
+  # ------------
   # The attribute used to pass this page's id and name in 
   # the rendered html for use in client sync
-  _pageAttr : ()->
-    "#{Strings.PAGE_ATTR_NAME}=\"#{@_page.key()}\""
+  _pageKeyAttr : ()->
+    "#{Strings.PAGE_KEY_ATTR_NAME}=\"#{@_page.key()}\""
+
+  # _pageIdAttr
+  # -----------
+  # Body attribute holding the page name (useful for CSS namespacing)
+  _pageIdAttr : ()->
+    "id=\"#{@_page.constructor.name}\""
 
   # _isLoadingAttr
   # --------------

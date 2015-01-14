@@ -50,11 +50,16 @@ class PageMap
         # if a page is found matching the route, add to request
         headers = request.headers
 
+        protocol = if request.connection.encrypted
+          'https'
+        else
+          'http'
+
         page = new Page(
           models : @_models
           user   : request.user
           route  : request.route
-          origin : "#{headers.protocol}#{headers.host}"
+          origin : "#{protocol}://#{headers.host}"
         ) 
 
         request.page = page

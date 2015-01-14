@@ -243,7 +243,7 @@ within pages via HTML5 history api</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  pageKey : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-property">@$body</span>().attr(Strings.PAGE_ATTR_NAME)</pre></div></div>
+    <span class="hljs-property">@$body</span>().attr(Strings.PAGE_KEY_ATTR_NAME)</pre></div></div>
             
         </li>
         
@@ -641,7 +641,7 @@ element of the view with id_map passed via the initalizeReply</p>
     
       $body = <span class="hljs-property">@$body</span>()
       $body.html(new_page.html())
-      $body.attr(Strings.PAGE_ATTR_NAME, new_page.key())
+      $body.attr(Strings.PAGE_KEY_ATTR_NAME, new_page.key())
 
       new_page.setup()
 

@@ -446,7 +446,7 @@ used in sync on the client</p>
           <span class="hljs-subst">#{<span class="hljs-property">@_page</span>.head()}</span>        
         &lt;/head&gt;
         
-        &lt;body <span class="hljs-subst">#{<span class="hljs-property">@_pageAttr</span>()}</span> <span class="hljs-subst">#{<span class="hljs-property">@_isLoadingAttr</span>()}</span>&gt;
+        &lt;body <span class="hljs-subst">#{<span class="hljs-property">@_pageIdAttr</span>()}</span> <span class="hljs-subst">#{<span class="hljs-property">@_pageKeyAttr</span>()}</span> <span class="hljs-subst">#{<span class="hljs-property">@_isLoadingAttr</span>()}</span>&gt;
           <span class="hljs-subst">#{<span class="hljs-property">@_page</span>.html()}</span>
         &lt;/body&gt;
       &lt;/html&gt;
@@ -708,7 +708,7 @@ the following metadata
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
-              <h2 id="_pageattr">_pageAttr</h2>
+              <h2 id="_pagekeyattr">_pageKeyAttr</h2>
 
             </div>
             
@@ -726,8 +726,8 @@ the rendered html for use in client sync</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _pageAttr : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
-    <span class="hljs-string">"<span class="hljs-subst">#{Strings.PAGE_ATTR_NAME}</span>=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.key()}</span>\""</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  _pageKeyAttr : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-string">"<span class="hljs-subst">#{Strings.PAGE_KEY_ATTR_NAME}</span>=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.key()}</span>\""</span></pre></div></div>
             
         </li>
         
@@ -738,7 +738,7 @@ the rendered html for use in client sync</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
-              <h2 id="_isloadingattr">_isLoadingAttr</h2>
+              <h2 id="_pageidattr">_pageIdAttr</h2>
 
             </div>
             
@@ -750,6 +750,35 @@ the rendered html for use in client sync</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>Body attribute holding the page name (useful for CSS namespacing)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  _pageIdAttr : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span>
+    <span class="hljs-string">"id=\"<span class="hljs-subst">#{<span class="hljs-property">@_page</span>.constructor.name}</span>\""</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <h2 id="_isloadingattr">_isLoadingAttr</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
               <p>Used by the client to determine whether the server was
 able to render the full page or whether its loading</p>

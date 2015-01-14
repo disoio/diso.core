@@ -91,7 +91,7 @@
           }));
         }
         return _results;
-      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageAttr()) + " " + (this._isLoadingAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
+      }).call(this)).join("\n")) + "\n    \n    " + (this._page.head()) + "        \n  </head>\n  \n  <body " + (this._pageIdAttr()) + " " + (this._pageKeyAttr()) + " " + (this._isLoadingAttr()) + ">\n    " + (this._page.html()) + "\n  </body>\n</html>";
     };
 
     ServerContainer.prototype.text = function() {
@@ -157,8 +157,12 @@
       return this._page.title() || this._site_name;
     };
 
-    ServerContainer.prototype._pageAttr = function() {
-      return "" + Strings.PAGE_ATTR_NAME + "=\"" + (this._page.key()) + "\"";
+    ServerContainer.prototype._pageKeyAttr = function() {
+      return "" + Strings.PAGE_KEY_ATTR_NAME + "=\"" + (this._page.key()) + "\"";
+    };
+
+    ServerContainer.prototype._pageIdAttr = function() {
+      return "id=\"" + this._page.constructor.name + "\"";
     };
 
     ServerContainer.prototype._isLoadingAttr = function() {

@@ -4,7 +4,7 @@
 Strings = {
   # body tag attribute used to communicate the page's name between
   # the server and the client
-  PAGE_ATTR_NAME : 'data-page-type'
+  PAGE_KEY_ATTR_NAME : 'data-page-key'
 
   IS_LOADING : 'is_loading'
 
