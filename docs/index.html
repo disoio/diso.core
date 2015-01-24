@@ -59,6 +59,11 @@
               </a>
             
               
+              <a class="source" href="ServerModel.html">
+                ServerModel.coffee
+              </a>
+            
+              
               <a class="source" href="SocketHandler.html">
                 SocketHandler.coffee
               </a>
@@ -119,7 +124,8 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <h2 id="local-dependencies">Local dependencies</h2>
-<p><a href="./Server.html">Server</a><br><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./ServerContainer.html">ServerContainer</a><br><a href="./Mediator.html">Mediator</a>  </p>
+<p><a href="./Server.html">Server</a><br><a href="./RequestHandler.html">RequestHandler</a><br><a href="./SocketHandler.html">SocketHandler</a><br><a href="./ServerContainer.html">ServerContainer</a>
+<a href="./ServerModel.html">ServerModel</a><br><a href="./Mediator.html">Mediator</a>  </p>
 
             </div>
             
@@ -127,11 +133,13 @@
 RequestHandler = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./RequestHandler'</span>)
 SocketHandler  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./SocketHandler'</span>)
 Container      = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerContainer'</span>)
+ServerModel    = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./ServerModel'</span>)
 Mediator       = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../Shared/Mediator'</span>)
 
 Server.RequestHandler = RequestHandler
 Server.SocketHandler  = SocketHandler
 Server.Container      = Container
+Server.Model          = ServerModel
 Server.Mediator       = Mediator
 
 <span class="hljs-built_in">module</span>.exports = Server</pre></div></div>

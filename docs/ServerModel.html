@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Cache</title>
+  <title>ServerModel.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -109,6 +109,12 @@
     
     <ul class="sections">
         
+          <li id="title">
+              <div class="annotation">
+                  <h1>ServerModel.coffee</h1>
+              </div>
+          </li>
+        
         
         
         <li id="section-1">
@@ -117,9 +123,10 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="cache">Cache</h1>
-
+              
             </div>
+            
+            <div class="content"><div class='highlight'><pre>Type = <span class="hljs-built_in">require</span>(<span class="hljs-string">'type-of-is'</span>)</pre></div></div>
             
         </li>
         
@@ -130,10 +137,9 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              
+              <h1 id="servermodel">ServerModel</h1>
+
             </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cache</span></span></pre></div></div>
             
         </li>
         
@@ -144,13 +150,12 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>teh data</p>
+              <p>Simple server-side model supporting basic transport
+via deflate method</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _data : <span class="hljs-literal">null</span>
-
-  constructor : <span class="hljs-function"><span class="hljs-params">()</span>-&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ServerModel</span></span></pre></div></div>
             
         </li>
         
@@ -161,11 +166,9 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>TODO: read from localStorage</p>
+              <h2 id="-mixin">@mixin</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@_data</span> = {}</pre></div></div>
             
         </li>
         
@@ -176,9 +179,17 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="get">get</h2>
+              <p>use dotmix mixins 
+<a href="https://github.com/stephenhandley/dotmix">https://github.com/stephenhandley/dotmix</a></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-property">@mixin</span> : <span class="hljs-function"><span class="hljs-params">(mixins)</span>-&gt;</span>
+    <span class="hljs-keyword">unless</span> Type(mixins, Array)
+      mixins = [mixins]
+
+    <span class="hljs-keyword">for</span> mixin <span class="hljs-keyword">in</span> mixins
+      mixin.mix(into : @)</pre></div></div>
             
         </li>
         
@@ -189,18 +200,9 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Get data from cache</p>
-<p><strong>key</strong> : key to get</p>
+              <h2 id="constructor">constructor</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  get : <span class="hljs-function"><span class="hljs-params">(key)</span>-&gt;</span>
-    key = args.key
-
-    <span class="hljs-keyword">if</span> key <span class="hljs-keyword">of</span> <span class="hljs-property">@_data</span>
-      <span class="hljs-property">@_data</span>[key]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
@@ -211,9 +213,18 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <h2 id="put">put</h2>
+              <p><strong>data</strong> : data for this model</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  constructor : <span class="hljs-function"><span class="hljs-params">(data)</span>-&gt;</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-property">@constructor</span>.attrs 
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Model <span class="hljs-subst">#{<span class="hljs-property">@constructor</span>.name}</span> muse have attrs defined."</span>)
+
+    <span class="hljs-property">@_data</span> = {}
+    <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> data
+      <span class="hljs-keyword">if</span> k <span class="hljs-keyword">in</span> <span class="hljs-property">@constructor</span>.attrs
+        <span class="hljs-property">@_data</span>[k] = v</pre></div></div>
             
         </li>
         
@@ -224,16 +235,9 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>Put data into the cache</p>
-<p><strong>key</strong> : key to put</p>
-<p><strong>data</strong> : data to put</p>
+              <h2 id="deflate">deflate</h2>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  put : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    key  = args.key
-    data = args.data
-    <span class="hljs-property">@_data</span>[key] = data</pre></div></div>
             
         </li>
         
@@ -244,29 +248,33 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <h2 id="remove">remove</h2>
+              <p>Called by server to create json object for transfer over
+the wire</p>
+<h3 id="required-args">required args</h3>
+<p><strong>model_key</strong> : The attribute name used to hold the model’s 
+                constructor name to be used by inflate</p>
+<h3 id="optional-args">optional args</h3>
+<p><strong>attrs</strong> : Only include the specified attributes</p>
 
             </div>
             
-        </li>
-        
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p>Remove data from the cache</p>
-<p><strong>key</strong> : key to remove</p>
+            <div class="content"><div class='highlight'><pre>  deflate : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    {model_key, attrs} = args
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  remove : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
-    key = args.key
-    <span class="hljs-keyword">delete</span> <span class="hljs-property">@_data</span>[key]
+    data = <span class="hljs-keyword">if</span> attrs
+      _data = {}
+      <span class="hljs-keyword">for</span> k,v <span class="hljs-keyword">of</span> <span class="hljs-property">@_data</span>
+        <span class="hljs-keyword">if</span> k <span class="hljs-keyword">in</span> attrs
+          _data[k] = v
+      _data
 
-<span class="hljs-built_in">module</span>.exports = Cache</pre></div></div>
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-property">@_data</span>
+
+    data[model_key] = <span class="hljs-property">@constructor</span>.name
+    data
+
+<span class="hljs-built_in">module</span>.exports = ServerModel</pre></div></div>
             
         </li>
         
