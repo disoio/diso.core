@@ -647,6 +647,7 @@ element of the view with id_map passed via the initalizeReply</p>
       $body = <span class="hljs-property">@$body</span>()
       $body.html(new_page.html())
       $body.attr(Strings.PAGE_KEY_ATTR_NAME, new_page.key())
+      $body.attr(<span class="hljs-string">'id'</span>, new_page.constructor.name)
 
       new_page.setup()
 

@@ -20,15 +20,42 @@
       return _results;
     };
 
+    ServerModel.attrs = function(attrs) {
+      var attr, _i, _len, _results;
+      if (!attrs) {
+        return this._attrs;
+      }
+      this._attrs = attrs;
+      _results = [];
+      for (_i = 0, _len = attrs.length; _i < _len; _i++) {
+        attr = attrs[_i];
+        _results.push((function(_this) {
+          return function(attr) {
+            if (!(attr in _this.prototype)) {
+              return Object.defineProperty(_this.prototype, attr, {
+                get: function() {
+                  return this._data[attr];
+                },
+                set: function(val) {
+                  return this._data[attr] = val;
+                }
+              });
+            }
+          };
+        })(this)(attr));
+      }
+      return _results;
+    };
+
     function ServerModel(data) {
       var k, v;
-      if (!this.constructor.attrs) {
+      if (!this.constructor._attrs) {
         throw new Error("Model " + this.constructor.name + " muse have attrs defined.");
       }
       this._data = {};
       for (k in data) {
         v = data[k];
-        if (__indexOf.call(this.constructor.attrs, k) >= 0) {
+        if (__indexOf.call(this.constructor._attrs, k) >= 0) {
           this._data[k] = v;
         }
       }

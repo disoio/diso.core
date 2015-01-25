@@ -208,6 +208,7 @@ class ClientContainer
       $body = @$body()
       $body.html(new_page.html())
       $body.attr(Strings.PAGE_KEY_ATTR_NAME, new_page.key())
+      $body.attr('id', new_page.constructor.name)
 
       new_page.setup()
 

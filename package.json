@@ -1,8 +1,8 @@
 {
   "name": "diso.core",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "description": "Client / Server",
-  "license": "MIT",
+  "license": "substanceware",
   "main": "index.js",
   "repository": {
     "type": "git",

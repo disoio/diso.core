@@ -2,8 +2,8 @@ Type = require('type-of-is')
 
 # ServerModel
 # ===========
-# Simple server-side model supporting basic transport
-# via deflate method
+# Simple server-side model supporting basic deflate
+# for transport and data access
 class ServerModel
   # @mixin
   # ------
@@ -16,16 +16,38 @@ class ServerModel
     for mixin in mixins
       mixin.mix(into : @)
 
+  # @attrs
+  # ------
+  # Specifiy attributes in this schema
+  @attrs : (attrs)->
+    # read
+    unless attrs
+      return @_attrs
+
+    # write
+    @_attrs = attrs
+
+    for attr in attrs
+      do (attr)=>
+        unless attr of @prototype
+          Object.defineProperty(@prototype, attr, {
+            get: ()->
+              @_data[attr]
+
+            set: (val)->
+              @_data[attr] = val
+          })
+
   # constructor
   # -----------
   # **data** : data for this model
   constructor : (data)->
-    unless @constructor.attrs 
+    unless @constructor._attrs 
       throw new Error("Model #{@constructor.name} muse have attrs defined.")
 
     @_data = {}
     for k,v of data
-      if k in @constructor.attrs
+      if k in @constructor._attrs
         @_data[k] = v
 
   # deflate
