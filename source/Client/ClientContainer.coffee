@@ -47,7 +47,7 @@ class ClientContainer
   # pageId
   # -------
   pageId : ()->
-    @pageKey().split(':')[1]
+    @$body().attr('id')
 
   # setup
   # -----

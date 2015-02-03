@@ -48,18 +48,21 @@ class RequestHandler
         if error
           return _onError(error)
 
-        # persist the init data so can get later and 
-        # send to client for initializeReply
-        # TODO: CLEANUP 4 2 SCALE PLZ 4 WEB
-        @_init_store[page.key()] = @_container.initData()
+        @_container.storeInitData(
+          store    : @_init_store
+          callback : (error)=>
+            if error
+              _onError(error)
 
-        try
-          @_render(
-            request  : request
-            response : response
-          )
-        catch error
-          _onError(error)
+            else
+              try
+                @_render(
+                  request  : request
+                  response : response
+                )
+              catch error
+                _onError(error)
+        )
     )
 
   # *INTERNAL METHODS*

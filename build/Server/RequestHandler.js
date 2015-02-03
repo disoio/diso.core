@@ -32,16 +32,24 @@
             if (error) {
               return _onError(error);
             }
-            _this._init_store[page.key()] = _this._container.initData();
-            try {
-              return _this._render({
-                request: request,
-                response: response
-              });
-            } catch (_error) {
-              error = _error;
-              return _onError(error);
-            }
+            return _this._container.storeInitData({
+              store: _this._init_store,
+              callback: function(error) {
+                if (error) {
+                  return _onError(error);
+                } else {
+                  try {
+                    return _this._render({
+                      request: request,
+                      response: response
+                    });
+                  } catch (_error) {
+                    error = _error;
+                    return _onError(error);
+                  }
+                }
+              }
+            });
           };
         })(this)
       });

@@ -40,7 +40,7 @@
     };
 
     ClientContainer.prototype.pageId = function() {
-      return this.pageKey().split(':')[1];
+      return this.$body().attr('id');
     };
 
     ClientContainer.prototype.setup = function(init_data) {

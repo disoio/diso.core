@@ -1,9 +1,11 @@
 (function() {
-  var ServerContainer, Strings, Tag, Type;
+  var ServerContainer, ShortId, Strings, Tag, Type;
 
   Tag = require('tf');
 
   Type = require('type-of-is');
+
+  ShortId = require('shortid');
 
   Strings = require('../Shared/Strings');
 
@@ -51,12 +53,14 @@
       }
     };
 
-    ServerContainer.prototype.initData = function() {
-      var result;
-      result = {};
-      result[Strings.ID_MAP] = this._idMap();
-      result[Strings.PAGE_DATA] = this._page.page_data;
-      return result;
+    ServerContainer.prototype.storeInitData = function(args) {
+      var callback, store;
+      store = args.store, callback = args.callback;
+      return store.set({
+        key: this._pageKey(),
+        value: this._initData(),
+        callback: callback
+      });
     };
 
     ServerContainer.prototype.status = function() {
@@ -157,12 +161,31 @@
       return this._page.title() || this._site_name;
     };
 
+    ServerContainer.prototype._pageKey = function() {
+      var id;
+      if (!this._page_key) {
+        id = ShortId.generate();
+        this._page_key = "" + this._page.constructor.name + ":" + id;
+      }
+      return this._page_key;
+    };
+
+    ServerContainer.prototype._initData = function() {
+      var result;
+      result = {};
+      result[Strings.ID_MAP] = this._idMap();
+      result[Strings.PAGE_DATA] = this._page.page_data;
+      return result;
+    };
+
     ServerContainer.prototype._pageKeyAttr = function() {
-      return "" + Strings.PAGE_KEY_ATTR_NAME + "=\"" + (this._page.key()) + "\"";
+      var page_key;
+      page_key = this._pageKey();
+      return "" + Strings.PAGE_KEY_ATTR_NAME + "=\"" + page_key + "\"";
     };
 
     ServerContainer.prototype._pageIdAttr = function() {
-      return "id=\"" + this._page.constructor.name + "\"";
+      return "id=\"" + this._page.id + "\"";
     };
 
     ServerContainer.prototype._isLoadingAttr = function() {

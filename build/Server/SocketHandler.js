@@ -97,7 +97,7 @@
     };
 
     SocketHandler.prototype._onMessage_initialize = function(message) {
-      var data, doReply, init_data, page, page_key;
+      var data, doReply;
       data = message.data;
       doReply = (function(_this) {
         return function(error, data) {
@@ -109,23 +109,27 @@
           return _this._sendMessage(reply);
         };
       })(this);
-      page_key = data.page_key;
-      init_data = this._init_store[page_key];
-      if (!data.reload) {
-        return doReply(null, init_data);
-      }
-      page = this._page_map.lookup({
-        location: data.location,
-        user: message.user
-      });
-      return page.load((function(_this) {
-        return function(error, data) {
-          if (!error) {
-            init_data[Strings.PAGE_DATA] = data;
+      return this._init_store.get({
+        key: data.page_key,
+        callback: function(error, init_data) {
+          var page;
+          if (!data.reload) {
+            return doReply(null, init_data);
           }
-          return doReply(error, init_data);
-        };
-      })(this));
+          page = this._page_map.lookup({
+            location: data.location,
+            user: message.user
+          });
+          return page.load((function(_this) {
+            return function(error, data) {
+              if (!error) {
+                init_data[Strings.PAGE_DATA] = data;
+              }
+              return doReply(error, init_data);
+            };
+          })(this));
+        }
+      });
     };
 
     SocketHandler.prototype._onMessage_authenticate = function(message) {

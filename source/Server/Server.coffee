@@ -26,6 +26,7 @@ Ecstatic = require('ecstatic')
 RequestHandler = require('./RequestHandler')
 SocketHandler  = require('./SocketHandler')
 Container      = require('./ServerContainer')
+InitStore      = require('./InitStore')
 JWT            = require('./JWT')
 PageMap        = require('../Shared/PageMap')
 
@@ -114,9 +115,12 @@ class Server
         site_name : args.name
       )
 
-    # TODO: to scale out this needs to use store 
-    #       in separate process (redis/leveldb/memcache)
-    @_init_store = {}
+    init_store_config = if ('init_store' of args)
+      args.init_store
+    else
+      { type : 'memory' }
+
+    @_init_store = InitStore.create(init_store_config)
 
     # CONNECT MIDDLEWARE
     # ------------------

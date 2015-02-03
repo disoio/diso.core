@@ -1,5 +1,5 @@
 (function() {
-  var Connect, Container, Ecstatic, Http, JWT, PageMap, Path, RequestHandler, Server, SocketHandler, Url, WS,
+  var Connect, Container, Ecstatic, Http, InitStore, JWT, PageMap, Path, RequestHandler, Server, SocketHandler, Url, WS,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Http = require('http');
@@ -20,13 +20,15 @@
 
   Container = require('./ServerContainer');
 
+  InitStore = require('./InitStore');
+
   JWT = require('./JWT');
 
   PageMap = require('../Shared/PageMap');
 
   Server = (function() {
     function Server(args) {
-      var Messages, arg, body_parser, connect, container, favicon, jwt_secret, map, request_handler, required_args, static_config, _i, _len, _static;
+      var Messages, arg, body_parser, connect, container, favicon, init_store_config, jwt_secret, map, request_handler, required_args, static_config, _i, _len, _static;
       if (args == null) {
         args = {};
       }
@@ -56,7 +58,10 @@
         logo_url: args.logo_url,
         site_name: args.name
       });
-      this._init_store = {};
+      init_store_config = 'init_store' in args ? args.init_store : {
+        type: 'memory'
+      };
+      this._init_store = InitStore.create(init_store_config);
       _static = null;
       if (static_config) {
         _static = Ecstatic({

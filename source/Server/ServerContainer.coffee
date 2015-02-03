@@ -1,9 +1,11 @@
 # NPM dependencies
 # ------------------
 # [tf](https://github.com/stephenhandley/tf)  
-# [type-of-is](https://github.com/stephenhandley/type-of-is)  
+# [type-of-is](https://github.com/stephenhandley/type-of-is)
+# [shortid](https://github.com/dylang/shortid)  
 Tag  = require('tf')
 Type = require('type-of-is')
+ShortId = require('shortid')
 
 # Local dependencies
 # ------------------ 
@@ -64,15 +66,13 @@ class ServerContainer
         callback(error)
       )
 
-  # initData
-  # --------
-  # Returns the page and id map data for this container to be
-  # used in sync on the client
-  initData : ()->
-    result = {}
-    result[Strings.ID_MAP]    = @_idMap()
-    result[Strings.PAGE_DATA] = @_page.page_data
-    result
+  storeInitData : (args)->
+    {store, callback} = args
+    store.set(
+      key      : @_pageKey()
+      value    : @_initData()
+      callback : callback
+    )
 
   # status
   # ------
@@ -199,18 +199,40 @@ class ServerContainer
   _title : ()->
     @_page.title() || @_site_name
 
+  # _pageKey
+  # --------
+  # Page key for storing init data
+  _pageKey : ()->
+    unless @_page_key
+      id = ShortId.generate()
+      @_page_key = "#{@_page.constructor.name}:#{id}"
+
+    @_page_key
+
+
+  # initData
+  # --------
+  # Returns the page and id map data for this container to be
+  # used in sync on the client
+  _initData : ()->
+    result = {}
+    result[Strings.ID_MAP]    = @_idMap()
+    result[Strings.PAGE_DATA] = @_page.page_data
+    result
+
   # _pageKeyAttr
   # ------------
   # The attribute used to pass this page's id and name in 
   # the rendered html for use in client sync
   _pageKeyAttr : ()->
-    "#{Strings.PAGE_KEY_ATTR_NAME}=\"#{@_page.key()}\""
+    page_key = @_pageKey()
+    "#{Strings.PAGE_KEY_ATTR_NAME}=\"#{page_key}\""
 
   # _pageIdAttr
   # -----------
   # Body attribute holding the page name (useful for CSS namespacing)
   _pageIdAttr : ()->
-    "id=\"#{@_page.constructor.name}\""
+    "id=\"#{@_page.id}\""
 
   # _isLoadingAttr
   # --------------

@@ -39,6 +39,21 @@
               </a>
             
               
+              <a class="source" href="MemoryInitStore.html">
+                MemoryInitStore.coffee
+              </a>
+            
+              
+              <a class="source" href="RedisInitStore.html">
+                RedisInitStore.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
               <a class="source" href="JWT.html">
                 JWT.coffee
               </a>
@@ -473,21 +488,22 @@ used by the server side render of the requested page</p>
       )
       <span class="hljs-property">@_sendMessage</span>(reply)
 
-    page_key = data.page_key
-    init_data = <span class="hljs-property">@_init_store</span>[page_key]
+    <span class="hljs-property">@_init_store</span>.get(
+      key      : data.page_key
+      callback : <span class="hljs-function"><span class="hljs-params">(error, init_data)</span>-&gt;</span>
+        <span class="hljs-keyword">unless</span> data.reload
+          <span class="hljs-keyword">return</span> doReply(<span class="hljs-literal">null</span>, init_data)
 
-    <span class="hljs-keyword">unless</span> data.reload
-      <span class="hljs-keyword">return</span> doReply(<span class="hljs-literal">null</span>, init_data)
+        page = <span class="hljs-property">@_page_map</span>.lookup(
+          location : data.location
+          user     : message.user
+        )
+        page.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
+          <span class="hljs-keyword">unless</span> error
+            init_data[Strings.PAGE_DATA] = data
 
-    page = <span class="hljs-property">@_page_map</span>.lookup(
-      location : data.location
-      user     : message.user
-    )
-    page.load(<span class="hljs-function"><span class="hljs-params">(error, data)</span>=&gt;</span>
-      <span class="hljs-keyword">unless</span> error
-        init_data[Strings.PAGE_DATA] = data
-
-      doReply(error, init_data)
+          doReply(error, init_data)
+        )
     )</pre></div></div>
             
         </li>

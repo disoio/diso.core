@@ -142,22 +142,24 @@ class SocketHandler
       )
       @_sendMessage(reply)
 
-    page_key = data.page_key
-    init_data = @_init_store[page_key]
+    @_init_store.get(
+      key      : data.page_key
+      callback : (error, init_data)->
+        unless data.reload
+          return doReply(null, init_data)
 
-    unless data.reload
-      return doReply(null, init_data)
+        page = @_page_map.lookup(
+          location : data.location
+          user     : message.user
+        )
+        page.load((error, data)=>
+          unless error
+            init_data[Strings.PAGE_DATA] = data
 
-    page = @_page_map.lookup(
-      location : data.location
-      user     : message.user
+          doReply(error, init_data)
+        )
     )
-    page.load((error, data)=>
-      unless error
-        init_data[Strings.PAGE_DATA] = data
 
-      doReply(error, init_data)
-    )
 
   # _onMessage_authenticate 
   # -------------

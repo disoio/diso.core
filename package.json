@@ -1,6 +1,6 @@
 {
   "name": "diso.core",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "Client / Server",
   "license": "substanceware",
   "main": "index.js",
@@ -30,7 +30,8 @@
     "shortid": "~2.0.0",
     "tf": "~1.0.1",
     "type-of-is": "~3.2.0",
-    "ws": "~0.4.32"
+    "ws": "~0.4.32",
+    "redis": "~0.12.1"
   },
   "devDependencies": {
     "asserts": "~4.0.2",

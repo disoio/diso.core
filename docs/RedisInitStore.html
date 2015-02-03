@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>parseAcceptHeader.coffee</title>
+  <title>RedisInitStore.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -126,7 +126,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>parseAcceptHeader.coffee</h1>
+                  <h1>RedisInitStore.coffee</h1>
               </div>
           </li>
         
@@ -138,69 +138,28 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="parseacceptheader">parseAcceptHeader</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
               
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>Helper function to parse the HTTP ACCEPT header</p>
-<p><strong>str</strong> : str headers to parse</p>
-
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">parseAcceptHeader</span> = <span class="hljs-params">(str)</span>-&gt;</span>
-  index = <span class="hljs-number">0</span>
+            <div class="content"><div class='highlight'><pre>Redis = <span class="hljs-built_in">require</span>(<span class="hljs-string">"redis"</span>)
 
-  str.split(<span class="hljs-regexp">/,\s+/</span>).map(<span class="hljs-function"><span class="hljs-params">(accept_str)</span>-&gt;</span>
-    parts = accept_str.split(<span class="hljs-regexp">/;\s+/</span>)
-    [type, subtype] = parts.shift().split(<span class="hljs-string">'/'</span>)
-    params = {
-      <span class="hljs-attribute">q</span>: <span class="hljs-number">1.0</span>
-    }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-3">&#182;</a>
-              </div>
-              <p>RFC is unclear about level param so don’t treat that specially
-<a href="http://stackoverflow.com/questions/13890996/http-accept-level">http://stackoverflow.com/questions/13890996/http-accept-level</a>
-<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html">http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html</a></p>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MemoryInitStore</span> </span>
+  constructor : <span class="hljs-function"><span class="hljs-params">(config)</span>-&gt;</span>
+    <span class="hljs-property">@client</span> = Redis.createClient(config)
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">for</span> param <span class="hljs-keyword">in</span> parts
-      [name, val] = param.split(<span class="hljs-string">'='</span>)
-      <span class="hljs-keyword">if</span> (name <span class="hljs-keyword">is</span> <span class="hljs-string">'q'</span>)
-        val = parseFloat(val)
-      params[name] = val
-    
-    {
-      index   : index++
-      type    : type
-      subtype : subtype
-      params  : params
-    }      
-  ).sort(<span class="hljs-function"><span class="hljs-params">(a, b)</span>-&gt;</span>
-    <span class="hljs-keyword">if</span> (a.params.q <span class="hljs-keyword">is</span> b.params.q) 
-      a.index - b.index
-    <span class="hljs-keyword">else</span>
-      b.params.q - a.params.q
-  )
+  set : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    {key, value, callback} = args
+    <span class="hljs-property">@client</span>.set(key, value, callback)
 
-<span class="hljs-built_in">module</span>.exports = parseAcceptHeader</pre></div></div>
+  get : <span class="hljs-function"><span class="hljs-params">(args)</span>-&gt;</span>
+    {key, callback} = args
+    <span class="hljs-property">@client</span>.get(key, <span class="hljs-function"><span class="hljs-params">(error, value)</span>-&gt;</span>
+      <span class="hljs-keyword">unless</span> error 
+        <span class="hljs-property">@client</span>.del(key)
+      callback(error, value)
+    )
+
+<span class="hljs-built_in">module</span>.exports = MemoryInitStore</pre></div></div>
             
         </li>
         
