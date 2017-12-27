@@ -1,15 +1,15 @@
 # NPM dependencies
 # ------------------
-# [jquery](https://github.com/jquery/jquery)  
-# [diso.router](https://github.com/disoio/diso.router)    
+# [jquery](https://github.com/jquery/jquery)
+# [diso.router](https://github.com/disoio/diso.router)
 $      = require('jquery')
 Router = require('diso.router')
 
 # Local dependencies
-# ------------------ 
-# [Mediator](./Mediator.html)  
-# [PageMap](./PageMap.html)  
-# [Strings](./Strings.html)  
+# ------------------
+# [Mediator](./Mediator.html)
+# [PageMap](./PageMap.html)
+# [Strings](./Strings.html)
 Mediator = require('../Shared/Mediator')
 PageMap  = require('../Shared/PageMap')
 Strings  = require('../Shared/Strings')
@@ -20,7 +20,7 @@ clientError = (error)->
 # ClientContainer
 # ===============
 # Used by the client to sync the initial serverside render
-# with the clientside page, perform navigation between and 
+# with the clientside page, perform navigation between and
 # within pages via HTML5 history api
 class ClientContainer
 
@@ -38,7 +38,7 @@ class ClientContainer
       @_$body = $('body')
 
     @_$body
-  
+
   # pageKey
   # -------
   pageKey : ()->
@@ -51,15 +51,15 @@ class ClientContainer
 
   # setup
   # -----
-  # The initializeReply contains two pieces of data that the client 
+  # The initializeReply contains two pieces of data that the client
   # needs: initial_data used to render the page on the server, and an
-  # id_map of views that make up the page. The client looks up the name 
+  # id_map of views that make up the page. The client looks up the name
   # of the page via the "data-page" body attribute, and then instantiates
-  # the page of that name with initial_data and id_map. The page syncs 
+  # the page of that name with initial_data and id_map. The page syncs
   # with the dom and handles user interaction, delegating to Mediator.send
   # to relay messages to/from the server via this client's send method
   #
-  # **init_data** : ... 
+  # **init_data** : ...
   setup : (init_data)->
     # use the page map to retrieve page for this location
     @_page = @_page_map.lookup(
@@ -77,7 +77,7 @@ class ClientContainer
 
     is_loading = @isLoading()
 
-    # if loading temporarily set body to loading 
+    # if loading temporarily set body to loading
     # view before sync. it will get reset by the
     # call to page.build after sync. otherwise
     # call build to setup the existing, already
@@ -89,9 +89,9 @@ class ClientContainer
 
     id_map = init_data[Strings.ID_MAP]
     @_sync(id_map)
-    
-    # if the page was loading, then we need to 
-    # rerender it with the data we just pulled 
+
+    # if the page was loading, then we need to
+    # rerender it with the data we just pulled
     # down in initializeReply
     if is_loading
       page = @_page
@@ -109,7 +109,7 @@ class ClientContainer
   # goto
   # ----
   # Make a transition between pages
-  # 
+  #
   # **route** : the route for new page
   goto : (args)=>
     route = args.route
@@ -133,21 +133,21 @@ class ClientContainer
 
   # _sync
   # -----
-  # This method uses the data sent in the initializeReply message to 
-  # create a page and sync it with the server-rendered html that is 
-  # in the current dom. 
-  # 
-  # A page is created using the window's location and then passed the 
-  # data that was sent down in the initializeReply. The id_map in that 
-  # message used to traverse the dom of and attach the view objects 
-  # created in the client to their associated containers, and update 
-  # their ids to match those sent in the id_map (which are the ids 
+  # This method uses the data sent in the initializeReply message to
+  # create a page and sync it with the server-rendered html that is
+  # in the current dom.
+  #
+  # A page is created using the window's location and then passed the
+  # data that was sent down in the initializeReply. The id_map in that
+  # message used to traverse the dom of and attach the view objects
+  # created in the client to their associated containers, and update
+  # their ids to match those sent in the id_map (which are the ids
   # that are present in the dom)
-  # 
+  #
   # **id_map** : the id map used for syncing this page and its views
   #              with the existing dom
   _sync : (id_map)->
-    # used to traverse the view hierarchy and sync each 
+    # used to traverse the view hierarchy and sync each
     # element of the view with id_map passed via the initalizeReply
     _syncView = (args)->
       id   = args.id
@@ -174,7 +174,7 @@ class ClientContainer
 
         temp_subid = temp_subids[i]
         subview    = subviews[temp_subid]
-        
+
         _syncView(
           id   : subid
           map  : submap
@@ -202,9 +202,9 @@ class ClientContainer
 
       new_page.setData(data)
       new_page.buildAndSetBody()
-    
+
       @_page.remove()
-    
+
       $body = @$body()
       $body.html(new_page.html())
       $body.attr(Strings.PAGE_KEY_ATTR_NAME, new_page.key())
@@ -224,30 +224,30 @@ class ClientContainer
   # _initializeHistory
   # ------------------
   # Initialize the html5 history api. Using the browser api rather 
-  # than adapter and falling back to full page loads if it isn't 
+  # than adapter and falling back to full page loads if it isn't
   # support
   # http://diveintohtml5.info/history.html
   _initializeHistory : ()->
     if @_supportsHistory()
       $(window).on('popstate', @_onPopState)
-        
+
   # _supportsHistory
   # ----------------
   # returns true if the user's browser supports HTML5 history
   # http://caniuse.com/#search=history
   _supportsHistory : ()->
     !!(window.history?.pushState)
-  
+
   # _onPopState
   # -----------
-  # called when user presses back button  
+  # called when user presses back button
   _onPopState : (event)=>
     if @_has_changed_page
       new_page = @_page_map.lookup(
         location  : window.location
         user      : Mediator.user()
       )
-      
+
       @_changePage(
         page : new_page
         push : false
